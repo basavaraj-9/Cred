@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Static Dashboard Removal</title>
+</head>
+<body>
+    <h1>Test Static Dashboard Removal</h1>
+    <button onclick="testDashboard()">Test Dashboard Route</button>
+    <button onclick="testStaticRoute()">Test Static Route (Should Fail)</button>
+    <div id="results"></div>
+    
+    <script>
+        async function testDashboard() {
+            try {
+                const response = await fetch('http://localhost:3000/dashboard');
+                const text = await response.text();
+                document.getElementById('results').innerHTML = 
+                    '<h3>Dashboard Route Test:</h3><pre style="background: #e0f0e0; padding: 10px;">SUCCESS - Dashboard loads</pre>';
+                console.log('Dashboard route works');
+            } catch (error) {
+                document.getElementById('results').innerHTML = 
+                    '<h3>Dashboard Route Test:</h3><pre style="background: #ffe0e0; padding: 10px;">ERROR: ' + error.message + '</pre>';
+            }
+        }
+        
+        async function testStaticRoute() {
+            try {
+                // This should fail since Static Dashboard is removed
+                const response = await fetch('http://localhost:3000/static-dashboard');
+                const text = await response.text();
+                document.getElementById('results').innerHTML += 
+                    '<h3>Static Route Test:</h3><pre style="background: #ffe0e0; padding: 10px;">UNEXPECTED: Static route still works</pre>';
+            } catch (error) {
+                document.getElementById('results').innerHTML += 
+                    '<h3>Static Route Test:</h3><pre style="background: #e0f0e0; padding: 10px;">EXPECTED: Static route fails (404)</pre>';
+                console.log('Static route correctly fails');
+            }
+        }
+    </script>
+</body>
+</html>

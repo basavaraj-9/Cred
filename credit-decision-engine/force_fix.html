@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Fix Static Dashboard</title>
+</head>
+<body>
+    <h1>Force Fix Static Dashboard</h1>
+    <button onclick="forceLoadData()">Force Load Data</button>
+    <button onclick="checkData()">Check Data</button>
+    <button onclick="goToStatic()">Go to Static Dashboard</button>
+    
+    <script>
+        function forceLoadData() {
+            // Force the exact data structure that should work
+            const testData = {
+                "company": "Test Company",
+                "industry": "Technology", 
+                "revenue": 5.3,
+                "file_name": "test_document.pdf",
+                "is_multi_company": false,
+                "ai_analysis": {
+                    "risk_analysis": {
+                        "risk_score": 65,
+                        "risk_category": "MEDIUM"
+                    },
+                    "decision_result": {
+                        "decision": "CONDITIONALLY_APPROVED",
+                        "confidence_score": 0.92
+                    },
+                    "loan_analysis": {
+                        "approved_loan_amount": 17403066,
+                        "interest_rate": 11.8,
+                        "recommended_tenure": 41
+                    },
+                    "risk_factors": [
+                        {
+                            "factor": "Market Volatility",
+                            "description": "Industry risk level: 6.5/10",
+                            "severity": "medium"
+                        }
+                    ]
+                },
+                "financial_metrics": {
+                    "annual_revenue": 52736565,
+                    "monthly_revenue": 4394713.75,
+                    "monthly_profit": 637233.49375,
+                    "total_liabilities": 19248846.224999998,
+                    "equity": 35069815.725
+                },
+                "upload_timestamp": "2026-03-16T17:56:19Z"
+            };
+            
+            // Force set the data
+            localStorage.setItem('companyData', JSON.stringify(testData));
+            
+            // Verify it was set
+            const stored = localStorage.getItem('companyData');
+            const parsed = JSON.parse(stored);
+            
+            console.log('Forced data stored:', parsed);
+            console.log('Annual revenue check:', parsed.financial_metrics.annual_revenue);
+            console.log('Liabilities check:', parsed.financial_metrics.total_liabilities);
+            console.log('Loan amount check:', parsed.ai_analysis.loan_analysis.approved_loan_amount);
+            
+            alert('Data forced! Check console and go to Static Dashboard.');
+        }
+        
+        function checkData() {
+            const data = localStorage.getItem('companyData');
+            if (data) {
+                const parsed = JSON.parse(data);
+                console.log('Current stored data:', parsed);
+                alert('Data found! Check console for details.');
+            } else {
+                alert('No data found in localStorage!');
+            }
+        }
+        
+        function goToStatic() {
+            window.location.href = 'http://localhost:3000/dashboard';
+        }
+    </script>
+</body>
+</html>

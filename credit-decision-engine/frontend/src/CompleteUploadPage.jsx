@@ -15,32 +15,94 @@ const CompleteUploadPage = () => {
   }, []);
 
   const generateMockData = (uploadedFiles) => {
-    const companies = uploadedFiles.map((file, index) => ({
-      unique_hash: `company_${index}_${Date.now()}`,
-      company: `Company ${index + 1}`,
-      industry: ['Technology', 'Manufacturing', 'Healthcare', 'Finance', 'Retail'][index % 5],
-      revenue: `${(Math.random() * 900 + 100).toFixed(1)}M`,
-      employees: Math.floor(Math.random() * 10000 + 100),
-      founded: Math.floor(Math.random() * 50 + 1970),
-      ai_analysis: {
-        risk_analysis: {
-          risk_score: Math.floor(Math.random() * 40 + 30),
-          risk_category: ['LOW', 'MEDIUM', 'HIGH'][Math.floor(Math.random() * 3)],
-          factors: {
-            financial_health: Math.floor(Math.random() * 40 + 60),
-            market_position: Math.floor(Math.random() * 30 + 70),
-            operational_efficiency: Math.floor(Math.random() * 20 + 80),
-            debt_ratio: (Math.random() * 0.6 + 0.1).toFixed(2)
-          }
+    const companies = uploadedFiles.map((file, index) => {
+      // Generate realistic financial data
+      const annualRevenue = Math.random() * 900 + 100; // 100M to 1000M
+      const monthlyRevenue = annualRevenue / 12;
+      const totalAssets = annualRevenue * (Math.random() * 2 + 1); // 1x to 3x revenue
+      const currentLiabilities = totalAssets * (Math.random() * 0.4 + 0.1); // 10% to 50% of assets
+      const longTermDebt = totalAssets * (Math.random() * 0.3 + 0.05); // 5% to 35% of assets
+      const totalLiabilities = currentLiabilities + longTermDebt;
+      const equity = totalAssets - totalLiabilities;
+      const monthlyExpenses = monthlyRevenue * (Math.random() * 0.6 + 0.4); // 40% to 100% of revenue
+      const monthlyProfit = monthlyRevenue - monthlyExpenses;
+      const cashFlow = monthlyProfit + (longTermDebt * 0.05 / 12); // Add interest portion
+      
+      // Calculate loan affordability (28% debt-to-income ratio rule)
+      const maxMonthlyPayment = monthlyRevenue * 0.28;
+      const interestRate = 0.08 + Math.random() * 0.04; // 8% to 12%
+      const loanTermMonths = 60; // 5 years
+      const maxLoanAmount = calculateMaxLoanAmount(maxMonthlyPayment, interestRate / 12, loanTermMonths);
+      
+      // Risk assessment based on comprehensive factors
+      const debtToEquityRatio = totalLiabilities / equity;
+      const currentRatio = totalAssets / currentLiabilities;
+      const profitMargin = monthlyProfit / monthlyRevenue;
+      const cashFlowCoverage = cashFlow / (maxMonthlyPayment * 0.3); // Assuming 30% of max payment for existing debts
+      
+      const riskScore = calculateRiskScore(debtToEquityRatio, currentRatio, profitMargin, cashFlowCoverage);
+      const riskCategory = riskScore < 40 ? 'LOW' : riskScore < 70 ? 'MEDIUM' : 'HIGH';
+      
+      return {
+        unique_hash: `company_${index}_${Date.now()}`,
+        company: `Company ${index + 1}`,
+        industry: ['Technology', 'Manufacturing', 'Healthcare', 'Finance', 'Retail'][index % 5],
+        revenue: `${annualRevenue.toFixed(1)}M`,
+        employees: Math.floor(Math.random() * 10000 + 100),
+        founded: Math.floor(Math.random() * 50 + 1970),
+        financial_metrics: {
+          total_assets: `${totalAssets.toFixed(1)}M`,
+          current_liabilities: `${currentLiabilities.toFixed(1)}M`,
+          long_term_debt: `${longTermDebt.toFixed(1)}M`,
+          total_liabilities: `${totalLiabilities.toFixed(1)}M`,
+          equity: `${equity.toFixed(1)}M`,
+          monthly_revenue: `${monthlyRevenue.toFixed(1)}M`,
+          monthly_expenses: `${monthlyExpenses.toFixed(1)}M`,
+          monthly_profit: `${monthlyProfit.toFixed(1)}M`,
+          cash_flow: `${cashFlow.toFixed(1)}M`,
+          debt_to_equity_ratio: debtToEquityRatio.toFixed(2),
+          current_ratio: currentRatio.toFixed(2),
+          profit_margin: `${(profitMargin * 100).toFixed(1)}%`
         },
-        decision_result: {
-          decision: ['APPROVE', 'REVIEW', 'DECLINE'][Math.floor(Math.random() * 3)],
-          confidence: Math.floor(Math.random() * 25 + 75),
-          recommended_amount: `${(Math.random() * 900 + 100).toFixed(1)}M`,
-          reasoning: `Based on comprehensive financial analysis and risk assessment`
+        loan_affordability: {
+          max_monthly_payment: `${maxMonthlyPayment.toFixed(1)}M`,
+          max_loan_amount: `${maxLoanAmount.toFixed(1)}M`,
+          interest_rate: `${(interestRate * 100).toFixed(1)}%`,
+          loan_term_months: loanTermMonths,
+          debt_to_income_ratio: '28%',
+          affordability_score: calculateAffordabilityScore(cashFlow, maxMonthlyPayment)
+        },
+        liabilities_breakdown: {
+          accounts_payable: `${(currentLiabilities * 0.4).toFixed(1)}M`,
+          short_term_debt: `${(currentLiabilities * 0.3).toFixed(1)}M`,
+          accrued_expenses: `${(currentLiabilities * 0.2).toFixed(1)}M`,
+          other_current_liabilities: `${(currentLiabilities * 0.1).toFixed(1)}M`,
+          long_term_bank_loans: `${(longTermDebt * 0.6).toFixed(1)}M`,
+          bonds_payable: `${(longTermDebt * 0.3).toFixed(1)}M`,
+          other_long_term_debt: `${(longTermDebt * 0.1).toFixed(1)}M`
+        },
+        ai_analysis: {
+          risk_analysis: {
+            risk_score: riskScore,
+            risk_category: riskCategory,
+            factors: {
+              financial_health: Math.floor(Math.random() * 40 + 60),
+              market_position: Math.floor(Math.random() * 30 + 70),
+              operational_efficiency: Math.floor(Math.random() * 20 + 80),
+              debt_ratio: Math.floor(debtToEquityRatio * 100),
+              cash_flow_adequacy: Math.floor(cashFlowCoverage * 100),
+              profitability: Math.floor(profitMargin * 100)
+            }
+          },
+          decision_result: {
+            decision: riskScore < 50 ? 'APPROVE' : riskScore < 75 ? 'REVIEW' : 'DECLINE',
+            confidence: Math.floor(Math.random() * 25 + 75),
+            recommended_amount: `${Math.min(maxLoanAmount * 0.8, annualRevenue * 0.5).toFixed(1)}M`,
+            reasoning: generateReasoning(riskScore, debtToEquityRatio, currentRatio, profitMargin, cashFlowCoverage)
+          }
         }
-      }
-    }));
+      };
+    });
 
     return {
       is_multi_company: uploadedFiles.length > 1,
@@ -48,6 +110,66 @@ const CompleteUploadPage = () => {
       uploaded_files: uploadedFiles.map(f => f.name),
       analysis_timestamp: new Date().toISOString()
     };
+  };
+
+  const calculateMaxLoanAmount = (monthlyPayment, monthlyRate, months) => {
+    if (monthlyRate === 0) return monthlyPayment * months;
+    return monthlyPayment * (1 - Math.pow(1 + monthlyRate, -months)) / monthlyRate;
+  };
+
+  const calculateRiskScore = (debtToEquity, currentRatio, profitMargin, cashFlowCoverage) => {
+    let score = 50; // Base score
+    
+    // Debt-to-equity factor (lower is better)
+    if (debtToEquity < 0.5) score -= 20;
+    else if (debtToEquity < 1) score -= 10;
+    else if (debtToEquity < 2) score += 10;
+    else score += 20;
+    
+    // Current ratio factor (higher is better)
+    if (currentRatio > 2) score -= 15;
+    else if (currentRatio > 1.5) score -= 5;
+    else if (currentRatio < 1) score += 15;
+    
+    // Profit margin factor (higher is better)
+    if (profitMargin > 0.2) score -= 15;
+    else if (profitMargin > 0.1) score -= 5;
+    else if (profitMargin < 0) score += 20;
+    
+    // Cash flow coverage factor (higher is better)
+    if (cashFlowCoverage > 3) score -= 20;
+    else if (cashFlowCoverage > 2) score -= 10;
+    else if (cashFlowCoverage < 1) score += 25;
+    
+    return Math.max(0, Math.min(100, score));
+  };
+
+  const calculateAffordabilityScore = (cashFlow, maxPayment) => {
+    const ratio = cashFlow / maxPayment;
+    if (ratio > 2) return 95;
+    if (ratio > 1.5) return 85;
+    if (ratio > 1) return 75;
+    if (ratio > 0.8) return 65;
+    if (ratio > 0.6) return 55;
+    return 45;
+  };
+
+  const generateReasoning = (riskScore, debtToEquity, currentRatio, profitMargin, cashFlowCoverage) => {
+    const factors = [];
+    
+    if (debtToEquity < 1) factors.push("strong equity position");
+    else if (debtToEquity > 2) factors.push("high leverage ratio");
+    
+    if (currentRatio > 2) factors.push("excellent liquidity");
+    else if (currentRatio < 1) factors.push("concerning liquidity");
+    
+    if (profitMargin > 0.15) factors.push("strong profitability");
+    else if (profitMargin < 0) factors.push("negative profitability");
+    
+    if (cashFlowCoverage > 2) factors.push("robust cash flow");
+    else if (cashFlowCoverage < 1) factors.push("insufficient cash flow coverage");
+    
+    return `Analysis indicates ${factors.join(", ")}. Risk assessment based on comprehensive financial metrics including debt ratios, liquidity, profitability, and cash flow adequacy.`;
   };
 
   const handleFileSelect = (e) => {
@@ -359,6 +481,75 @@ const CompleteUploadPage = () => {
                           {file.size}
                         </p>
                       </div>
+                    <div style={{ display: 'flex', gap: '16px', marginTop: '24px' }}>
+                      <button
+                        onClick={() => navigate('/dashboard')}
+                        style={{
+                          background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '12px',
+                          padding: '16px 32px',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 4px 6px rgba(59, 130, 246, 0.2)'
+                        }}
+                      >
+                        📊 View Static Dashboard
+                      </button>
+                      <button
+                        onClick={() => navigate('/dynamic-dashboard')}
+                        style={{
+                          background: 'linear-gradient(135deg, #10b981, #059669)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '12px',
+                          padding: '16px 32px',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 4px 6px rgba(16, 185, 129, 0.2)'
+                        }}
+                      >
+                        🚀 View Dynamic Dashboard
+                      </button>
+                      <button
+                        onClick={() => navigate('/research')}
+                        style={{
+                          background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '12px',
+                          padding: '16px 32px',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 4px 6px rgba(139, 92, 246, 0.2)'
+                        }}
+                      >
+                        🔍 Research Insights
+                      </button>
+                      <button
+                        onClick={() => navigate('/cam-preview')}
+                        style={{
+                          background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '12px',
+                          padding: '16px 32px',
+                          cursor: 'pointer',
+                          fontSize: '16px',
+                          fontWeight: '600',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 4px 6px rgba(6, 182, 212, 0.2)'
+                        }}
+                      >
+                        📄 CAM Preview
+                      </button>
                     </div>
                     <button
                       onClick={() => removeFile(file.id)}
@@ -374,8 +565,6 @@ const CompleteUploadPage = () => {
                         transition: 'all 0.3s ease',
                         boxShadow: '0 4px 6px rgba(239, 68, 68, 0.2)'
                       }}
-                      onMouseOver={(e) => e.target.style.backgroundColor = '#dc2626'}
-                      onMouseOut={(e) => e.target.style.backgroundColor = '#ef4444'}
                     >
                       Remove
                     </button>
@@ -383,36 +572,14 @@ const CompleteUploadPage = () => {
                 ))}
               </div>
             </div>
+          </div>
+          </div>
           )}
-
-          {/* Enhanced Upload Button */}
-          <button
-            onClick={handleUpload}
-            disabled={files.length === 0 || uploading}
-            style={{
-              background: files.length === 0 || uploading 
-                ? 'linear-gradient(135deg, #94a3b8, #64748b)' 
-                : 'linear-gradient(135deg, #1e40af, #0f766e)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '16px',
-              padding: '18px 36px',
-              fontSize: '18px',
-              fontWeight: 'bold',
-              cursor: files.length === 0 || uploading ? 'not-allowed' : 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: files.length === 0 || uploading 
-                ? '0 4px 6px rgba(0, 0, 0, 0.1)' 
-                : '0 10px 25px rgba(30, 64, 175, 0.4), 0 4px 6px rgba(0, 0, 0, 0.1)',
-              opacity: files.length === 0 || uploading ? 0.7 : 1,
-              animation: 'fadeIn 0.8s ease-out',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            {uploading ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div style={{
+          </div>
+        </div>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
                   width: '20px',
                   height: '20px',
                   border: '2px solid white',

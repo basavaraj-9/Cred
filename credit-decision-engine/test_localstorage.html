@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test LocalStorage</title>
+</head>
+<body>
+    <h1>Testing LocalStorage Data</h1>
+    <button onclick="loadTestData()">Load Test Data</button>
+    <button onclick="viewData()">View Stored Data</button>
+    <button onclick="goToDashboard()">Go to Dashboard</button>
+    
+    <script>
+        function loadTestData() {
+            const testData = {
+                "company": "Test Company",
+                "industry": "Technology",
+                "revenue": 5.3,
+                "file_name": "test_document.pdf",
+                "is_multi_company": false,
+                "ai_analysis": {
+                    "risk_analysis": {
+                        "risk_score": 65,
+                        "risk_category": "MEDIUM"
+                    },
+                    "decision_result": {
+                        "decision": "CONDITIONALLY_APPROVED",
+                        "confidence_score": 0.92
+                    },
+                    "loan_analysis": {
+                        "approved_loan_amount": 17403066,
+                        "interest_rate": 11.8,
+                        "recommended_tenure": 41
+                    },
+                    "risk_factors": [
+                        {
+                            "factor": "Market Volatility",
+                            "description": "Industry risk level: 6.5/10",
+                            "severity": "medium"
+                        }
+                    ]
+                },
+                "financial_metrics": {
+                    "annual_revenue": 52736565,
+                    "monthly_revenue": 4394713.75,
+                    "monthly_profit": 637233.49375,
+                    "total_liabilities": 19248846.224999998,
+                    "equity": 35069815.725
+                },
+                "upload_timestamp": "2026-03-16T17:56:19Z"
+            };
+            
+            localStorage.setItem('companyData', JSON.stringify(testData));
+            alert('Test data loaded into localStorage!');
+            console.log('Test data loaded:', testData);
+        }
+        
+        function viewData() {
+            const data = localStorage.getItem('companyData');
+            if (data) {
+                console.log('Stored data:', JSON.parse(data));
+                alert('Data loaded in console. Check F12 > Console.');
+            } else {
+                alert('No data found in localStorage');
+            }
+        }
+        
+        function goToDashboard() {
+            window.location.href = 'http://localhost:3000/dashboard';
+        }
+    </script>
+</body>
+</html>

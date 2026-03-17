@@ -3,7 +3,7 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import Dict, Any
 import os
-from cam_generator.cam_template import CAMGenerator
+from services.cam_generator import CAMGenerator
 
 router = APIRouter()
 

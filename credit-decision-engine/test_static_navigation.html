@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Static Dashboard Navigation</title>
+</head>
+<body>
+    <h1>Test Static Dashboard Navigation</h1>
+    <button onclick="loadDataAndNavigate()">Load Data & Go to Static Dashboard</button>
+    <button onclick="goDirectly()">Go Directly to Static Dashboard</button>
+    <button onclick="checkData()">Check Current Data</button>
+    
+    <script>
+        async function loadDataAndNavigate() {
+            try {
+                // Get fresh data from backend
+                const response = await fetch('http://localhost:8000/test-data');
+                const result = await response.json();
+                
+                console.log('=== LOADING DATA FOR STATIC DASHBOARD ===');
+                console.log('Backend response:', result);
+                console.log('Company data:', result.data);
+                console.log('Financial metrics:', result.data.financial_metrics);
+                console.log('==========================================');
+                
+                // Store the data exactly as backend provides
+                localStorage.setItem('companyData', JSON.stringify(result.data));
+                
+                alert('Data loaded! Now navigating to Static Dashboard...');
+                
+                // Navigate to Static Dashboard
+                window.location.href = 'http://localhost:3000/dashboard';
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading data: ' + error.message);
+            }
+        }
+        
+        function goDirectly() {
+            console.log('=== NAVIGATING DIRECTLY TO STATIC DASHBOARD ===');
+            window.location.href = 'http://localhost:3000/dashboard';
+        }
+        
+        function checkData() {
+            const data = localStorage.getItem('companyData');
+            if (data) {
+                const parsed = JSON.parse(data);
+                console.log('=== CURRENT LOCALSTORAGE DATA ===');
+                console.log('Company name:', parsed.company);
+                console.log('Industry:', parsed.industry);
+                console.log('Financial metrics:', parsed.financial_metrics);
+                console.log('Annual revenue:', parsed.financial_metrics?.annual_revenue);
+                console.log('Total liabilities:', parsed.financial_metrics?.total_liabilities);
+                console.log('Loan amount:', parsed.ai_analysis?.loan_analysis?.approved_loan_amount);
+                console.log('===============================');
+            } else {
+                console.log('No data in localStorage!');
+            }
+        }
+    </script>
+</body>
+</html>

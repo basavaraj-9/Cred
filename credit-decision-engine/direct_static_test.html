@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Direct Static Dashboard Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; font-size: 16px; cursor: pointer; }
+        .debug { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Direct Static Dashboard Test</h1>
+    
+    <div class="debug">
+        <h3>Step 1: Load Data</h3>
+        <button onclick="loadData()">Load Backend Data</button>
+        <div id="dataStatus"></div>
+    </div>
+    
+    <div class="debug">
+        <h3>Step 2: Navigate to Static Dashboard</h3>
+        <button onclick="goToStatic()">Go to Static Dashboard (http://localhost:3000/dashboard)</button>
+        <p><strong>IMPORTANT:</strong> After clicking this button, look at the browser console (F12) for "Static Dashboard" messages!</p>
+    </div>
+    
+    <div class="debug">
+        <h3>Step 3: Check Data</h3>
+        <button onclick="checkData()">Check Current localStorage Data</button>
+        <div id="dataDisplay"></div>
+    </div>
+    
+    <script>
+        async function loadData() {
+            try {
+                const response = await fetch('http://localhost:8000/test-data');
+                const result = await response.json();
+                
+                console.log('=== LOADING DATA ===');
+                console.log('Backend data:', result.data);
+                
+                localStorage.setItem('companyData', JSON.stringify(result.data));
+                
+                document.getElementById('dataStatus').innerHTML = 
+                    '<strong style="color: green;">✅ Data loaded successfully!</strong><br>' +
+                    'Company: ' + result.data.company + '<br>' +
+                    'Revenue: ₹' + (result.data.financial_metrics.annual_revenue / 10000000).toFixed(1) + 'Cr<br>' +
+                    'Liabilities: ₹' + (result.data.financial_metrics.total_liabilities / 10000000).toFixed(1) + 'Cr<br>' +
+                    'Loan: ₹' + (result.data.ai_analysis.loan_analysis.approved_loan_amount / 10000000).toFixed(1) + 'Cr';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('dataStatus').innerHTML = 
+                    '<strong style="color: red;">❌ Error: ' + error.message + '</strong>';
+            }
+        }
+        
+        function goToStatic() {
+            console.log('=== NAVIGATING TO STATIC DASHBOARD ===');
+            console.log('Look for console messages starting with "Static Dashboard:"');
+            window.location.href = 'http://localhost:3000/dashboard';
+        }
+        
+        function checkData() {
+            const data = localStorage.getItem('companyData');
+            if (data) {
+                const parsed = JSON.parse(data);
+                const display = 
+                    '<strong>Company:</strong> ' + parsed.company + '<br>' +
+                    '<strong>Industry:</strong> ' + parsed.industry + '<br>' +
+                    '<strong>Annual Revenue:</strong> ₹' + (parsed.financial_metrics.annual_revenue / 10000000).toFixed(1) + 'Cr<br>' +
+                    '<strong>Total Liabilities:</strong> ₹' + (parsed.financial_metrics.total_liabilities / 10000000).toFixed(1) + 'Cr<br>' +
+                    '<strong>Loan Amount:</strong> ₹' + (parsed.ai_analysis.loan_analysis.approved_loan_amount / 10000000).toFixed(1) + 'Cr<br>' +
+                    '<strong>Risk Score:</strong> ' + parsed.ai_analysis.risk_analysis.risk_score;
+                
+                document.getElementById('dataDisplay').innerHTML = display;
+                console.log('=== CURRENT DATA ===');
+                console.log(parsed);
+            } else {
+                document.getElementById('dataDisplay').innerHTML = '<strong style="color: red;">No data found!</strong>';
+            }
+        }
+    </script>
+</body>
+</html>

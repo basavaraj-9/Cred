@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Static Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        .big-button { 
+            background: #3b82f6; 
+            color: white; 
+            padding: 20px 40px; 
+            font-size: 20px; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            margin: 20px;
+            display: block;
+            width: 300px;
+        }
+        .big-button:hover { background: #2563eb; }
+        .warning { background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px; border: 2px solid #f59e0b; }
+    </style>
+</head>
+<body>
+    <h1>🎯 STATIC DASHBOARD TEST</h1>
+    
+    <div class="warning">
+        <h3>⚠️ IMPORTANT INSTRUCTIONS:</h3>
+        <ol style="text-align: left;">
+            <li>Open Browser Console (F12) NOW</li>
+            <li>Keep Console Visible</li>
+            <li>Click the button below</li>
+            <li>Watch for "Static Dashboard:" messages in Console</li>
+            <li>Look for "STATIC DASHBOARD DEBUG INFO" on the page</li>
+        </ol>
+    </div>
+    
+    <button class="big-button" onclick="forceNavigate()">
+        🚀 FORCE NAVIGATE TO STATIC DASHBOARD
+    </button>
+    
+    <div class="warning">
+        <h3>📊 What You Should See:</h3>
+        <ul style="text-align: left;">
+            <li><strong>Console:</strong> "Static Dashboard: Loading data from localStorage..."</li>
+            <li><strong>Console:</strong> "Static Dashboard - Company data: {...}"</li>
+            <li><strong>Console:</strong> "Direct values - Revenue: 54606917, Liabilities: 17310392, Loan: ..."</li>
+            <li><strong>Page:</strong> Yellow "STATIC DASHBOARD DEBUG INFO" section</li>
+            <li><strong>Page:</strong> Annual Revenue: ₹5.5Cr, Total Liabilities: ₹1.7Cr, etc.</li>
+        </ul>
+    </div>
+    
+    <script>
+        function forceNavigate() {
+            console.log('=== FORCING NAVIGATION TO STATIC DASHBOARD ===');
+            console.log('👀 WATCH THE CONSOLE FOR "Static Dashboard:" MESSAGES!');
+            console.log('👀 LOOK FOR YELLOW DEBUG INFO SECTION ON THE PAGE!');
+            
+            // Navigate to Static Dashboard
+            window.location.href = 'http://localhost:3000/dashboard';
+        }
+        
+        // Auto-check data on page load
+        window.onload = function() {
+            const data = localStorage.getItem('companyData');
+            if (data) {
+                const parsed = JSON.parse(data);
+                console.log('=== CURRENT DATA IN LOCALSTORAGE ===');
+                console.log('Company:', parsed.company);
+                console.log('Financial Metrics:', parsed.financial_metrics);
+                console.log('Annual Revenue:', parsed.financial_metrics?.annual_revenue);
+                console.log('Total Liabilities:', parsed.financial_metrics?.total_liabilities);
+                console.log('Loan Amount:', parsed.ai_analysis?.loan_analysis?.approved_loan_amount);
+                console.log('====================================');
+            } else {
+                console.log('❌ No data found in localStorage!');
+            }
+        };
+    </script>
+</body>
+</html>

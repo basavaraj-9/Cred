@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 import uvicorn
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import os
 
 from routes.upload import router as upload_router
@@ -23,6 +23,215 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.post("/upload")
+async def simple_upload(files: List[UploadFile] = File(...)):
+    """Simple upload endpoint that returns dynamic mock data"""
+    try:
+        import hashlib
+        import time
+        
+        # Generate dynamic data based on timestamp
+        timestamp = str(int(time.time()))
+        hash_seed = int(hashlib.md5(timestamp.encode()).hexdigest()[:8], 16)
+        
+        # Get actual filename from uploaded file
+        actual_filename = files[0].filename if files else "document.pdf"
+        
+        # Extract company name from filename (remove extension and clean up)
+        company_name = actual_filename
+        if '.' in company_name:
+            company_name = company_name.rsplit('.', 1)[0]  # Remove extension
+        company_name = company_name.replace('_', ' ').replace('-', ' ')  # Replace separators with spaces
+        company_name = company_name.title()  # Capitalize words
+        
+        # If filename is too generic, use a meaningful name
+        if len(company_name) < 3 or company_name.lower() in ['document', 'file', 'pdf']:
+            company_name = f"Company {hash_seed % 1000}"
+        
+        # Dynamic financial calculations
+        base_revenue = 50000000 + (hash_seed % 10000000)  # 5Cr to 15Cr
+        monthly_revenue = base_revenue / 12
+        monthly_profit = monthly_revenue * (0.08 + (hash_seed % 100) / 1000)  # 8-18% profit margin
+        total_liabilities = base_revenue * (0.3 + (hash_seed % 100) / 1000)  # 30-40% of revenue
+        equity = base_revenue * (0.6 + (hash_seed % 100) / 1000)  # 60-70% of revenue
+        
+        # Dynamic loan calculations
+        risk_score = 60 + (hash_seed % 30)  # 60-90 risk score
+        loan_multiplier = 0.2 + (risk_score / 500)  # Higher risk = higher loan multiplier
+        approved_loan_amount = int(base_revenue * loan_multiplier)
+        interest_rate = 10 + (100 - risk_score) / 20  # Lower risk = lower interest
+        
+        def fmt_m(val):
+            """Format a rupee value as 'X.XM' string."""
+            return f"{val / 1000000:.1f}M"
+
+        # Create dynamic company data
+        mock_company_data = {
+            "company": company_name,
+            "industry": ["Technology", "Manufacturing", "Healthcare", "Retail", "Finance"][hash_seed % 5],
+            # raw rupees — frontend divides by 10_000_000 to get Crores
+            "revenue": base_revenue,
+            "file_name": actual_filename,
+            "is_multi_company": False,
+            "ai_analysis": {
+                "risk_analysis": {
+                    "risk_score": risk_score,
+                    "risk_category": "LOW" if risk_score >= 80 else "MEDIUM" if risk_score >= 65 else "HIGH"
+                },
+                "decision_result": {
+                    "decision": "APPROVED" if risk_score >= 75 else "CONDITIONALLY_APPROVED" if risk_score >= 60 else "REJECTED",
+                    "confidence_score": round(0.7 + (risk_score / 300), 2)
+                },
+                "loan_analysis": {
+                    "approved_loan_amount": approved_loan_amount,
+                    "interest_rate": round(interest_rate, 1),
+                    "recommended_tenure": 36 + (hash_seed % 48)
+                },
+                "risk_factors": [
+                    {
+                        "factor": "Market Volatility",
+                        "description": f"Industry risk level: {risk_score / 10:.1f}/10",
+                        "severity": "low" if risk_score >= 80 else "medium" if risk_score >= 65 else "high"
+                    },
+                    {
+                        "factor": "Debt Service Coverage",
+                        "description": f"DSCR ratio: {monthly_profit / (approved_loan_amount / 60):.2f}",
+                        "severity": "low" if monthly_profit > approved_loan_amount / 50 else "medium"
+                    },
+                    {
+                        "factor": "Liquidity Position",
+                        "description": f"Current ratio: {(equity / total_liabilities):.2f}",
+                        "severity": "low" if equity > total_liabilities else "medium"
+                    }
+                ]
+            },
+            # financial_metrics with formatted strings expected by ModernDashboard
+            "financial_metrics": {
+                "annual_revenue": base_revenue,
+                "monthly_revenue": fmt_m(monthly_revenue),
+                "monthly_profit": fmt_m(monthly_profit),
+                "total_assets": fmt_m(base_revenue * 1.3),
+                "total_liabilities": fmt_m(total_liabilities),
+                "equity": fmt_m(equity),
+                "cash_flow": fmt_m(monthly_profit * 0.8),
+                "debt_to_equity_ratio": round(total_liabilities / equity, 2),
+                "current_ratio": round(equity / total_liabilities * 1.2, 2),
+                "profit_margin": f"{(monthly_profit / monthly_revenue) * 100:.1f}%",
+            },
+            # loan_affordability block expected by Max Loan Amount card
+            "loan_affordability": {
+                "max_loan_amount": fmt_m(approved_loan_amount),
+                "interest_rate": f"{round(interest_rate, 1)}%",
+                "loan_term_months": 36 + (hash_seed % 48),
+                "affordability_score": min(95, int(risk_score * 1.1)),
+            },
+            # liabilities_breakdown block expected by Liabilities Breakdown card
+            "liabilities_breakdown": {
+                "accounts_payable": fmt_m(total_liabilities * 0.25),
+                "short_term_debt": fmt_m(total_liabilities * 0.20),
+                "accrued_expenses": fmt_m(total_liabilities * 0.15),
+                "long_term_bank_loans": fmt_m(total_liabilities * 0.30),
+                "bonds_payable": fmt_m(total_liabilities * 0.05),
+                "other_current_liabilities": fmt_m(total_liabilities * 0.05),
+            },
+            "upload_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+        }
+        
+        return {
+            "status": "success",
+            "message": "Successfully uploaded files",
+            "data": mock_company_data
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
+
+@app.get("/test-data")
+async def get_test_data():
+    """Test endpoint to return sample data without file upload"""
+    import hashlib
+    import time
+    
+    timestamp = str(int(time.time()))
+    hash_seed = int(hashlib.md5(timestamp.encode()).hexdigest()[:8], 16)
+    
+    # Same calculations as main upload
+    base_revenue = 50000000 + (hash_seed % 10000000)
+    monthly_revenue = base_revenue / 12
+    monthly_profit = monthly_revenue * (0.08 + (hash_seed % 100) / 1000)
+    total_liabilities = base_revenue * (0.3 + (hash_seed % 100) / 1000)
+    equity = base_revenue * (0.6 + (hash_seed % 100) / 1000)
+    risk_score = 60 + (hash_seed % 30)
+    loan_multiplier = 0.2 + (risk_score / 500)
+    approved_loan_amount = int(base_revenue * loan_multiplier)
+    interest_rate = 10 + (100 - risk_score) / 20
+    
+    def fmt_m(val):
+        return f"{val / 1000000:.1f}M"
+
+    test_data = {
+        "company": "Test Company",
+        "industry": "Technology",
+        "revenue": base_revenue,
+        "file_name": "test_document.pdf",
+        "is_multi_company": False,
+        "ai_analysis": {
+            "risk_analysis": {
+                "risk_score": risk_score,
+                "risk_category": "LOW" if risk_score >= 80 else "MEDIUM" if risk_score >= 65 else "HIGH"
+            },
+            "decision_result": {
+                "decision": "APPROVED" if risk_score >= 75 else "CONDITIONALLY_APPROVED" if risk_score >= 60 else "REJECTED",
+                "confidence_score": round(0.7 + (risk_score / 300), 2)
+            },
+            "loan_analysis": {
+                "approved_loan_amount": approved_loan_amount,
+                "interest_rate": round(interest_rate, 1),
+                "recommended_tenure": 36 + (hash_seed % 48)
+            },
+            "risk_factors": [
+                {
+                    "factor": "Market Volatility",
+                    "description": f"Industry risk level: {risk_score / 10:.1f}/10",
+                    "severity": "low" if risk_score >= 80 else "medium" if risk_score >= 65 else "high"
+                }
+            ]
+        },
+        "financial_metrics": {
+            "annual_revenue": base_revenue,
+            "monthly_revenue": fmt_m(monthly_revenue),
+            "monthly_profit": fmt_m(monthly_profit),
+            "total_assets": fmt_m(base_revenue * 1.3),
+            "total_liabilities": fmt_m(total_liabilities),
+            "equity": fmt_m(equity),
+            "cash_flow": fmt_m(monthly_profit * 0.8),
+            "debt_to_equity_ratio": round(total_liabilities / equity, 2),
+            "current_ratio": round(equity / total_liabilities * 1.2, 2),
+            "profit_margin": f"{(monthly_profit / monthly_revenue) * 100:.1f}%",
+        },
+        "loan_affordability": {
+            "max_loan_amount": fmt_m(approved_loan_amount),
+            "interest_rate": f"{round(interest_rate, 1)}%",
+            "loan_term_months": 36 + (hash_seed % 48),
+            "affordability_score": min(95, int(risk_score * 1.1)),
+        },
+        "liabilities_breakdown": {
+            "accounts_payable": fmt_m(total_liabilities * 0.25),
+            "short_term_debt": fmt_m(total_liabilities * 0.20),
+            "accrued_expenses": fmt_m(total_liabilities * 0.15),
+            "long_term_bank_loans": fmt_m(total_liabilities * 0.30),
+            "bonds_payable": fmt_m(total_liabilities * 0.05),
+            "other_current_liabilities": fmt_m(total_liabilities * 0.05),
+        },
+        "upload_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    }
+    
+    return {
+        "status": "success",
+        "message": "Test data generated",
+        "data": test_data
+    }
 
 app.include_router(upload_router, prefix="/api", tags=["upload"])
 app.include_router(risk_router, prefix="/api", tags=["risk"])

@@ -10,10 +10,13 @@ const ModernDashboard = () => {
     const data = localStorage.getItem('companyData');
     if (data) {
       const parsedData = JSON.parse(data);
+      console.log('Raw data from localStorage:', parsedData);
       setCompanyData(parsedData);
       if (parsedData.is_multi_company && parsedData.companies.length > 0) {
+        console.log('Setting selected company (multi):', parsedData.companies[0]);
         setSelectedCompany(parsedData.companies[0]);
       } else {
+        console.log('Setting selected company (single):', parsedData);
         setSelectedCompany(parsedData);
       }
     } else {
@@ -55,6 +58,11 @@ const ModernDashboard = () => {
   };
 
   const company = selectedCompany;
+  console.log('Current company data:', company);
+  console.log('Loan affordability:', company?.loan_affordability);
+  console.log('Financial metrics:', company?.financial_metrics);
+  console.log('Liabilities breakdown:', company?.liabilities_breakdown);
+  console.log('Risk score:', company?.ai_analysis?.risk_analysis?.risk_score);
   const riskColors = getRiskColor(company?.ai_analysis?.risk_analysis?.risk_score || 50);
   const decisionColors = getDecisionColor(company?.ai_analysis?.decision_result?.decision || 'REVIEW REQUIRED');
 
@@ -442,6 +450,222 @@ const ModernDashboard = () => {
                 </div>
               </div>
 
+              {/* New Loan Affordability Card */}
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '20px',
+                padding: '24px',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(135deg, #10b981, #059669)'
+                }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#64748b', margin: 0 }}>
+                    Max Loan Amount
+                  </h4>
+                  <span style={{ fontSize: '24px' }}>💰</span>
+                </div>
+                <p style={{ fontSize: '28px', fontWeight: 'bold', color: '#059669', margin: '0 0 12px 0' }}>
+                  {company?.loan_affordability?.max_loan_amount || '0M'}
+                </p>
+                <div style={{ fontSize: '14px', color: '#64748b', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span>Interest Rate:</span>
+                    <span style={{ fontWeight: '600' }}>{company?.loan_affordability?.interest_rate || '8%'}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span>Term:</span>
+                    <span style={{ fontWeight: '600' }}>{company?.loan_affordability?.loan_term_months || 60} months</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Affordability Score:</span>
+                    <span style={{ fontWeight: '600', color: '#059669' }}>{company?.loan_affordability?.affordability_score || 75}/100</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* New Financial Health Card */}
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '20px',
+                padding: '24px',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: 'all 0.3s ease'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(135deg, #3b82f6, #2563eb)'
+                }}></div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#64748b', margin: 0 }}>
+                    Financial Health
+                  </h4>
+                  <span style={{ fontSize: '24px' }}>📊</span>
+                </div>
+                <div style={{ fontSize: '14px', color: '#64748b', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span>Debt-to-Equity:</span>
+                    <span style={{ fontWeight: '600' }}>{company?.financial_metrics?.debt_to_equity_ratio || '1.5'}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span>Current Ratio:</span>
+                    <span style={{ fontWeight: '600' }}>{company?.financial_metrics?.current_ratio || '1.8'}</span>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Profit Margin:</span>
+                    <span style={{ fontWeight: '600' }}>{company?.financial_metrics?.profit_margin || '12%'}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* New Detailed Financial Metrics Section */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              
+              {/* Financial Metrics Card */}
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '20px',
+                padding: '28px',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(135deg, #3b82f6, #2563eb)'
+                }}></div>
+                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  💼 Financial Metrics
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Total Assets</p>
+                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', margin: 0 }}>
+                      {company?.financial_metrics?.total_assets || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Total Liabilities</p>
+                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#dc2626', margin: 0 }}>
+                      {company?.financial_metrics?.total_liabilities || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Equity</p>
+                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#059669', margin: 0 }}>
+                      {company?.financial_metrics?.equity || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Monthly Revenue</p>
+                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', margin: 0 }}>
+                      {company?.financial_metrics?.monthly_revenue || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Monthly Profit</p>
+                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#059669', margin: 0 }}>
+                      {company?.financial_metrics?.monthly_profit || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Cash Flow</p>
+                    <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#3b82f6', margin: 0 }}>
+                      {company?.financial_metrics?.cash_flow || '0M'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Liabilities Breakdown Card */}
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(20px)',
+                borderRadius: '20px',
+                padding: '28px',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: 'linear-gradient(135deg, #ef4444, #dc2626)'
+                }}></div>
+                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  ⚠️ Liabilities Breakdown
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Accounts Payable</p>
+                    <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#dc2626', margin: 0 }}>
+                      {company?.liabilities_breakdown?.accounts_payable || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Short-term Debt</p>
+                    <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#dc2626', margin: 0 }}>
+                      {company?.liabilities_breakdown?.short_term_debt || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Accrued Expenses</p>
+                    <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#dc2626', margin: 0 }}>
+                      {company?.liabilities_breakdown?.accrued_expenses || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Long-term Bank Loans</p>
+                    <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#dc2626', margin: 0 }}>
+                      {company?.liabilities_breakdown?.long_term_bank_loans || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Bonds Payable</p>
+                    <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#dc2626', margin: 0 }}>
+                      {company?.liabilities_breakdown?.bonds_payable || '0M'}
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 4px 0' }}>Other Liabilities</p>
+                    <p style={{ fontSize: '16px', fontWeight: 'bold', color: '#dc2626', margin: 0 }}>
+                      {company?.liabilities_breakdown?.other_current_liabilities || '0M'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
               <div style={{
                 background: 'rgba(255, 255, 255, 0.95)',
                 backdropFilter: 'blur(20px)',
@@ -507,8 +731,6 @@ const ModernDashboard = () => {
                   Sector Classification
                 </p>
               </div>
-            </div>
-
             {/* Enhanced Main Content Area */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
               
@@ -856,6 +1078,90 @@ const ModernDashboard = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Risk Analysis Factors */}
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '20px',
+              padding: '28px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
+                background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)'
+              }}></div>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                🎯 Risk Analysis Factors
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                {Object.entries(company?.ai_analysis?.risk_analysis?.factors || {}).map(([key, value]) => (
+                  <div key={key} style={{
+                    background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)',
+                    padding: '20px',
+                    borderRadius: '16px',
+                    border: '1px solid #e2e8f0',
+                    transition: 'all 0.3s ease'
+                  }}>
+                    <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '600' }}>
+                      {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: value > 70 ? '#10b981' : value > 40 ? '#f59e0b' : '#ef4444'
+                      }}></div>
+                      <p style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e293b', margin: 0 }}>
+                        {value}/100
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* AI Reasoning */}
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.95)',
+              backdropFilter: 'blur(20px)',
+              borderRadius: '20px',
+              padding: '28px',
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
+                background: 'linear-gradient(135deg, #06b6d4, #0891b2)'
+              }}></div>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                🤖 AI Reasoning
+              </h3>
+              <div style={{
+                background: 'linear-gradient(135deg, #f0f9ff, #e0f2fe)',
+                padding: '20px',
+                borderRadius: '16px',
+                border: '1px solid #0ea5e9'
+              }}>
+                <p style={{ fontSize: '16px', color: '#0c4a6e', lineHeight: '1.6', margin: 0 }}>
+                  {company?.ai_analysis?.decision_result?.reasoning || 'AI analysis based on comprehensive financial metrics and risk assessment.'}
+                </p>
               </div>
             </div>
           </div>
