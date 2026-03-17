@@ -132,13 +132,16 @@ class RecommendationEngine:
         )
     
     def _determine_decision(self, risk_score: float, risk_category: str) -> str:
-        """Determine lending decision based on risk score and category"""
+        """Determine lending decision based on risk score and category.
         
-        if risk_score >= self.risk_thresholds['approve']:
+        NOTE: risk_score is HIGH = BAD (50 = medium risk, 80+ = very high risk).
+        Lower score means safer borrower.
+        """
+        if risk_score < self.risk_thresholds['conditional']:   # < 55 → Approved
             return 'Approved'
-        elif risk_score >= self.risk_thresholds['conditional']:
+        elif risk_score < self.risk_thresholds['approve']:     # < 75 → Conditional
             return 'Conditional Approval'
-        else:
+        else:                                                  # >= 75 → Rejected
             return 'Rejected'
     
     def _calculate_optimal_loan_amount(self, risk_category: str, financial_data: Dict, 
@@ -230,7 +233,7 @@ class RecommendationEngine:
         monthly_rate = interest_rate / 12 / 100
         
         # EMI formula: P * r * (1+r)^n / ((1+r)^n - 1)
-        emi = loan_amount * monthly_rate * (1 + monthly_rate) ** tenure_months / \
+        emi: float = loan_amount * monthly_rate * (1 + monthly_rate) ** tenure_months / \
               ((1 + monthly_rate) ** tenure_months - 1)
         
         return round(emi, 2)

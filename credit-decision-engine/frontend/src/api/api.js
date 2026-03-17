@@ -230,28 +230,10 @@ export const getCAMPreview = async (filename) => {
   return response.data;
 };
 
-// Get risk score (simplified version for dashboard)
-export const getRiskScore = async () => {
-  const response = await api.get('/risk-score');
-  return response.data;
-};
-
-// Get recommendation (simplified version for dashboard)
-export const getRecommendation = async () => {
-  const response = await api.get('/recommendation');
-  return response.data;
-};
-
-// Get consistency analysis (simplified version for dashboard)
-export const getConsistencyAnalysis = async () => {
-  const response = await api.get('/consistency-analysis');
-  return response.data;
-};
-
-// List CAM files
-export const listCAMFiles = async () => {
-  const response = await api.get('/cam-list');
-  return response.data;
-};
+// NOTE: getRiskScore, getRecommendation, getConsistencyAnalysis have been removed.
+// Those endpoints are POST-only. Use calculateRiskScore(), generateRecommendation(),
+// and analyzeConsistency() respectively for programmatic access.
+// listCAMFiles is an alias for getCAMList (kept for backwards compatibility).
+export const listCAMFiles = getCAMList;
 
 export default api;

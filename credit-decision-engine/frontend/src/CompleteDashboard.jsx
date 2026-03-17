@@ -130,6 +130,24 @@ const CompleteDashboard = () => {
                 📈 Research Insights
               </button>
               <button
+                onClick={() => navigate('/dynamic-dashboard')}
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  backdropFilter: 'blur(10px)',
+                  color: 'white',
+                  padding: '14px 28px',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  transition: 'all 0.3s ease',
+                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                }}
+              >
+                🚀 Dynamic Dashboard
+              </button>
+              <button
                 onClick={() => navigate('/cam-preview')}
                 style={{
                   backgroundColor: 'rgba(255, 255, 255, 0.2)',

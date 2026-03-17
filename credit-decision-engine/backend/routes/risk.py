@@ -7,6 +7,14 @@ from services.recommendation_engine import RecommendationEngine
 
 router = APIRouter()
 
+class ConsistencyRequest(BaseModel):
+    gst_data: Dict[str, Any]
+    bank_data: Dict[str, Any]
+
+class RecommendationRequest(BaseModel):
+    risk_analysis: Dict[str, Any]
+    financial_data: Dict[str, Any]
+
 class CreditOfficerInput(BaseModel):
     factory_utilization: Optional[float] = 50
     management_quality: Optional[str] = "moderate"
@@ -22,12 +30,12 @@ class RiskAnalysisRequest(BaseModel):
     officer_input: Optional[CreditOfficerInput] = None
 
 @router.post("/consistency-analysis")
-async def analyze_consistency(gst_data: Dict[str, Any], bank_data: Dict[str, Any]):
+async def analyze_consistency(request: ConsistencyRequest):
     """Analyze consistency between GST and bank data"""
     
     try:
         analyzer = GSTBankAnalyzer()
-        consistency_result = analyzer.analyze_consistency(gst_data, bank_data)
+        consistency_result = analyzer.analyze_consistency(request.gst_data, request.bank_data)
         
         return {
             "status": "success",
@@ -69,17 +77,17 @@ async def calculate_risk_score(request: RiskAnalysisRequest):
         raise HTTPException(status_code=500, detail=f"Risk scoring failed: {str(e)}")
 
 @router.post("/recommendation")
-async def generate_recommendation(risk_analysis: Dict[str, Any], financial_data: Dict[str, Any]):
+async def generate_recommendation(request: RecommendationRequest):
     """Generate final lending recommendation"""
     
     try:
         recommendation_engine = RecommendationEngine()
         
         recommendation = recommendation_engine.generate_recommendation(
-            risk_score=risk_analysis.get('risk_score', 0),
-            risk_category=risk_analysis.get('risk_category', 'Medium'),
-            financial_data=financial_data,
-            component_scores=risk_analysis.get('component_scores', {})
+            risk_score=request.risk_analysis.get('risk_score', 0),
+            risk_category=request.risk_analysis.get('risk_category', 'Medium'),
+            financial_data=request.financial_data,
+            component_scores=request.risk_analysis.get('component_scores', {})
         )
         
         return {

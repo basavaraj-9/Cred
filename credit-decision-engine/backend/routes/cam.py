@@ -20,15 +20,22 @@ async def generate_cam(request: CAMRequest):
     
     try:
         cam_generator = CAMGenerator()
-        
-        # Generate CAM
-        cam_result = cam_generator.generate_cam(
-            company_data=request.company_data,
-            financial_data=request.financial_data,
-            risk_analysis=request.risk_analysis,
-            research_data=request.research_data,
-            recommendation=request.recommendation
+
+        # Build the CAMContent dataclass from the incoming request fields.
+        # The service's generate_cam() requires a CAMContent object, not raw dicts.
+        cam_content = cam_generator.create_cam_content(
+            borrower_info=request.company_data,
+            industry_analysis=request.research_data.get("industry_analysis", {}),
+            financial_analysis=request.financial_data,
+            risk_assessment=request.risk_analysis,
+            research_insights=request.research_data,
+            recommendation=request.recommendation,
+            five_cs_analysis=request.research_data.get("five_cs_analysis", {}),
+            compliance_notes=request.research_data.get("compliance_notes", [])
         )
+
+        # Generate CAM (returns dict of file paths)
+        cam_result = cam_generator.generate_cam(cam_content)
         
         return {
             "status": "success",

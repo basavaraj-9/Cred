@@ -27,7 +27,7 @@ except ImportError:
 # Word Document Libraries  
 try:
     from docx import Document
-    from docx.shared import Inches, Pt
+    from docx.shared import Inches, Pt, RGBColor
     from docx.enum.text import WD_ALIGN_PARAGRAPH
     from docx.enum.table import WD_TABLE_ALIGNMENT
     WORD_AVAILABLE = True
@@ -316,7 +316,7 @@ class CAMGenerator:
         doc.add_paragraph()
         conf_para = doc.add_paragraph('CONFIDENTIAL & PROPRIETARY')
         conf_para.runs[0].bold = True
-        conf_para.runs[0].font.color.rgb = (255, 0, 0)  # Red color
+        conf_para.runs[0].font.color.rgb = RGBColor(255, 0, 0)  # Red color
         
         doc.add_paragraph('This document contains confidential information and is intended for internal use only.')
         
