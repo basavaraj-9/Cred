@@ -54,7 +54,71 @@ class GSTBankAnalyzer:
             revenue_analysis, circular_analysis, cash_flow_analysis
         )
         
+        # New: Counterparty Risk & DSR
+        analysis_result['counterparty_risk'] = self._analyze_counterparty_risk(bank_data)
+        analysis_result['debt_service_ratio'] = self._calculate_dsr(bank_data, gst_data)
+        
         return analysis_result
+
+    def _analyze_counterparty_risk(self, bank_data: Dict) -> Dict[str, Any]:
+        """Identify potential related-party transactions and concentration risk"""
+        if not isinstance(bank_data, dict) or 'transactions' not in bank_data:
+            return {'risk_level': 'Low', 'details': 'No transaction data available'}
+            
+        transactions = bank_data['transactions']
+        counterparties = {}
+        
+        for t in transactions:
+            desc = t.get('description', '').upper()
+            amount = t.get('amount', 0)
+            
+            # Simplified entity extraction from description
+            # In production, this would use a NER model or entity database
+            entity = desc.split('/')[0].split('-')[0].strip()
+            if len(entity) > 3:
+                if entity not in counterparties:
+                    counterparties[entity] = {'total_volume': 0, 'count': 0}
+                counterparties[entity]['total_volume'] += amount
+                counterparties[entity]['count'] += 1
+        
+        # Identify concentration (e.g., more than 40% volume with one party)
+        total_vol = sum(c['total_volume'] for c in counterparties.values())
+        high_concentration_parties = []
+        if total_vol > 0:
+            for entity, stats in counterparties.items():
+                if stats['total_volume'] / total_vol > 0.4:
+                    high_concentration_parties.append(entity)
+                    
+        return {
+            'risk_level': 'High' if high_concentration_parties else 'Low',
+            'top_counterparties': sorted(counterparties.items(), key=lambda x: x[1]['total_volume'], reverse=True)[:5],
+            'high_concentration_parties': high_concentration_parties,
+            'description': f"High concentration detected with: {', '.join(high_concentration_parties)}" if high_concentration_parties else "Diversified counterparties"
+        }
+
+    def _calculate_dsr(self, bank_data: Dict, gst_data: Dict) -> Dict[str, Any]:
+        """Calculate Debt Service Ratio (DSR) and Debt-to-Income"""
+        # Estimates based on bank flows
+        total_inflow = self._extract_total_deposits(bank_data)
+        total_outflow = self._extract_total_withdrawals(bank_data)
+        
+        # Estimated monthly debt obligation (would usually come from bureau data)
+        # Here we look for keywords in withdrawals like 'EMI', 'LOAN', 'INTEREST'
+        debt_obligations = 0
+        if isinstance(bank_data, dict) and 'transactions' in bank_data:
+            debt_obligations = sum(t['amount'] for t in bank_data['transactions'] 
+                                 if any(k in t.get('description', '').upper() for k in ['EMI', 'LOAN', 'INTEREST', 'FINANCE']))
+        
+        # Monthly average inflow
+        monthly_inflow = total_inflow / 6  # Assuming 6 months of data
+        dsr = (debt_obligations / monthly_inflow) if monthly_inflow > 0 else 0
+        
+        return {
+            'value': round(dsr, 2),
+            'status': 'Healthy' if dsr < 0.4 else 'Warning' if dsr < 0.6 else 'Critical',
+            'monthly_debt_obligations': debt_obligations,
+            'monthly_average_inflow': round(monthly_inflow, 2)
+        }
     
     def _extract_total_deposits(self, bank_data: Dict) -> float:
         """Extract total deposits from bank statement data"""

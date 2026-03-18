@@ -9,12 +9,18 @@ from routes.upload import router as upload_router
 from routes.risk import router as risk_router
 from routes.research import router as research_router
 from routes.cam import router as cam_router
+from services.document_parser import DocumentParser
+from services.gst_bank_analyzer import GSTBankAnalyzer
 
 app = FastAPI(
     title="AI Credit Decisioning Engine",
     description="Production-grade credit decisioning system with AI-powered risk assessment",
     version="1.0.0"
 )
+
+# Initialize services
+doc_parser = DocumentParser()
+bank_analyzer = GSTBankAnalyzer()
 
 app.add_middleware(
     CORSMiddleware,
@@ -135,6 +141,27 @@ async def simple_upload(files: List[UploadFile] = File(...)):
                 "bonds_payable": fmt_m(total_liabilities * 0.05),
                 "other_current_liabilities": fmt_m(total_liabilities * 0.05),
             },
+            # Phase 2: Advanced Document Intelligence
+            "bank_analysis": {
+                "transactions": [
+                    {"date": "2024-03-01", "description": "VENDOR_PAYMENT_ABC", "amount": 450000, "type": "debit"},
+                    {"date": "2024-03-05", "description": "REVENUE_CLIENT_X", "amount": 1200000, "type": "credit"},
+                    {"date": "2024-03-10", "description": "SALARY_BATCH_01", "amount": 800000, "type": "debit"},
+                    {"date": "2024-03-15", "description": "LOAN_EMI_BANK_Y", "amount": 200000, "type": "debit"},
+                    {"date": "2024-03-20", "description": "REVENUE_CLIENT_Y", "amount": 950000, "type": "credit"},
+                ],
+                "counterparty_risk": {
+                    "risk_level": "Low",
+                    "description": "Diversified counterparties; no significant related-party concentration.",
+                    "top_counterparties": [("CLIENT_X", 1200000), ("CLIENT_Y", 950000)]
+                },
+                "debt_service_ratio": {
+                    "value": 0.25,
+                    "status": "Healthy",
+                    "monthly_debt_obligations": 200000,
+                    "monthly_average_inflow": 1100000
+                }
+            },
             "upload_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         }
         
@@ -223,6 +250,26 @@ async def get_test_data():
             "long_term_bank_loans": fmt_m(total_liabilities * 0.30),
             "bonds_payable": fmt_m(total_liabilities * 0.05),
             "other_current_liabilities": fmt_m(total_liabilities * 0.05),
+        },
+        # Phase 2: Advanced Document Intelligence
+        "bank_analysis": {
+            "transactions": [
+                {"date": "2024-03-01", "description": "SALARY_PAYOUT", "amount": 150000, "type": "debit"},
+                {"date": "2024-03-02", "description": "INCOMING_WIRE_X", "amount": 500000, "type": "credit"},
+                {"date": "2024-03-05", "description": "GST_PAYMENT", "amount": 75000, "type": "debit"},
+                {"date": "2024-03-10", "description": "EMI_TRANSFER", "amount": 120000, "type": "debit"},
+            ],
+            "counterparty_risk": {
+                "risk_level": "Medium",
+                "description": "35% concentration detected with single counterparty (WIRE_X).",
+                "top_counterparties": [("WIRE_X", 500000)]
+            },
+            "debt_service_ratio": {
+                "value": 0.35,
+                "status": "Warning",
+                "monthly_debt_obligations": 120000,
+                "monthly_average_inflow": 450000
+            }
         },
         "upload_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     }

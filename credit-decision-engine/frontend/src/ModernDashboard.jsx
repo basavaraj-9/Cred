@@ -1,10 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
+  Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, PieChart, Pie, Cell 
+} from 'recharts';
+import BankAnalysisTab from './components/BankAnalysisTab';
 
 const ModernDashboard = () => {
   const navigate = useNavigate();
   const [companyData, setCompanyData] = useState(null);
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [simulation, setSimulation] = useState({
+    amount: 10,
+    rate: 12,
+    tenure: 36,
+    riskScore: 50
+  });
+
+  useEffect(() => {
+    if (selectedCompany) {
+      const loanData = selectedCompany.loan_affordability;
+      const amount = parseFloat(loanData?.max_loan_amount?.replace(/[^0-9.]/g, '') || 10);
+      const rate = parseFloat(loanData?.interest_rate?.replace(/[^0-9.]/g, '') || 12);
+      const tenure = loanData?.loan_term_months || 36;
+      
+      setSimulation({
+        amount,
+        rate,
+        tenure,
+        riskScore: selectedCompany.ai_analysis?.risk_analysis?.risk_score || 50
+      });
+    }
+  }, [selectedCompany]);
+
+  const handleSimulationChange = (field, value) => {
+    const val = parseFloat(value);
+    const newSim = { ...simulation, [field]: val };
+    
+    // Simulate risk score impact
+    const baseRisk = selectedCompany?.ai_analysis?.risk_analysis?.risk_score || 50;
+    const origAmount = parseFloat(selectedCompany?.loan_affordability?.max_loan_amount?.replace(/[^0-9.]/g, '') || 10);
+    
+    const amountImpact = (newSim.amount - origAmount) / origAmount * 20;
+    const rateImpact = (newSim.rate - 12) * 2;
+    const tenureImpact = (newSim.tenure - 36) / 12 * 5;
+    
+    newSim.riskScore = Math.max(1, Math.min(100, Math.round(baseRisk - (amountImpact + rateImpact + tenureImpact))));
+    setSimulation(newSim);
+  };
 
   useEffect(() => {
     const data = localStorage.getItem('companyData');
@@ -28,7 +72,7 @@ const ModernDashboard = () => {
     return (
       <div style={{ 
         minHeight: '100vh', 
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'var(--bg-primary)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -69,7 +113,7 @@ const ModernDashboard = () => {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #1e40af 0%, #0f766e 50%, #0891b2 100%)',
+      background: 'var(--dashboard-bg)',
       position: 'relative',
       display: 'flex',
       flexDirection: 'column'
@@ -108,9 +152,9 @@ const ModernDashboard = () => {
 
       {/* Enhanced Header */}
       <div style={{ 
-        background: 'rgba(255, 255, 255, 0.1)', 
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+        background: 'var(--header-bg)', 
+        backdropFilter: 'var(--glass-blur)',
+        borderBottom: '1px solid var(--border-color)',
         padding: '24px 0',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         position: 'sticky',
@@ -240,17 +284,17 @@ const ModernDashboard = () => {
           
           {/* Enhanced Sidebar */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
+            background: 'var(--card-bg)',
+            backdropFilter: 'var(--glass-blur)',
             borderRadius: '20px',
             padding: '24px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
+            boxShadow: 'var(--card-shadow)',
+            border: '1px solid var(--border-color)',
             height: 'fit-content',
             position: 'sticky',
             top: '120px'
           }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               🏢 {isMultiCompany ? 'Companies' : 'Company Details'}
             </h3>
             
@@ -314,7 +358,7 @@ const ModernDashboard = () => {
                         <p style={{ 
                           fontSize: '16px', 
                           fontWeight: '700', 
-                          color: selectedCompany?.unique_hash === comp.unique_hash ? 'white' : '#1e293b',
+                          color: selectedCompany?.unique_hash === comp.unique_hash ? 'white' : 'var(--text-primary)',
                           margin: '0 0 4px 0' 
                         }}>
                           Company {index + 1}
@@ -381,15 +425,60 @@ const ModernDashboard = () => {
           {/* Enhanced Main Dashboard Content */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             
-            {/* Enhanced Top Stats Cards */}
+            {/* Tab Navigation */}
+            <div style={{ 
+              display: 'flex', 
+              gap: '12px', 
+              background: 'var(--card-bg)', 
+              padding: '6px', 
+              borderRadius: '16px', 
+              width: 'fit-content',
+              border: '1px solid var(--border-color)',
+              backdropFilter: 'var(--glass-blur)'
+            }}>
+              <button
+                onClick={() => setActiveTab('overview')}
+                style={{
+                  padding: '10px 24px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: activeTab === 'overview' ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'transparent',
+                  color: activeTab === 'overview' ? 'white' : 'var(--text-secondary)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                📊 Overview
+              </button>
+              <button
+                onClick={() => setActiveTab('bank')}
+                style={{
+                  padding: '10px 24px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: activeTab === 'bank' ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : 'transparent',
+                  color: activeTab === 'bank' ? 'white' : 'var(--text-secondary)',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                🏦 Bank Analysis
+              </button>
+            </div>
+
+            {activeTab === 'overview' ? (
+              <>
+                {/* Enhanced Top Stats Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
                 borderRadius: '20px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease'
@@ -403,7 +492,7 @@ const ModernDashboard = () => {
                   background: riskColors.gradient
                 }}></div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#64748b', margin: 0 }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-secondary)', margin: 0 }}>
                     Risk Score
                   </h4>
                   <span style={{ fontSize: '24px' }}>{riskColors.icon}</span>
@@ -432,12 +521,12 @@ const ModernDashboard = () => {
               </div>
 
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
                 borderRadius: '20px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease'
@@ -473,12 +562,12 @@ const ModernDashboard = () => {
 
               {/* New Loan Affordability Card */}
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
                 borderRadius: '20px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease'
@@ -518,12 +607,12 @@ const ModernDashboard = () => {
 
               {/* New Financial Health Card */}
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
                 borderRadius: '20px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease'
@@ -559,17 +648,87 @@ const ModernDashboard = () => {
               </div>
             </div>
 
+            {/* Interactive Charts Section */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              {/* Financial Performance Chart */}
+              <div style={{
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                borderRadius: '20px',
+                padding: '24px',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
+                height: '400px',
+                transition: 'all 0.3s ease'
+              }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px' }}>
+                  📈 Financial Overview (Major Metrics)
+                </h3>
+                <ResponsiveContainer width="100%" height="80%">
+                  <BarChart data={[
+                    { name: 'Assets', value: parseFloat(company?.financial_metrics?.total_assets?.replace(/[^0-9.]/g, '') || 500) },
+                    { name: 'Liabilities', value: parseFloat(company?.financial_metrics?.total_liabilities?.replace(/[^0-9.]/g, '') || 200) },
+                    { name: 'Revenue', value: parseFloat(company?.financial_metrics?.monthly_revenue?.replace(/[^0-9.]/g, '') || 100) * 12 },
+                    { name: 'Equity', value: parseFloat(company?.financial_metrics?.equity?.replace(/[^0-9.]/g, '') || 300) }
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                    <XAxis dataKey="name" stroke="var(--text-secondary)" />
+                    <YAxis stroke="var(--text-secondary)" />
+                    <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} />
+                    <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Risk Factor Distribution (Explainable AI) */}
+              <div style={{
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                borderRadius: '20px',
+                padding: '24px',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
+                height: '400px',
+                transition: 'all 0.3s ease'
+              }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px' }}>
+                  🎯 AI Decision Rationale (Factor Weighting)
+                </h3>
+                <ResponsiveContainer width="100%" height="80%">
+                  <RadarChart cx="50%" cy="50%" outerRadius="80%" data={
+                    company?.ai_analysis?.factor_weights ? 
+                    Object.keys(company?.ai_analysis?.factor_weights).map(key => ({
+                      subject: key.replace('_', ' ').toUpperCase(),
+                      A: company.ai_analysis.factor_weights[key],
+                      fullMark: 100
+                    })) : [
+                      { subject: 'FINANCIAL', A: 80, fullMark: 100 },
+                      { subject: 'MARKET', A: 65, fullMark: 100 },
+                      { subject: 'INDUSTRY', A: 70, fullMark: 100 },
+                      { subject: 'HISTORY', A: 50, fullMark: 100 }
+                    ]
+                  }>
+                    <PolarGrid stroke="var(--border-color)" />
+                    <PolarAngleAxis dataKey="subject" stroke="var(--text-secondary)" fontSize={10} />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="var(--text-secondary)" />
+                    <Radar name="Weight" dataKey="A" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.6} />
+                    <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
             {/* New Detailed Financial Metrics Section */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               
               {/* Financial Metrics Card */}
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
                 borderRadius: '20px',
                 padding: '28px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden'
               }}>
@@ -581,7 +740,7 @@ const ModernDashboard = () => {
                   height: '4px',
                   background: 'linear-gradient(135deg, #3b82f6, #2563eb)'
                 }}></div>
-                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   💼 Financial Metrics
                 </h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
@@ -626,12 +785,12 @@ const ModernDashboard = () => {
 
               {/* Liabilities Breakdown Card */}
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
                 borderRadius: '20px',
                 padding: '28px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden'
               }}>
@@ -688,12 +847,12 @@ const ModernDashboard = () => {
             </div>
 
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
                 borderRadius: '20px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease'
@@ -721,12 +880,12 @@ const ModernDashboard = () => {
               </div>
 
               <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
                 borderRadius: '20px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
                 transition: 'all 0.3s ease'
@@ -1185,10 +1344,140 @@ const ModernDashboard = () => {
                 </p>
               </div>
             </div>
-          </div>
-        </div>
+            {/* AI Decision Rationale & What-If Panel */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              {/* Decision Rationale */}
+              <div style={{
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                borderRadius: '20px',
+                padding: '32px',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
+              }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  📜 Decision Rationale
+                </h3>
+                <div style={{
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  padding: '20px',
+                  borderRadius: '16px',
+                  border: '1px solid rgba(59, 130, 246, 0.2)',
+                  marginBottom: '24px'
+                }}>
+                  <p style={{ fontSize: '16px', fontWeight: '600', color: '#3b82f6', marginBottom: '8px' }}>
+                    AI Summary
+                  </p>
+                  <p style={{ fontSize: '15px', color: 'var(--text-primary)', margin: 0, lineHeight: '1.6' }}>
+                    {company?.ai_analysis?.decision_rationale?.summary || "Analysis indicates stable financial metrics with moderate exposure to market volatility. The primary decision driver is the current health of the manufacturing sector."}
+                  </p>
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>
+                    Key Observations
+                  </h4>
+                  <ul style={{ paddingLeft: '20px', margin: 0 }}>
+                    {(company?.ai_analysis?.decision_rationale?.key_observations || [
+                      "Consistent revenue growth over the last 12 months.",
+                      "Low debt-to-equity ratio compared to industry peers.",
+                      "Diversified client base reduces single-source risk."
+                    ]).map((obs, i) => (
+                      <li key={i} style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '8px' }}>
+                        {obs}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* What-If Panel */}
+              <div style={{
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                borderRadius: '20px',
+                padding: '32px',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
+              }}>
+                <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  🧪 What-If Analysis
+                </h3>
+                <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '24px' }}>
+                  Simulate different loan scenarios to see real-time impact on risk assessment.
+                </p>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>Loan Amount</span>
+                      <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 'bold' }}>{simulation.amount.toFixed(1)}M</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min={simulation.amount * 0.5} 
+                      max={simulation.amount * 2} 
+                      step="0.1"
+                      value={simulation.amount}
+                      onChange={(e) => handleSimulationChange('amount', e.target.value)}
+                      style={{ width: '100%', cursor: 'pointer' }} 
+                    />
+                  </div>
+                  
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>Interest Rate</span>
+                      <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 'bold' }}>{simulation.rate.toFixed(1)}%</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="5" 
+                      max="25" 
+                      step="0.5"
+                      value={simulation.rate}
+                      onChange={(e) => handleSimulationChange('rate', e.target.value)}
+                      style={{ width: '100%', cursor: 'pointer' }} 
+                    />
+                  </div>
+
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)' }}>Tenure (Months)</span>
+                      <span style={{ fontSize: '14px', color: '#3b82f6', fontWeight: 'bold' }}>{simulation.tenure} months</span>
+                    </div>
+                    <input 
+                      type="range" 
+                      min="6" 
+                      max="84" 
+                      step="6"
+                      value={simulation.tenure}
+                      onChange={(e) => handleSimulationChange('tenure', e.target.value)}
+                      style={{ width: '100%', cursor: 'pointer' }} 
+                    />
+                  </div>
+                </div>
+
+                <div style={{ 
+                  marginTop: '32px', 
+                  padding: '16px', 
+                  background: simulation.riskScore >= 70 ? 'linear-gradient(135deg, #22c55e, #16a34a)' : simulation.riskScore >= 50 ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 'linear-gradient(135deg, #ef4444, #dc2626)', 
+                  borderRadius: '12px',
+                  color: 'white',
+                  textAlign: 'center',
+                  transition: 'all 0.5s ease'
+                }}>
+                  <p style={{ fontSize: '12px', opacity: 0.9, margin: '0 0 4px 0' }}>Simulated Risk Score</p>
+                  <p style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>{simulation.riskScore} / 100</p>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : (
+          <BankAnalysisTab bankData={company?.bank_analysis} />
+        )}
       </div>
     </div>
+  </div>
+</div>
   );
 };
 

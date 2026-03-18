@@ -68,7 +68,134 @@ class DocumentParser:
         # Extract company name
         extracted_data['company'] = self._extract_company_name(extracted_data['raw_text'])
         
+        # If it's a bank statement, try to extract structured transactions
+        if extracted_data['document_type'] == 'bank_statement':
+            extracted_data['transactions'] = self._extract_bank_transactions(file_content)
+        
+        # New: Extract financial statements (P&L, Balance Sheet) if applicable
+        if extracted_data['document_type'] in ['annual_report', 'tax_return', 'financial_statement']:
+            extracted_data['financial_statements'] = self._extract_financial_statements(file_content)
+            # Override extracted entities with table data if more precise
+            if extracted_data['financial_statements'].get('income_statement'):
+                pnl = extracted_data['financial_statements']['income_statement']
+                if 'revenue' in pnl: extracted_data['revenue'] = pnl['revenue']
+                if 'net_profit' in pnl: extracted_data['profit'] = pnl['net_profit']
+        
         return extracted_data
+
+    def _extract_financial_statements(self, file_content: bytes) -> Dict[str, Any]:
+        """Extract P&L and Balance Sheet data from tables"""
+        financials = {
+            'income_statement': {},
+            'balance_sheet': {}
+        }
+        
+        try:
+            with pdfplumber.open(io.BytesIO(file_content)) as pdf:
+                for page in pdf.pages:
+                    tables = page.extract_tables()
+                    for table in tables:
+                        if not table: continue
+                        
+                        # Identify table type
+                        table_text = " ".join([" ".join([str(c) for c in row if c]) for row in table]).lower()
+                        
+                        is_pnl = any(k in table_text for k in ['revenue', 'sales', 'turnover', 'profit', 'expenses', 'ebitda'])
+                        is_bs = any(k in table_text for k in ['assets', 'liabilities', 'equity', 'share capital', 'fixed assets'])
+                        
+                        if is_pnl:
+                            self._map_pnl_table(table, financials['income_statement'])
+                        elif is_bs:
+                            self._map_bs_table(table, financials['balance_sheet'])
+                            
+        except Exception as e:
+            print(f"Financial spreading failed: {str(e)}")
+            
+        return financials
+
+    def _map_pnl_table(self, table: List[List[str]], store: Dict):
+        """Map P&L rows to standard keys"""
+        mapping = {
+            'revenue': ['revenue', 'sales', 'turnover', 'income from operations'],
+            'cogs': ['cost of goods sold', 'cogs', 'direct expenses'],
+            'gross_profit': ['gross profit', 'gp'],
+            'ebitda': ['ebitda', 'operating profit'],
+            'net_profit': ['net profit', 'profit after tax', 'pat']
+        }
+        self._extract_rows_by_mapping(table, mapping, store)
+
+    def _map_bs_table(self, table: List[List[str]], store: Dict):
+        """Map Balance Sheet rows to standard keys"""
+        mapping = {
+            'total_assets': ['total assets'],
+            'fixed_assets': ['fixed assets', 'property plant', 'non-current assets'],
+            'current_assets': ['current assets'],
+            'total_liabilities': ['total liabilities'],
+            'equity': ['equity', 'share capital', 'net worth'],
+            'current_liabilities': ['current liabilities']
+        }
+        self._extract_rows_by_mapping(table, mapping, store)
+
+    def _extract_rows_by_mapping(self, table: List[List[str]], mapping: Dict, store: Dict):
+        """Helper to find values in table rows based on keyword mapping"""
+        for row in table:
+            if not row or len(row) < 2: continue
+            # Look at first column for labels
+            label = str(row[0]).lower()
+            for key, keywords in mapping.items():
+                if any(k in label for k in keywords):
+                    # Try to find a numeric value in the following columns
+                    for val in row[1:]:
+                        if not val: continue
+                        parsed = self._parse_amount(str(val))
+                        if parsed > 0:
+                            store[key] = parsed
+                            break
+
+    def _extract_bank_transactions(self, file_content: bytes) -> List[Dict[str, Any]]:
+        """Extract structured transaction data from bank statement PDF"""
+        transactions = []
+        try:
+            with pdfplumber.open(io.BytesIO(file_content)) as pdf:
+                for page in pdf.pages:
+                    tables = page.extract_tables()
+                    for table in tables:
+                        # Clean and process table rows
+                        for row in table:
+                            if not row or len(row) < 3:
+                                continue
+                            
+                            # Try to identify Date, Description, and Amount columns
+                            # This is a heuristic that works for many standard bank formats
+                            date_str = str(row[0]).strip()
+                            if not re.match(r'\d{1,2}[/-]\d{1,2}[/-]\d{2,4}', date_str):
+                                continue
+                                
+                            desc = str(row[1]).strip()
+                            
+                            # Find amount (usually in one of the last few columns)
+                            amount = 0.0
+                            trans_type = 'debit'
+                            
+                            for val in row[2:]:
+                                parsed_val = self._parse_amount(str(val))
+                                if parsed_val > 0:
+                                    amount = parsed_val
+                                    # Heuristic: Deciding credit/debit based on column index or keyword
+                                    # For now, we'll keep it simple and refine in analyzer
+                                    break
+                            
+                            if amount > 0:
+                                transactions.append({
+                                    'date': date_str,
+                                    'description': desc,
+                                    'amount': amount,
+                                    'type': 'credit' if 'credit' in desc.lower() or 'dep' in desc.lower() else 'debit'
+                                })
+        except Exception as e:
+            print(f"Structured bank parsing failed: {str(e)}")
+            
+        return transactions
     
     async def _ocr_pdf(self, file_content: bytes, extracted_data: Dict) -> Dict[str, Any]:
         """Perform OCR on PDF using PyMuPDF and Tesseract"""
