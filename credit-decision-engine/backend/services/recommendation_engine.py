@@ -207,30 +207,41 @@ class RecommendationEngine:
         
         # Get annual revenue
         annual_revenue = financial_data.get('revenue', 0)
-        if annual_revenue == 0:
+        if annual_revenue <= 0:
             return 0
         
-        # Base loan amount from revenue multiplier
-        multiplier = self.loan_multipliers.get(risk_category, 2.0)
+        # 1. Base Cap: Revenue Multiplier (more conservative for high risk)
+        # multipliers scaled down to be more realistic (e.g. 0.2x to 0.5x revenue)
+        multiplier_map = {
+            'Very Low': 0.5,
+            'Low': 0.4,
+            'Medium': 0.3,
+            'High': 0.2,
+            'Very High': 0.1
+        }
+        multiplier = multiplier_map.get(risk_category, 0.2)
         base_loan_amount = annual_revenue * multiplier
         
-        # Adjust for cash flow capacity
-        monthly_cash_flow = financial_data.get('monthly_cash_flow', 0)
-        if monthly_cash_flow > 0:
-            # Maximum EMI should not exceed 40% of monthly cash flow
-            max_emi = monthly_cash_flow * 0.4
-            cash_flow_capacity = max_emi * 60  # Assuming 5-year tenure
-            base_loan_amount = min(base_loan_amount, cash_flow_capacity)
+        # 2. Cash Flow Constraint (DSCR based)
+        # Assuming monthly profit is roughly available for debt service
+        monthly_profit = financial_data.get('profit', 0) / 12
+        if monthly_profit > 0:
+            # Monthly EMI should not exceed 50% of monthly profit for safety
+            max_emi_capacity = monthly_profit * 0.5
+            # Simplified: approx loan = max_emi * (expected life of loan in months)
+            # A 36 month loan at 12% has a factor of ~30x monthly payment
+            cash_flow_cap = max_emi_capacity * 30
+            base_loan_amount = min(base_loan_amount, cash_flow_cap)
         
-        # Adjust for existing debt
+        # 3. Existing Debt Burden Adjustment
         existing_loans = financial_data.get('existing_loans', 0)
-        if existing_loans > 0:
-            # Total debt should not exceed 3x annual revenue
-            max_total_debt = annual_revenue * 3
-            max_additional_loan = max_total_debt - existing_loans
-            base_loan_amount = min(base_loan_amount, max_additional_loan)
+        # Hard cap: Total Debt (old + new) should not exceed 0.6x Revenue for most SMEs
+        hard_total_debt_cap = annual_revenue * 0.6
+        max_additional_headroom = hard_total_debt_cap - existing_loans
         
-        return max(0, base_loan_amount)
+        final_loan_amount = min(base_loan_amount, max_additional_headroom)
+        
+        return max(0, round(final_loan_amount, 0))
     
     def _calculate_risk_adjusted_rate(self, risk_category: str, financial_data: Dict, 
                                    research_data: Dict) -> float:

@@ -11,6 +11,12 @@ from routes.research import router as research_router
 from routes.cam import router as cam_router
 from services.document_parser import DocumentParser
 from services.gst_bank_analyzer import GSTBankAnalyzer
+from services.risk_engine import RiskEngine
+from services.recommendation_engine import RecommendationEngine
+import logging
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="AI Credit Decisioning Engine",
@@ -21,6 +27,8 @@ app = FastAPI(
 # Initialize services
 doc_parser = DocumentParser()
 bank_analyzer = GSTBankAnalyzer()
+risk_engine = RiskEngine()
+recommendation_engine = RecommendationEngine()
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,255 +38,209 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/upload")
+@app.post("/api/upload")
 async def simple_upload(files: List[UploadFile] = File(...)):
-    """Simple upload endpoint that returns dynamic mock data"""
+    """Real upload endpoint that parses documents and runs the analytical engines"""
     try:
-        import hashlib
-        import time
+        if not files:
+            raise HTTPException(status_code=400, detail="No files uploaded")
+            
+        file = files[0]
+        content = await file.read()
         
-        # Generate dynamic data based on timestamp
-        timestamp = str(int(time.time()))
-        hash_seed = int(hashlib.md5(timestamp.encode()).hexdigest()[:8], 16)
+        # 1. Parse Document
+        extracted_data = await doc_parser.parse_document(
+            content, 
+            file.content_type, 
+            file.filename
+        )
         
-        # Get actual filename from uploaded file
-        actual_filename = files[0].filename if files else "document.pdf"
+        # 2. Run Risk Analysis
+        # Explicitly cast to float to ensure math safety
+        financial_data = {
+            'revenue': float(extracted_data.get('revenue', 0)),
+            'profit': float(extracted_data.get('profit', 0)),
+            'assets': float(extracted_data.get('assets', 0)),
+            'liabilities': float(extracted_data.get('liabilities', 0)),
+            'existing_loans': float(extracted_data.get('existing_loans', 0)),
+            'industry': extracted_data.get('industry', 'Manufacturing')
+        }
         
-        # Extract company name from filename (remove extension and clean up)
-        company_name = actual_filename
-        if '.' in company_name:
-            company_name = company_name.rsplit('.', 1)[0]  # Remove extension
-        company_name = company_name.replace('_', ' ').replace('-', ' ')  # Replace separators with spaces
-        company_name = company_name.title()  # Capitalize words
+        risk_result = risk_engine.calculate_risk_score(
+            financial_data=financial_data,
+            consistency_analysis={}, 
+            research_data={'industry': financial_data['industry']}
+        )
         
-        # If filename is too generic, use a meaningful name
-        if len(company_name) < 3 or company_name.lower() in ['document', 'file', 'pdf']:
-            company_name = f"Company {hash_seed % 1000}"
+        # 3. Generate Recommendation
+        rec_result = recommendation_engine.generate_recommendation(
+            risk_score=risk_result['risk_score'],
+            risk_category=risk_result['risk_category'],
+            financial_data=financial_data,
+            component_scores=risk_result['component_scores']
+        )
         
-        # Dynamic financial calculations
-        base_revenue = 50000000 + (hash_seed % 10000000)  # 5Cr to 15Cr
-        monthly_revenue = base_revenue / 12
-        monthly_profit = monthly_revenue * (0.08 + (hash_seed % 100) / 1000)  # 8-18% profit margin
-        total_liabilities = base_revenue * (0.3 + (hash_seed % 100) / 1000)  # 30-40% of revenue
-        equity = base_revenue * (0.6 + (hash_seed % 100) / 1000)  # 60-70% of revenue
-        
-        # Dynamic loan calculations
-        risk_score = 60 + (hash_seed % 30)  # 60-90 risk score
-        loan_multiplier = 0.2 + (risk_score / 500)  # Higher risk = higher loan multiplier
-        approved_loan_amount = int(base_revenue * loan_multiplier)
-        interest_rate = 10 + (100 - risk_score) / 20  # Lower risk = lower interest
-        
+        # 4. Map to UI format
         def fmt_m(val):
-            """Format a rupee value as 'X.XM' string."""
             return f"{val / 1000000:.1f}M"
 
-        # Create dynamic company data
-        mock_company_data = {
-            "company": company_name,
-            "industry": ["Technology", "Manufacturing", "Healthcare", "Retail", "Finance"][hash_seed % 5],
-            # raw rupees — frontend divides by 10_000_000 to get Crores
-            "revenue": base_revenue,
-            "file_name": actual_filename,
+        response_data = {
+            "company": extracted_data.get('company') or "Extracted Entity",
+            "industry": financial_data['industry'],
+            "revenue": financial_data['revenue'],
+            "file_name": file.filename,
             "is_multi_company": False,
             "ai_analysis": {
                 "risk_analysis": {
-                    "risk_score": risk_score,
-                    "risk_category": "LOW" if risk_score >= 80 else "MEDIUM" if risk_score >= 65 else "HIGH"
+                    "risk_score": risk_result['risk_score'],
+                    "risk_category": risk_result['risk_category'].upper()
                 },
                 "decision_result": {
-                    "decision": "APPROVED" if risk_score >= 75 else "CONDITIONALLY_APPROVED" if risk_score >= 60 else "REJECTED",
-                    "confidence_score": round(0.7 + (risk_score / 300), 2)
+                    "decision": rec_result['decision'].upper().replace(' ', '_'),
+                    "confidence_score": 0.85 if risk_result['confidence_level'] == 'High' else 0.7
                 },
                 "loan_analysis": {
-                    "approved_loan_amount": approved_loan_amount,
-                    "interest_rate": round(interest_rate, 1),
-                    "recommended_tenure": 36 + (hash_seed % 48)
+                    "approved_loan_amount": rec_result['loan_limit'],
+                    "interest_rate": rec_result['interest_rate'],
+                    "recommended_tenure": rec_result['tenure_months']
                 },
                 "risk_factors": [
-                    {
-                        "factor": "Market Volatility",
-                        "description": f"Industry risk level: {risk_score / 10:.1f}/10",
-                        "severity": "low" if risk_score >= 80 else "medium" if risk_score >= 65 else "high"
-                    },
-                    {
-                        "factor": "Debt Service Coverage",
-                        "description": f"DSCR ratio: {monthly_profit / (approved_loan_amount / 60):.2f}",
-                        "severity": "low" if monthly_profit > approved_loan_amount / 50 else "medium"
-                    },
-                    {
-                        "factor": "Liquidity Position",
-                        "description": f"Current ratio: {(equity / total_liabilities):.2f}",
-                        "severity": "low" if equity > total_liabilities else "medium"
-                    }
+                    {"factor": f, "description": "System identified risk", "severity": "medium"}
+                    for f in risk_result['risk_factors'][:3]
                 ]
             },
-            # financial_metrics with formatted strings expected by ModernDashboard
             "financial_metrics": {
-                "annual_revenue": base_revenue,
-                "monthly_revenue": fmt_m(monthly_revenue),
-                "monthly_profit": fmt_m(monthly_profit),
-                "total_assets": fmt_m(base_revenue * 1.3),
-                "total_liabilities": fmt_m(total_liabilities),
-                "equity": fmt_m(equity),
-                "cash_flow": fmt_m(monthly_profit * 0.8),
-                "debt_to_equity_ratio": round(total_liabilities / equity, 2),
-                "current_ratio": round(equity / total_liabilities * 1.2, 2),
-                "profit_margin": f"{(monthly_profit / monthly_revenue) * 100:.1f}%",
+                "annual_revenue": financial_data['revenue'],
+                "monthly_revenue": fmt_m(financial_data['revenue'] / 12),
+                "monthly_profit": fmt_m(financial_data['profit'] / 12),
+                "total_assets": fmt_m(financial_data['assets']),
+                "total_liabilities": fmt_m(financial_data['liabilities']),
+                "equity": fmt_m(financial_data['assets'] - financial_data['liabilities']),
+                "cash_flow": fmt_m(financial_data['profit'] / 12 * 0.8),
+                "debt_to_equity_ratio": round(financial_data['existing_loans'] / max(1.0, (financial_data['assets'] - financial_data['liabilities'])), 2),
+                "current_ratio": 1.5,
+                "profit_margin": f"{(financial_data['profit'] / max(1.0, financial_data['revenue'])) * 100:.1f}%",
             },
-            # loan_affordability block expected by Max Loan Amount card
             "loan_affordability": {
-                "max_loan_amount": fmt_m(approved_loan_amount),
-                "interest_rate": f"{round(interest_rate, 1)}%",
-                "loan_term_months": 36 + (hash_seed % 48),
-                "affordability_score": min(95, int(risk_score * 1.1)),
+                "max_loan_amount": fmt_m(rec_result['loan_limit']),
+                "interest_rate": f"{rec_result['interest_rate']}%",
+                "loan_term_months": rec_result['tenure_months'],
+                "affordability_score": int(100 - risk_result['risk_score']),
             },
-            # liabilities_breakdown block expected by Liabilities Breakdown card
             "liabilities_breakdown": {
-                "accounts_payable": fmt_m(total_liabilities * 0.25),
-                "short_term_debt": fmt_m(total_liabilities * 0.20),
-                "accrued_expenses": fmt_m(total_liabilities * 0.15),
-                "long_term_bank_loans": fmt_m(total_liabilities * 0.30),
-                "bonds_payable": fmt_m(total_liabilities * 0.05),
-                "other_current_liabilities": fmt_m(total_liabilities * 0.05),
+                "accounts_payable": fmt_m(financial_data['liabilities'] * 0.3),
+                "long_term_bank_loans": fmt_m(financial_data['existing_loans']),
+                "other_current_liabilities": fmt_m(financial_data['liabilities'] * 0.1),
             },
-            # Phase 2: Advanced Document Intelligence
+            "upload_timestamp": datetime.now().isoformat()
+        }
+        
+        return {"status": "success", "message": "Successfully analyzed document", "data": response_data}
+    except Exception as e:
+        import traceback
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+@app.get("/api/test-data")
+async def get_test_data():
+    """Deterministic test data endpoint using real analytical engines on a static profile"""
+    try:
+        # 1. Static Profile: High-Growth Healthy Tech SME
+        financial_data = {
+            'revenue': 120000000,      # 12 Cr
+            'profit': 18000000,        # 1.8 Cr (15% margin)
+            'assets': 85000000,        # 8.5 Cr
+            'liabilities': 30000000,   # 3.0 Cr
+            'existing_loans': 15000000, # 1.5 Cr
+            'industry': 'Technology'
+        }
+        
+        # 2. Run Engines
+        risk_result = risk_engine.calculate_risk_score(
+            financial_data=financial_data,
+            consistency_analysis={'consistency_score': 95.0, 'anomalies': []},
+            research_data={'industry': 'Technology', 'news_sentiment': 'Positive'}
+        )
+        
+        rec_result = recommendation_engine.generate_recommendation(
+            risk_score=risk_result['risk_score'],
+            risk_category=risk_result['risk_category'],
+            financial_data=financial_data,
+            component_scores=risk_result['component_scores']
+        )
+        
+        def fmt_m(val):
+            return f"{val / 1000000:.1f}M"
+
+        # 3. Map to UI format
+        test_data = {
+            "company": "Crystal Tech Solutions Ltd",
+            "industry": "Technology",
+            "revenue": financial_data['revenue'],
+            "file_name": "annual_report_2024.pdf",
+            "is_multi_company": False,
+            "ai_analysis": {
+                "risk_analysis": {
+                    "risk_score": risk_result['risk_score'],
+                    "risk_category": risk_result['risk_category'].upper()
+                },
+                "decision_result": {
+                    "decision": rec_result['decision'].upper().replace(' ', '_'),
+                    "confidence_score": 0.92
+                },
+                "loan_analysis": {
+                    "approved_loan_amount": rec_result['loan_limit'],
+                    "interest_rate": rec_result['interest_rate'],
+                    "recommended_tenure": rec_result['tenure_months']
+                },
+                "risk_factors": [
+                    {"factor": f, "description": "Analysis insight", "severity": "low"}
+                    for f in risk_result['risk_factors'][:3]
+                ]
+            },
+            "financial_metrics": {
+                "annual_revenue": financial_data['revenue'],
+                "monthly_revenue": fmt_m(financial_data['revenue'] / 12),
+                "monthly_profit": fmt_m(financial_data['profit'] / 12),
+                "total_assets": fmt_m(financial_data['assets']),
+                "total_liabilities": fmt_m(financial_data['liabilities']),
+                "equity": fmt_m(financial_data['assets'] - financial_data['liabilities']),
+                "cash_flow": fmt_m(financial_data['profit'] / 12 * 0.85),
+                "debt_to_equity_ratio": 0.27,
+                "current_ratio": 2.1,
+                "profit_margin": "15.0%",
+            },
+            "loan_affordability": {
+                "max_loan_amount": fmt_m(rec_result['loan_limit']),
+                "interest_rate": f"{rec_result['interest_rate']}%",
+                "loan_term_months": rec_result['tenure_months'],
+                "affordability_score": 88,
+            },
+            "liabilities_breakdown": {
+                "accounts_payable": "4.5M",
+                "short_term_debt": "2.0M",
+                "long_term_bank_loans": "15.0M",
+            },
             "bank_analysis": {
                 "transactions": [
-                    {"date": "2024-03-01", "description": "VENDOR_PAYMENT_ABC", "amount": 450000, "type": "debit"},
-                    {"date": "2024-03-05", "description": "REVENUE_CLIENT_X", "amount": 1200000, "type": "credit"},
-                    {"date": "2024-03-10", "description": "SALARY_BATCH_01", "amount": 800000, "type": "debit"},
-                    {"date": "2024-03-15", "description": "LOAN_EMI_BANK_Y", "amount": 200000, "type": "debit"},
-                    {"date": "2024-03-20", "description": "REVENUE_CLIENT_Y", "amount": 950000, "type": "credit"},
+                    {"date": "2024-03-01", "description": "CLIENT_PAYMENT_A", "amount": 2500000, "type": "credit"},
+                    {"date": "2024-03-05", "description": "AWS_INFRA_FEES", "amount": 400000, "type": "debit"},
+                    {"date": "2024-03-10", "description": "SALARY_OUT_MARCH", "amount": 1200000, "type": "debit"},
                 ],
-                "counterparty_risk": {
-                    "risk_level": "Low",
-                    "description": "Diversified counterparties; no significant related-party concentration.",
-                    "top_counterparties": [("CLIENT_X", 1200000), ("CLIENT_Y", 950000)]
-                },
-                "debt_service_ratio": {
-                    "value": 0.25,
-                    "status": "Healthy",
-                    "monthly_debt_obligations": 200000,
-                    "monthly_average_inflow": 1100000
-                }
+                "counterparty_risk": {"risk_level": "Low", "description": "Healthy diversification."},
+                "debt_service_ratio": {"value": 0.12, "status": "Healthy"}
             },
-            "upload_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+            "upload_timestamp": datetime.now().isoformat()
         }
         
         return {
             "status": "success",
-            "message": "Successfully uploaded files",
-            "data": mock_company_data
+            "message": "Deterministic test data generated",
+            "data": test_data
         }
-        
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
-
-@app.get("/test-data")
-async def get_test_data():
-    """Test endpoint to return sample data without file upload"""
-    import hashlib
-    import time
-    
-    timestamp = str(int(time.time()))
-    hash_seed = int(hashlib.md5(timestamp.encode()).hexdigest()[:8], 16)
-    
-    # Same calculations as main upload
-    base_revenue = 50000000 + (hash_seed % 10000000)
-    monthly_revenue = base_revenue / 12
-    monthly_profit = monthly_revenue * (0.08 + (hash_seed % 100) / 1000)
-    total_liabilities = base_revenue * (0.3 + (hash_seed % 100) / 1000)
-    equity = base_revenue * (0.6 + (hash_seed % 100) / 1000)
-    risk_score = 60 + (hash_seed % 30)
-    loan_multiplier = 0.2 + (risk_score / 500)
-    approved_loan_amount = int(base_revenue * loan_multiplier)
-    interest_rate = 10 + (100 - risk_score) / 20
-    
-    def fmt_m(val):
-        return f"{val / 1000000:.1f}M"
-
-    test_data = {
-        "company": "Test Company",
-        "industry": "Technology",
-        "revenue": base_revenue,
-        "file_name": "test_document.pdf",
-        "is_multi_company": False,
-        "ai_analysis": {
-            "risk_analysis": {
-                "risk_score": risk_score,
-                "risk_category": "LOW" if risk_score >= 80 else "MEDIUM" if risk_score >= 65 else "HIGH"
-            },
-            "decision_result": {
-                "decision": "APPROVED" if risk_score >= 75 else "CONDITIONALLY_APPROVED" if risk_score >= 60 else "REJECTED",
-                "confidence_score": round(0.7 + (risk_score / 300), 2)
-            },
-            "loan_analysis": {
-                "approved_loan_amount": approved_loan_amount,
-                "interest_rate": round(interest_rate, 1),
-                "recommended_tenure": 36 + (hash_seed % 48)
-            },
-            "risk_factors": [
-                {
-                    "factor": "Market Volatility",
-                    "description": f"Industry risk level: {risk_score / 10:.1f}/10",
-                    "severity": "low" if risk_score >= 80 else "medium" if risk_score >= 65 else "high"
-                }
-            ]
-        },
-        "financial_metrics": {
-            "annual_revenue": base_revenue,
-            "monthly_revenue": fmt_m(monthly_revenue),
-            "monthly_profit": fmt_m(monthly_profit),
-            "total_assets": fmt_m(base_revenue * 1.3),
-            "total_liabilities": fmt_m(total_liabilities),
-            "equity": fmt_m(equity),
-            "cash_flow": fmt_m(monthly_profit * 0.8),
-            "debt_to_equity_ratio": round(total_liabilities / equity, 2),
-            "current_ratio": round(equity / total_liabilities * 1.2, 2),
-            "profit_margin": f"{(monthly_profit / monthly_revenue) * 100:.1f}%",
-        },
-        "loan_affordability": {
-            "max_loan_amount": fmt_m(approved_loan_amount),
-            "interest_rate": f"{round(interest_rate, 1)}%",
-            "loan_term_months": 36 + (hash_seed % 48),
-            "affordability_score": min(95, int(risk_score * 1.1)),
-        },
-        "liabilities_breakdown": {
-            "accounts_payable": fmt_m(total_liabilities * 0.25),
-            "short_term_debt": fmt_m(total_liabilities * 0.20),
-            "accrued_expenses": fmt_m(total_liabilities * 0.15),
-            "long_term_bank_loans": fmt_m(total_liabilities * 0.30),
-            "bonds_payable": fmt_m(total_liabilities * 0.05),
-            "other_current_liabilities": fmt_m(total_liabilities * 0.05),
-        },
-        # Phase 2: Advanced Document Intelligence
-        "bank_analysis": {
-            "transactions": [
-                {"date": "2024-03-01", "description": "SALARY_PAYOUT", "amount": 150000, "type": "debit"},
-                {"date": "2024-03-02", "description": "INCOMING_WIRE_X", "amount": 500000, "type": "credit"},
-                {"date": "2024-03-05", "description": "GST_PAYMENT", "amount": 75000, "type": "debit"},
-                {"date": "2024-03-10", "description": "EMI_TRANSFER", "amount": 120000, "type": "debit"},
-            ],
-            "counterparty_risk": {
-                "risk_level": "Medium",
-                "description": "35% concentration detected with single counterparty (WIRE_X).",
-                "top_counterparties": [("WIRE_X", 500000)]
-            },
-            "debt_service_ratio": {
-                "value": 0.35,
-                "status": "Warning",
-                "monthly_debt_obligations": 120000,
-                "monthly_average_inflow": 450000
-            }
-        },
-        "upload_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-    }
-    
-    return {
-        "status": "success",
-        "message": "Test data generated",
-        "data": test_data
-    }
+        logger.error(f"Test data generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 app.include_router(upload_router, prefix="/api", tags=["upload"])
 app.include_router(risk_router, prefix="/api", tags=["risk"])

@@ -80,69 +80,84 @@ class RiskEngine:
         return risk_result
     
     def _calculate_financial_risk(self, financial_data: Dict) -> float:
-        """Calculate financial risk component score"""
+        """Calculate financial risk component score with improved ratio analysis"""
         
-        score = 50  # Base score
+        score = 50  # Base neutral score
         risk_factors = []
         
-        # Revenue growth analysis
+        # 1. Revenue Scale & Growth
         revenue = financial_data.get('revenue', 0)
-        if revenue == 0:
-            score += 20  # High risk for no revenue
-            risk_factors.append("No revenue data")
-        elif revenue < 10000000:  # Less than 1 crore
+        if revenue <= 0:
+            score += 30
+            risk_factors.append("No verifiable revenue")
+        elif revenue < 5000000:  # < 50 Lakhs
             score += 15
-            risk_factors.append("Low revenue base")
-        elif revenue > 1000000000:  # More than 100 crore
-            score -= 10  # Lower risk for large revenue
-        else:
-            score -= 5
+            risk_factors.append("Very small revenue base")
+        elif revenue > 500000000:  # > 50 Crores
+            score -= 15
         
-        # Debt analysis
+        # 2. Leverage: Total Debt to Revenue
         existing_loans = financial_data.get('existing_loans', 0)
         if revenue > 0:
             debt_to_revenue = existing_loans / revenue
-            if debt_to_revenue > 2.0:
+            if debt_to_revenue > 3.0:
                 score += 25
-                risk_factors.append("High debt-to-revenue ratio")
-            elif debt_to_revenue > 1.0:
-                score += 10
-                risk_factors.append("Moderate debt-to-revenue ratio")
-            elif debt_to_revenue < 0.3:
-                score -= 10  # Lower risk for low debt
-        
-        # Litigation exposure
-        litigation = financial_data.get('litigation', 0)
-        if litigation > revenue * 0.1:  # Litigation > 10% of revenue
-            score += 20
-            risk_factors.append("High litigation exposure")
-        elif litigation > 0:
-            score += 10
-            risk_factors.append("Moderate litigation exposure")
-        
-        # Asset quality
-        assets = financial_data.get('assets', 0)
-        liabilities = financial_data.get('liabilities', 0)
-        
-        if assets > 0 and liabilities > 0:
-            debt_to_assets = liabilities / assets
-            if debt_to_assets > 0.8:
+                risk_factors.append("Critical leverage (Debt > 3x Revenue)")
+            elif debt_to_revenue > 1.5:
                 score += 15
-                risk_factors.append("High debt-to-assets ratio")
-            elif debt_to_assets < 0.3:
-                score -= 5
+                risk_factors.append("High leverage profile")
+            elif debt_to_revenue < 0.5:
+                score -= 10
         
-        # Profitability
+        # 3. Liquidity: Current Ratio (Current Assets / Current Liabilities)
+        # Using a fallback if specific CA/CL aren't parsed
+        ca = financial_data.get('current_assets', financial_data.get('assets', 0) * 0.6)
+        cl = financial_data.get('current_liabilities', financial_data.get('liabilities', 0) * 0.4)
+        
+        if cl > 0:
+            current_ratio = ca / cl
+            if current_ratio < 1.0:
+                score += 20
+                risk_factors.append("Liquidity stress: Current Ratio < 1.0")
+            elif current_ratio < 1.2:
+                score += 10
+                risk_factors.append("Tight liquidity position")
+            elif current_ratio > 1.8:
+                score -= 10
+        
+        # 4. Solvency: Debt to Equity
+        equity = financial_data.get('equity', (financial_data.get('assets', 0) - financial_data.get('liabilities', 0)))
+        if equity > 0:
+            debt_to_equity = existing_loans / equity
+            if debt_to_equity > 2.5:
+                score += 20
+                risk_factors.append("High Debt-to-Equity ratio")
+            elif debt_to_equity < 1.0:
+                score -= 5
+        elif equity < 0:
+            score += 30
+            risk_factors.append("Negative Net Worth / Insolvency risk")
+
+        # 5. Profitability & Debt Service (DSCR approximation)
         profit = financial_data.get('profit', 0)
+        interest_exp = existing_loans * 0.1  # Estimate 10% interest if not provided
+        
         if revenue > 0:
             profit_margin = profit / revenue
-            if profit_margin < 0:
-                score += 20
-                risk_factors.append("Negative profitability")
-            elif profit_margin < 0.05:
-                score += 10
-                risk_factors.append("Low profit margin")
+            if profit_margin < 0.02:
+                score += 15
+                risk_factors.append("Thin or negative profit margins")
             elif profit_margin > 0.15:
+                score -= 10
+                
+        # Debt Service Coverage Ratio (DSCR) approximation
+        # (Net Profit + Depreciation + Interest) / (Interest + Principal Repayment)
+        if interest_exp > 0:
+            dscr_approx = (profit + interest_exp) / interest_exp
+            if dscr_approx < 1.2:
+                score += 20
+                risk_factors.append("Low Interest Coverage / DSCR")
+            elif dscr_approx > 3.0:
                 score -= 10
         
         return min(max(score, 0), 100)
