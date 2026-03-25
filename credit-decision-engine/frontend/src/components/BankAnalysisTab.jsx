@@ -37,7 +37,7 @@ const BankAnalysisTab = ({ bankData }) => {
               width: '100px',
               height: '100px',
               borderRadius: '50%',
-              border: `8px solid ${debt_service_ratio.status === 'Healthy' ? '#10b981' : debt_service_ratio.status === 'Warning' ? '#f59e0b' : '#ef4444'}`,
+              border: `8px solid ${debt_service_ratio?.status === 'Healthy' ? '#10b981' : debt_service_ratio?.status === 'Warning' ? '#f59e0b' : '#ef4444'}`,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -45,19 +45,19 @@ const BankAnalysisTab = ({ bankData }) => {
               fontWeight: 'bold',
               color: 'var(--text-primary)'
             }}>
-              {Math.round(debt_service_ratio.value * 100)}%
+              {Math.round((debt_service_ratio?.value || 0) * 100)}%
             </div>
             <div>
               <p style={{ margin: '0 0 4px 0', fontSize: '14px', color: 'var(--text-secondary)' }}>Status: 
-                <span style={{ fontWeight: 'bold', color: debt_service_ratio.status === 'Healthy' ? '#10b981' : '#ef4444', marginLeft: '4px' }}>
-                  {debt_service_ratio.status}
+                <span style={{ fontWeight: 'bold', color: debt_service_ratio?.status === 'Healthy' ? '#10b981' : '#ef4444', marginLeft: '4px' }}>
+                  {debt_service_ratio?.status || 'N/A'}
                 </span>
               </p>
               <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)' }}>
-                Avg Monthly Inflow: <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>₹{debt_service_ratio.monthly_average_inflow.toLocaleString()}</span>
+                Avg Monthly Inflow: <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>₹{(debt_service_ratio?.monthly_average_inflow || 0).toLocaleString()}</span>
               </p>
               <p style={{ margin: 0, fontSize: '14px', color: 'var(--text-secondary)' }}>
-                Debt Obligations: <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>₹{debt_service_ratio.monthly_debt_obligations.toLocaleString()}</span>
+                Debt Obligations: <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>₹{(debt_service_ratio?.monthly_debt_obligations || 0).toLocaleString()}</span>
               </p>
             </div>
           </div>
@@ -73,22 +73,22 @@ const BankAnalysisTab = ({ bankData }) => {
           boxShadow: 'var(--card-shadow)'
         }}>
           <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <AlertTriangle size={20} color={counterparty_risk.risk_level === 'High' ? '#ef4444' : '#f59e0b'} /> Counterparty Risk
+            <AlertTriangle size={20} color={counterparty_risk?.risk_level === 'High' ? '#ef4444' : '#f59e0b'} /> Counterparty Risk
           </h3>
           <p style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--text-secondary)' }}>
-            {counterparty_risk.description}
+            {counterparty_risk?.description || 'No data available'}
           </p>
           <div style={{ height: '120px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={counterparty_risk.top_counterparties.map(([name, val]) => ({ name, value: val }))}
+                  data={(counterparty_risk?.top_counterparties || []).map(([name, val]) => ({ name, value: val }))}
                   innerRadius={30}
                   outerRadius={50}
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {counterparty_risk.top_counterparties.map((entry, index) => (
+                  {(counterparty_risk?.top_counterparties || []).map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -143,7 +143,7 @@ const BankAnalysisTab = ({ bankData }) => {
                     </span>
                   </td>
                   <td style={{ padding: '12px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: 'bold', textAlign: 'right' }}>
-                    ₹{t.amount.toLocaleString()}
+                    ₹{(t.amount || 0).toLocaleString()}
                   </td>
                 </tr>
               ))}

@@ -226,9 +226,24 @@ async def get_test_data():
                     {"date": "2024-03-01", "description": "CLIENT_PAYMENT_A", "amount": 2500000, "type": "credit"},
                     {"date": "2024-03-05", "description": "AWS_INFRA_FEES", "amount": 400000, "type": "debit"},
                     {"date": "2024-03-10", "description": "SALARY_OUT_MARCH", "amount": 1200000, "type": "debit"},
+                    {"date": "2024-03-15", "description": "OFFICE_RENT", "amount": 350000, "type": "debit"},
+                    {"date": "2024-03-20", "description": "CLIENT_PAYMENT_B", "amount": 1800000, "type": "credit"},
                 ],
-                "counterparty_risk": {"risk_level": "Low", "description": "Healthy diversification."},
-                "debt_service_ratio": {"value": 0.12, "status": "Healthy"}
+                "counterparty_risk": {
+                    "risk_level": "Low", 
+                    "description": "Healthy diversification across multiple blue-chip clients. No single counterparty dependency found.",
+                    "top_counterparties": [
+                        ["Global Exports", 4500000],
+                        ["Apex Solutions", 3200000],
+                        ["Nexus IT", 2800000]
+                    ]
+                },
+                "debt_service_ratio": {
+                    "value": 0.12, 
+                    "status": "Healthy",
+                    "monthly_average_inflow": 4300000,
+                    "monthly_debt_obligations": 516000
+                }
             },
             "upload_timestamp": datetime.now().isoformat()
         }

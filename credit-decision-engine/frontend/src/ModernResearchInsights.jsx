@@ -8,13 +8,23 @@ const ModernResearchInsights = () => {
 
   useEffect(() => {
     const data = localStorage.getItem('companyData');
-    if (data) {
-      const parsedData = JSON.parse(data);
-      setCompanyData(parsedData);
-      if (parsedData.is_multi_company && parsedData.companies.length > 0) {
-        setSelectedCompany(parsedData.companies[0]);
-      } else {
-        setSelectedCompany(parsedData);
+    if (data && data !== 'undefined' && data !== 'null') {
+      try {
+        const parsedData = JSON.parse(data);
+        if (parsedData) {
+          setCompanyData(parsedData);
+          if (parsedData.is_multi_company && parsedData.companies && parsedData.companies.length > 0) {
+            setSelectedCompany(parsedData.companies[0]);
+          } else {
+            setSelectedCompany(parsedData);
+          }
+        } else {
+          navigate('/');
+        }
+      } catch (err) {
+        console.error('Failed to parse company data from localStorage:', err);
+        localStorage.removeItem('companyData');
+        navigate('/');
       }
     } else {
       navigate('/');
@@ -179,8 +189,6 @@ const ModernResearchInsights = () => {
         borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
         padding: '24px 0',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        position: 'sticky',
-        top: 0,
         zIndex: 1000
       }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px' }}>

@@ -16,13 +16,18 @@ const CompleteUploadPageFixed = () => {
   // Add debug function to test backend data
   const testBackendData = async () => {
     try {
-      const response = await fetch('http://localhost:8000/test-data');
+      const response = await fetch('http://localhost:8000/api/test-data');
       const result = await response.json();
       
       console.log('Backend test data:', result);
       
-      // Store the backend data directly
-      localStorage.setItem('companyData', JSON.stringify(result.data));
+      // Store the backend data directly if it exists
+      if (result && result.data) {
+        localStorage.setItem('companyData', JSON.stringify(result.data));
+      } else {
+        console.error('Invalid backend response structure:', result);
+        throw new Error('Backend returned invalid data structure');
+      }
       
       setMessage('Test data loaded! Navigate to dashboard to see results.');
       setUploadProgress(100);
@@ -52,7 +57,7 @@ const CompleteUploadPageFixed = () => {
         formData.append(`files`, file);
       });
 
-      const response = await fetch('http://localhost:8000/upload', {
+      const response = await fetch('http://localhost:8000/api/upload', {
         method: 'POST',
         body: formData,
       });
@@ -68,8 +73,13 @@ const CompleteUploadPageFixed = () => {
       // Store the backend data directly - it's already in the correct format
       const companyData = result.data;
       
-      console.log('Company data to store:', companyData);
-      localStorage.setItem('companyData', JSON.stringify(companyData));
+      if (companyData) {
+        console.log('Company data to store:', companyData);
+        localStorage.setItem('companyData', JSON.stringify(companyData));
+      } else {
+        console.error('No company data found in response:', result);
+        throw new Error('Analysis failed to produce report data');
+      }
       
       setMessage('Files uploaded successfully! Analyzing financial data...');
       setUploadProgress(100);

@@ -52,18 +52,30 @@ const ModernDashboard = () => {
 
   useEffect(() => {
     const data = localStorage.getItem('companyData');
-    if (data) {
-      const parsedData = JSON.parse(data);
-      console.log('Raw data from localStorage:', parsedData);
-      setCompanyData(parsedData);
-      if (parsedData.is_multi_company && parsedData.companies.length > 0) {
-        console.log('Setting selected company (multi):', parsedData.companies[0]);
-        setSelectedCompany(parsedData.companies[0]);
-      } else {
-        console.log('Setting selected company (single):', parsedData);
-        setSelectedCompany(parsedData);
+    if (data && data !== 'undefined' && data !== 'null') {
+      try {
+        const parsedData = JSON.parse(data);
+        console.log('Raw data from localStorage:', parsedData);
+        if (parsedData) {
+          setCompanyData(parsedData);
+          if (parsedData.is_multi_company && parsedData.companies && parsedData.companies.length > 0) {
+            console.log('Setting selected company (multi):', parsedData.companies[0]);
+            setSelectedCompany(parsedData.companies[0]);
+          } else {
+            console.log('Setting selected company (single):', parsedData);
+            setSelectedCompany(parsedData);
+          }
+        } else {
+          console.error('Parsed data is empty');
+          navigate('/');
+        }
+      } catch (err) {
+        console.error('Failed to parse company data from localStorage:', err);
+        localStorage.removeItem('companyData');
+        navigate('/');
       }
     } else {
+      console.log('No valid company data in localStorage, redirecting to upload');
       navigate('/');
     }
   }, [navigate]);
@@ -157,8 +169,6 @@ const ModernDashboard = () => {
         borderBottom: '1px solid var(--border-color)',
         padding: '24px 0',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-        position: 'sticky',
-        top: 0,
         zIndex: 1000
       }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px' }}>
