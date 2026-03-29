@@ -1,5 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
+
+const TiltCard = ({ children, style, className }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const rotateX = useTransform(y, [-100, 100], [10, -10]);
+  const rotateY = useTransform(x, [-100, 100], [-10, 10]);
+
+  function handleMouseMove(event) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+    const xPct = (mouseX / width - 0.5) * 200;
+    const yPct = (mouseY / height - 0.5) * 200;
+    x.set(xPct);
+    y.set(yPct);
+  }
+
+  function handleMouseLeave() {
+    x.set(0);
+    y.set(0);
+  }
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        ...style,
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      className={className}
+      whileHover={{ scale: 1.02, translateZ: 20 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 const ModernResearchInsights = () => {
   const navigate = useNavigate();
@@ -143,15 +187,22 @@ const ModernResearchInsights = () => {
   const sentimentColors = getSentimentColor(research.news_sentiment.sentiment);
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #1e40af 0%, #0f766e 50%, #0891b2 100%)',
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="mesh-background"
+      style={{ 
+        minHeight: '100vh', 
+        background: 'var(--dashboard-bg)',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        perspective: '1500px',
+        overflowX: 'hidden'
+      }}
+    >
       {/* Enhanced Animated background elements */}
-      <div style={{
+      <motion.div style={{
         position: 'absolute',
         top: '10%',
         left: '5%',
@@ -159,9 +210,12 @@ const ModernResearchInsights = () => {
         height: '300px',
         background: 'radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%)',
         borderRadius: '50%',
-        animation: 'float 6s ease-in-out infinite'
-      }}></div>
-      <div style={{
+      }} animate={{ 
+        y: [0, -30, 0],
+        scale: [1, 1.1, 1],
+        opacity: [0.3, 0.5, 0.3]
+      }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}></motion.div>
+      <motion.div style={{
         position: 'absolute',
         top: '60%',
         right: '10%',
@@ -169,9 +223,12 @@ const ModernResearchInsights = () => {
         height: '250px',
         background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
         borderRadius: '50%',
-        animation: 'float 8s ease-in-out infinite reverse'
-      }}></div>
-      <div style={{
+      }} animate={{ 
+        y: [0, 40, 0],
+        x: [0, 20, 0],
+        opacity: [0.2, 0.4, 0.2]
+      }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}></motion.div>
+      <motion.div style={{
         position: 'absolute',
         bottom: '20%',
         left: '15%',
@@ -179,14 +236,16 @@ const ModernResearchInsights = () => {
         height: '200px',
         background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)',
         borderRadius: '50%',
-        animation: 'float 10s ease-in-out infinite'
-      }}></div>
+      }} animate={{ 
+        y: [0, -50, 0],
+        opacity: [0.1, 0.3, 0.1]
+      }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}></motion.div>
 
       {/* Enhanced Header */}
       <div style={{ 
-        background: 'rgba(255, 255, 255, 0.1)', 
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+        background: 'var(--header-bg)', 
+        backdropFilter: 'var(--glass-blur)',
+        borderBottom: '1px solid var(--border-color)',
         padding: '24px 0',
         boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         zIndex: 1000
@@ -219,90 +278,98 @@ const ModernResearchInsights = () => {
               </p>
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
-              <button
+              <motion.button
                 onClick={() => navigate('/dashboard')}
+                whileHover={{ scale: 1.05, translateZ: 10 }}
+                whileTap={{ scale: 0.95 }}
+                className="glass-3d"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)',
+                  background: 'var(--card-bg)',
+                  backdropFilter: 'var(--glass-blur)',
                   color: 'white',
                   padding: '12px 24px',
                   borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  border: '1px solid var(--border-color)',
                   cursor: 'pointer',
                   fontSize: '15px',
                   fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  boxShadow: 'var(--card-shadow)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}
               >
                 📊 Dashboard
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={() => navigate('/dynamic-dashboard')}
+                whileHover={{ scale: 1.05, translateZ: 10 }}
+                whileTap={{ scale: 0.95 }}
+                className="glass-3d"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)',
+                  background: 'var(--card-bg)',
+                  backdropFilter: 'var(--glass-blur)',
                   color: 'white',
                   padding: '12px 24px',
                   borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  border: '1px solid var(--border-color)',
                   cursor: 'pointer',
                   fontSize: '15px',
                   fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  boxShadow: 'var(--card-shadow)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}
               >
                 🚀 Dynamic Dashboard
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={() => navigate('/cam-preview')}
+                whileHover={{ scale: 1.05, translateZ: 10 }}
+                whileTap={{ scale: 0.95 }}
+                className="glass-3d"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)',
+                  background: 'var(--card-bg)',
+                  backdropFilter: 'var(--glass-blur)',
                   color: 'white',
                   padding: '12px 24px',
                   borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  border: '1px solid var(--border-color)',
                   cursor: 'pointer',
                   fontSize: '15px',
                   fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  boxShadow: 'var(--card-shadow)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}
               >
                 📄 Generate CAM
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={() => navigate('/')}
+                whileHover={{ scale: 1.05, translateZ: 10 }}
+                whileTap={{ scale: 0.95 }}
+                className="glass-3d"
                 style={{
-                  background: 'rgba(255, 255, 255, 0.2)',
-                  backdropFilter: 'blur(10px)',
+                  background: 'var(--card-bg)',
+                  backdropFilter: 'var(--glass-blur)',
                   color: 'white',
                   padding: '12px 24px',
                   borderRadius: '12px',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  border: '1px solid var(--border-color)',
                   cursor: 'pointer',
                   fontSize: '15px',
                   fontWeight: '600',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  boxShadow: 'var(--card-shadow)',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}
               >
                 📤 New Upload
-              </button>
+              </motion.button>
             </div>
           </div>
         </div>
@@ -314,41 +381,43 @@ const ModernResearchInsights = () => {
           
           {/* Enhanced Sidebar */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.95)',
-            backdropFilter: 'blur(20px)',
-            borderRadius: '20px',
+            background: 'var(--card-bg)',
+            backdropFilter: 'var(--glass-blur)',
+            borderRadius: '24px',
             padding: '24px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
+            boxShadow: 'var(--card-shadow)',
+            border: '1px solid var(--border-color)',
             height: 'fit-content',
             position: 'sticky',
             top: '120px'
           }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               🏢 {isMultiCompany ? 'Companies' : 'Company Details'}
             </h3>
             
             {isMultiCompany ? (
               <div>
                 <div style={{ 
-                  background: 'linear-gradient(135deg, #dbeafe, #eff6ff)',
+                  background: 'rgba(59, 130, 246, 0.1)',
                   padding: '16px',
                   borderRadius: '12px',
                   marginBottom: '20px',
-                  border: '1px solid #3b82f6'
+                  border: '1px solid rgba(59, 130, 246, 0.2)'
                 }}>
-                  <p style={{ fontSize: '16px', fontWeight: '600', color: '#1e40af', margin: '0 0 8px 0' }}>
+                  <p style={{ fontSize: '16px', fontWeight: '600', color: '#3b82f6', margin: '0 0 8px 0' }}>
                     Total Companies
                   </p>
-                  <p style={{ fontSize: '32px', fontWeight: 'bold', color: '#1e40af', margin: 0 }}>
+                  <p style={{ fontSize: '32px', fontWeight: 'bold', color: 'var(--text-primary)', margin: 0 }}>
                     {companies.length}
                   </p>
                 </div>
                 
                 {companies.map((comp, index) => (
-                  <div
+                  <motion.div
                     key={comp.unique_hash || index}
                     onClick={() => setSelectedCompany(comp)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     style={{
                       padding: '16px',
                       borderRadius: '12px',
@@ -356,15 +425,14 @@ const ModernResearchInsights = () => {
                       cursor: 'pointer',
                       background: selectedCompany?.unique_hash === comp.unique_hash 
                         ? 'linear-gradient(135deg, #3b82f6, #2563eb)' 
-                        : 'linear-gradient(135deg, #f8fafc, #f1f5f9)',
+                        : 'rgba(255, 255, 255, 0.05)',
                       border: selectedCompany?.unique_hash === comp.unique_hash 
-                        ? '2px solid #3b82f6' 
-                        : '1px solid #e2e8f0',
+                        ? '1px solid #3b82f6' 
+                        : '1px solid var(--border-color)',
                       transition: 'all 0.3s ease',
-                      transform: selectedCompany?.unique_hash === comp.unique_hash ? 'scale(1.02)' : 'scale(1)',
                       boxShadow: selectedCompany?.unique_hash === comp.unique_hash 
                         ? '0 8px 16px rgba(59, 130, 246, 0.3)' 
-                        : '0 2px 4px rgba(0, 0, 0, 0.05)'
+                        : 'none'
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -388,7 +456,7 @@ const ModernResearchInsights = () => {
                         <p style={{ 
                           fontSize: '16px', 
                           fontWeight: '700', 
-                          color: selectedCompany?.unique_hash === comp.unique_hash ? 'white' : '#1e293b',
+                          color: selectedCompany?.unique_hash === comp.unique_hash ? 'white' : 'var(--text-primary)',
                           margin: '0 0 4px 0' 
                         }}>
                           Company {index + 1}
@@ -415,7 +483,7 @@ const ModernResearchInsights = () => {
                         Currently Selected
                       </div>
                     )}
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             ) : (
@@ -457,16 +525,15 @@ const ModernResearchInsights = () => {
             
             {/* Enhanced Top Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
-                borderRadius: '20px',
+              <TiltCard style={{
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                borderRadius: '24px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -477,7 +544,7 @@ const ModernResearchInsights = () => {
                   background: sentimentColors.gradient
                 }}></div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#64748b', margin: 0 }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-secondary)', margin: 0 }}>
                     News Sentiment
                   </h4>
                   <span style={{ fontSize: '24px' }}>{sentimentColors.icon}</span>
@@ -496,18 +563,17 @@ const ModernResearchInsights = () => {
                     {research.news_sentiment.confidence}% confidence
                   </span>
                 </div>
-              </div>
+              </TiltCard>
 
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
-                borderRadius: '20px',
+              <TiltCard style={{
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                borderRadius: '24px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -518,12 +584,12 @@ const ModernResearchInsights = () => {
                   background: 'linear-gradient(135deg, #10b981, #059669)'
                 }}></div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#64748b', margin: 0 }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-secondary)', margin: 0 }}>
                     Industry Trend
                   </h4>
                   <span style={{ fontSize: '24px' }}>📊</span>
                 </div>
-                <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 12px 0' }}>
+                <p style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 12px 0' }}>
                   {research.industry_analysis.trend}
                 </p>
                 <div style={{
@@ -537,18 +603,17 @@ const ModernResearchInsights = () => {
                     {research.industry_analysis.growth_potential}% growth potential
                   </span>
                 </div>
-              </div>
+              </TiltCard>
 
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
-                borderRadius: '20px',
+              <TiltCard style={{
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                borderRadius: '24px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -559,12 +624,12 @@ const ModernResearchInsights = () => {
                   background: 'linear-gradient(135deg, #f59e0b, #d97706)'
                 }}></div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#64748b', margin: 0 }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-secondary)', margin: 0 }}>
                     Legal Risk
                   </h4>
                   <span style={{ fontSize: '24px' }}>⚖️</span>
                 </div>
-                <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 12px 0' }}>
+                <p style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 12px 0' }}>
                   {research.legal_compliance.risk_level}
                 </p>
                 <div style={{
@@ -578,18 +643,17 @@ const ModernResearchInsights = () => {
                     {research.legal_compliance.compliance_score}/100 compliance
                   </span>
                 </div>
-              </div>
+              </TiltCard>
 
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px)',
-                borderRadius: '20px',
+              <TiltCard style={{
+                background: 'var(--card-bg)',
+                backdropFilter: 'var(--glass-blur)',
+                borderRadius: '24px',
                 padding: '24px',
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.3)',
+                boxShadow: 'var(--card-shadow)',
+                border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -600,12 +664,12 @@ const ModernResearchInsights = () => {
                   background: 'linear-gradient(135deg, #8b5cf6, #7c3aed)'
                 }}></div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#64748b', margin: 0 }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-secondary)', margin: 0 }}>
                     Market Signal
                   </h4>
                   <span style={{ fontSize: '24px' }}>📈</span>
                 </div>
-                <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 12px 0' }}>
+                <p style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 12px 0' }}>
                   {research.market_signals.technical_indicator}
                 </p>
                 <div style={{
@@ -619,7 +683,7 @@ const ModernResearchInsights = () => {
                     {research.market_signals.analyst_rating} rating
                   </span>
                 </div>
-              </div>
+              </TiltCard>
             </div>
 
             {/* Enhanced Main Content Area */}
@@ -629,13 +693,13 @@ const ModernResearchInsights = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 
                 {/* Enhanced News Sentiment Analysis */}
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: '20px',
+                <TiltCard style={{
+                  background: 'var(--card-bg)',
+                  backdropFilter: 'var(--glass-blur)',
+                  borderRadius: '24px',
                   padding: '32px',
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: 'var(--card-shadow)',
+                  border: '1px solid var(--border-color)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -649,7 +713,7 @@ const ModernResearchInsights = () => {
                     borderRadius: '20px 20px 0 0'
                   }}></div>
 
-                  <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e293b', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     📰 {isMultiCompany ? `Company ${companies.indexOf(company) + 1} News Sentiment` : 'News Sentiment Analysis'}
                   </h3>
                   
@@ -668,7 +732,7 @@ const ModernResearchInsights = () => {
                         }}>
                           {research.news_sentiment.sentiment}
                         </span>
-                        <span style={{ fontSize: '16px', color: '#64748b', marginLeft: '12px' }}>
+                        <span style={{ fontSize: '16px', color: 'var(--text-secondary)', marginLeft: '12px' }}>
                           ({research.news_sentiment.confidence}% confidence)
                         </span>
                       </div>
@@ -676,16 +740,16 @@ const ModernResearchInsights = () => {
                   </div>
 
                   <div style={{ marginBottom: '24px' }}>
-                    <h4 style={{ fontSize: '18px', fontWeight: '600', color: '#374151', marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '16px' }}>
                       Recent Headlines
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {research.news_sentiment.headlines.map((headline, i) => (
                         <div key={i} style={{ 
                           padding: '16px', 
-                          background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
+                          background: 'rgba(255, 255, 255, 0.05)', 
                           borderRadius: '12px',
-                          border: '1px solid #e2e8f0',
+                          border: '1px solid var(--border-color)',
                           position: 'relative',
                           overflow: 'hidden'
                         }}>
@@ -697,7 +761,7 @@ const ModernResearchInsights = () => {
                             height: '100%',
                             background: sentimentColors.gradient
                           }}></div>
-                          <p style={{ fontSize: '15px', color: '#1e293b', margin: 0, paddingLeft: '12px', fontWeight: '500' }}>
+                          <p style={{ fontSize: '15px', color: 'var(--text-primary)', margin: 0, paddingLeft: '12px', fontWeight: '500' }}>
                             {headline}
                           </p>
                         </div>
@@ -706,16 +770,16 @@ const ModernResearchInsights = () => {
                   </div>
 
                   <div>
-                    <h4 style={{ fontSize: '18px', fontWeight: '600', color: '#374151', marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '16px' }}>
                       News Articles
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                       {research.news_sentiment.articles.map((article, i) => (
                         <div key={i} style={{ 
                           padding: '20px', 
-                          background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
+                          background: 'rgba(255, 255, 255, 0.05)', 
                           borderRadius: '16px',
-                          border: '1px solid #e2e8f0',
+                          border: '1px solid var(--border-color)',
                           position: 'relative',
                           overflow: 'hidden'
                         }}>
@@ -728,7 +792,7 @@ const ModernResearchInsights = () => {
                             background: getSentimentColor(article.sentiment).gradient
                           }}></div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px', paddingLeft: '12px' }}>
-                            <h5 style={{ fontSize: '16px', fontWeight: '700', color: '#1e293b', margin: 0 }}>
+                            <h5 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', margin: 0 }}>
                               {article.title}
                             </h5>
                             <span style={{
@@ -743,26 +807,26 @@ const ModernResearchInsights = () => {
                               {article.sentiment}
                             </span>
                           </div>
-                          <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 12px 12px' }}>
+                          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', margin: '0 0 12px 12px' }}>
                             {article.source} • {article.date}
                           </p>
-                          <p style={{ fontSize: '14px', color: '#374151', margin: 0, paddingLeft: '12px', lineHeight: '1.5' }}>
+                          <p style={{ fontSize: '14px', color: 'var(--text-primary)', margin: 0, paddingLeft: '12px', lineHeight: '1.5' }}>
                             {article.summary}
                           </p>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
+                </TiltCard>
 
                 {/* Enhanced Industry Analysis */}
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: '20px',
+                <TiltCard style={{
+                  background: 'var(--card-bg)',
+                  backdropFilter: 'var(--glass-blur)',
+                  borderRadius: '24px',
                   padding: '32px',
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: 'var(--card-shadow)',
+                  border: '1px solid var(--border-color)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -776,16 +840,16 @@ const ModernResearchInsights = () => {
                     borderRadius: '20px 20px 0 0'
                   }}></div>
 
-                  <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e293b', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     📊 Industry Analysis
                   </h3>
                   
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', marginBottom: '24px' }}>
                     <div style={{ 
-                      background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
+                      background: 'rgba(255, 255, 255, 0.05)', 
                       padding: '20px', 
                       borderRadius: '16px',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--border-color)',
                       position: 'relative',
                       overflow: 'hidden'
                     }}>
@@ -797,13 +861,13 @@ const ModernResearchInsights = () => {
                         height: '3px',
                         background: 'linear-gradient(135deg, #10b981, #059669)'
                       }}></div>
-                      <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '600' }}>Market Trend</p>
-                      <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 12px 0' }}>
+                      <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 8px 0', fontWeight: '600' }}>Market Trend</p>
+                      <p style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 12px 0' }}>
                         {research.industry_analysis.trend}
                       </p>
                       <div style={{
                         height: '6px',
-                        backgroundColor: '#e2e8f0',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
                         borderRadius: '3px',
                         overflow: 'hidden'
                       }}>
@@ -818,10 +882,10 @@ const ModernResearchInsights = () => {
                     </div>
                     
                     <div style={{ 
-                      background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
+                      background: 'rgba(255, 255, 255, 0.05)', 
                       padding: '20px', 
                       borderRadius: '16px',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--border-color)',
                       position: 'relative',
                       overflow: 'hidden'
                     }}>
@@ -833,13 +897,13 @@ const ModernResearchInsights = () => {
                         height: '3px',
                         background: 'linear-gradient(135deg, #3b82f6, #2563eb)'
                       }}></div>
-                      <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '600' }}>Market Share</p>
-                      <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 12px 0' }}>
+                      <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 8px 0', fontWeight: '600' }}>Market Share</p>
+                      <p style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 12px 0' }}>
                         {research.industry_analysis.market_share}%
                       </p>
                       <div style={{
                         height: '6px',
-                        backgroundColor: '#e2e8f0',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
                         borderRadius: '3px',
                         overflow: 'hidden'
                       }}>
@@ -853,10 +917,10 @@ const ModernResearchInsights = () => {
                     </div>
                     
                     <div style={{ 
-                      background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
+                      background: 'rgba(255, 255, 255, 0.05)', 
                       padding: '20px', 
                       borderRadius: '16px',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--border-color)',
                       position: 'relative',
                       overflow: 'hidden'
                     }}>
@@ -868,13 +932,13 @@ const ModernResearchInsights = () => {
                         height: '3px',
                         background: 'linear-gradient(135deg, #10b981, #059669)'
                       }}></div>
-                      <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '600' }}>Growth Potential</p>
-                      <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 12px 0' }}>
+                      <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 8px 0', fontWeight: '600' }}>Growth Potential</p>
+                      <p style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 12px 0' }}>
                         {research.industry_analysis.growth_potential}%
                       </p>
                       <div style={{
                         height: '6px',
-                        backgroundColor: '#e2e8f0',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
                         borderRadius: '3px',
                         overflow: 'hidden'
                       }}>
@@ -888,10 +952,10 @@ const ModernResearchInsights = () => {
                     </div>
                     
                     <div style={{ 
-                      background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
+                      background: 'rgba(255, 255, 255, 0.05)', 
                       padding: '20px', 
                       borderRadius: '16px',
-                      border: '1px solid #e2e8f0',
+                      border: '1px solid var(--border-color)',
                       position: 'relative',
                       overflow: 'hidden'
                     }}>
@@ -903,13 +967,13 @@ const ModernResearchInsights = () => {
                         height: '3px',
                         background: 'linear-gradient(135deg, #f59e0b, #d97706)'
                       }}></div>
-                      <p style={{ fontSize: '14px', color: '#64748b', margin: '0 0 8px 0', fontWeight: '600' }}>Competition</p>
-                      <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', margin: '0 0 12px 0' }}>
+                      <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 8px 0', fontWeight: '600' }}>Competition</p>
+                      <p style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', margin: '0 0 12px 0' }}>
                         {research.industry_analysis.competition_level}
                       </p>
                       <div style={{
                         height: '6px',
-                        backgroundColor: '#e2e8f0',
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
                         borderRadius: '3px',
                         overflow: 'hidden'
                       }}>
@@ -925,62 +989,62 @@ const ModernResearchInsights = () => {
                   </div>
 
                   <div>
-                    <h4 style={{ fontSize: '18px', fontWeight: '600', color: '#374151', marginBottom: '16px' }}>
+                    <h4 style={{ fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '16px' }}>
                       Key Industry Metrics
                     </h4>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
                       <div style={{ 
-                        background: 'linear-gradient(135deg, #dbeafe, #eff6ff)', 
+                        background: 'rgba(59, 130, 246, 0.1)', 
                         padding: '20px', 
                         borderRadius: '16px',
-                        border: '1px solid #3b82f6',
+                        border: '1px solid rgba(59, 130, 246, 0.2)',
                         textAlign: 'center'
                       }}>
-                        <p style={{ fontSize: '14px', color: '#1e40af', margin: '0 0 8px 0', fontWeight: '600' }}>Market Size</p>
-                        <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#0c4a6e', margin: 0 }}>
+                        <p style={{ fontSize: '14px', color: '#3b82f6', margin: '0 0 8px 0', fontWeight: '600' }}>Market Size</p>
+                        <p style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', margin: 0 }}>
                           ${research.industry_analysis.key_metrics.market_size}
                         </p>
                       </div>
                       <div style={{ 
-                        background: 'linear-gradient(135deg, #dcfce7, #f0fdf4)', 
+                        background: 'rgba(16, 185, 129, 0.1)', 
                         padding: '20px', 
                         borderRadius: '16px',
-                        border: '1px solid #22c55e',
+                        border: '1px solid rgba(16, 185, 129, 0.2)',
                         textAlign: 'center'
                       }}>
-                        <p style={{ fontSize: '14px', color: '#166534', margin: '0 0 8px 0', fontWeight: '600' }}>CAGR</p>
-                        <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#15803d', margin: 0 }}>
+                        <p style={{ fontSize: '14px', color: '#10b981', margin: '0 0 8px 0', fontWeight: '600' }}>CAGR</p>
+                        <p style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', margin: 0 }}>
                           {research.industry_analysis.key_metrics.cagr}
                         </p>
                       </div>
                       <div style={{ 
-                        background: 'linear-gradient(135deg, #fef3c7, #fef9c3)', 
+                        background: 'rgba(245, 158, 11, 0.1)', 
                         padding: '20px', 
                         borderRadius: '16px',
-                        border: '1px solid #f59e0b',
+                        border: '1px solid rgba(245, 158, 11, 0.2)',
                         textAlign: 'center'
                       }}>
-                        <p style={{ fontSize: '14px', color: '#92400e', margin: '0 0 8px 0', fontWeight: '600' }}>Competitors</p>
-                        <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#78350f', margin: 0 }}>
+                        <p style={{ fontSize: '14px', color: '#f59e0b', margin: '0 0 8px 0', fontWeight: '600' }}>Competitors</p>
+                        <p style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', margin: 0 }}>
                           {research.industry_analysis.key_metrics.competitors}
                         </p>
                       </div>
                     </div>
                   </div>
-                </div>
+                </TiltCard>
               </div>
 
               {/* Enhanced Right Panel */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
                 
                 {/* Enhanced Legal & Compliance */}
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: '20px',
+                <TiltCard style={{
+                  background: 'var(--card-bg)',
+                  backdropFilter: 'var(--glass-blur)',
+                  borderRadius: '24px',
                   padding: '24px',
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: 'var(--card-shadow)',
+                  border: '1px solid var(--border-color)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -994,42 +1058,42 @@ const ModernResearchInsights = () => {
                     borderRadius: '20px 20px 0 0'
                   }}></div>
 
-                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     ⚖️ Legal & Compliance
                   </h3>
                   
-                  <div style={{ background: 'linear-gradient(135deg, #fef3c7, #fef9c3)', padding: '20px', borderRadius: '16px', marginBottom: '20px', border: '1px solid #f59e0b' }}>
+                  <div style={{ background: 'rgba(245, 158, 11, 0.1)', padding: '20px', borderRadius: '16px', marginBottom: '20px', border: '1px solid rgba(245, 158, 11, 0.2)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '14px', color: '#92400e', fontWeight: '600' }}>Risk Level</span>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#78350f' }}>
+                      <span style={{ fontSize: '14px', color: '#f59e0b', fontWeight: '600' }}>Risk Level</span>
+                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                         {research.legal_compliance.risk_level}
                       </span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '14px', color: '#92400e', fontWeight: '600' }}>Compliance Score</span>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#78350f' }}>
+                      <span style={{ fontSize: '14px', color: '#f59e0b', fontWeight: '600' }}>Compliance Score</span>
+                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                         {research.legal_compliance.compliance_score}/100
                       </span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '14px', color: '#92400e', fontWeight: '600' }}>Pending Litigations</span>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#78350f' }}>
+                      <span style={{ fontSize: '14px', color: '#f59e0b', fontWeight: '600' }}>Pending Litigations</span>
+                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                         {research.legal_compliance.pending_litigations}
                       </span>
                     </div>
                   </div>
 
                   <div>
-                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#374151', marginBottom: '12px' }}>
+                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>
                       Recent Filings
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {research.legal_compliance.filings.map((filing, i) => (
                         <div key={i} style={{ 
                           padding: '16px', 
-                          background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
+                          background: 'rgba(255, 255, 255, 0.05)', 
                           borderRadius: '12px',
-                          border: '1px solid #e2e8f0',
+                          border: '1px solid var(--border-color)',
                           position: 'relative',
                           overflow: 'hidden'
                         }}>
@@ -1042,7 +1106,7 @@ const ModernResearchInsights = () => {
                             background: filing.status === 'Filed' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #f59e0b, #d97706)'
                           }}></div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: '12px' }}>
-                            <span style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>
+                            <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' }}>
                               {filing.type}
                             </span>
                             <span style={{
@@ -1057,23 +1121,23 @@ const ModernResearchInsights = () => {
                               {filing.status}
                             </span>
                           </div>
-                          <p style={{ fontSize: '12px', color: '#64748b', margin: '8px 0 0 12px' }}>
+                          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '8px 0 0 12px' }}>
                             {filing.date}
                           </p>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
+                </TiltCard>
 
                 {/* Enhanced Market Signals */}
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: '20px',
+                <TiltCard style={{
+                  background: 'var(--card-bg)',
+                  backdropFilter: 'var(--glass-blur)',
+                  borderRadius: '24px',
                   padding: '24px',
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: 'var(--card-shadow)',
+                  border: '1px solid var(--border-color)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -1087,48 +1151,48 @@ const ModernResearchInsights = () => {
                     borderRadius: '20px 20px 0 0'
                   }}></div>
 
-                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     📈 Market Signals
                   </h3>
                   
-                  <div style={{ background: 'linear-gradient(135deg, #f3e8ff, #faf5ff)', padding: '20px', borderRadius: '16px', marginBottom: '20px', border: '1px solid #8b5cf6' }}>
+                  <div style={{ background: 'rgba(139, 92, 246, 0.1)', padding: '20px', borderRadius: '16px', marginBottom: '20px', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '14px', color: '#6b21a8', fontWeight: '600' }}>Technical Indicator</span>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#4c1d95' }}>
+                      <span style={{ fontSize: '14px', color: '#8b5cf6', fontWeight: '600' }}>Technical Indicator</span>
+                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                         {research.market_signals.technical_indicator}
                       </span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '14px', color: '#6b21a8', fontWeight: '600' }}>Volume Trend</span>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#4c1d95' }}>
+                      <span style={{ fontSize: '14px', color: '#8b5cf6', fontWeight: '600' }}>Volume Trend</span>
+                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                         {research.market_signals.volume_trend}
                       </span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '14px', color: '#6b21a8', fontWeight: '600' }}>Volatility Index</span>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#4c1d95' }}>
+                      <span style={{ fontSize: '14px', color: '#8b5cf6', fontWeight: '600' }}>Volatility Index</span>
+                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                         {research.market_signals.volatility_index}
                       </span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '14px', color: '#6b21a8', fontWeight: '600' }}>Price Target</span>
-                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#4c1d95' }}>
+                      <span style={{ fontSize: '14px', color: '#8b5cf6', fontWeight: '600' }}>Price Target</span>
+                      <span style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                         {research.market_signals.price_target}
                       </span>
                     </div>
                   </div>
 
                   <div>
-                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#374151', marginBottom: '12px' }}>
+                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '12px' }}>
                       Analyst Recommendations
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                       {research.market_signals.recommendations.map((rec, i) => (
                         <div key={i} style={{ 
                           padding: '16px', 
-                          background: 'linear-gradient(135deg, #f8fafc, #f1f5f9)', 
+                          background: 'rgba(255, 255, 255, 0.05)', 
                           borderRadius: '12px',
-                          border: '1px solid #e2e8f0',
+                          border: '1px solid var(--border-color)',
                           position: 'relative',
                           overflow: 'hidden'
                         }}>
@@ -1143,7 +1207,7 @@ const ModernResearchInsights = () => {
                                            'linear-gradient(135deg, #ef4444, #dc2626)'
                           }}></div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingLeft: '12px' }}>
-                            <span style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>
+                            <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' }}>
                               {rec.firm}
                             </span>
                             <span style={{
@@ -1160,23 +1224,23 @@ const ModernResearchInsights = () => {
                               {rec.rating}
                             </span>
                           </div>
-                          <p style={{ fontSize: '12px', color: '#64748b', margin: '8px 0 0 12px' }}>
+                          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '8px 0 0 12px' }}>
                             Target: {rec.target}
                           </p>
                         </div>
                       ))}
                     </div>
                   </div>
-                </div>
+                </TiltCard>
 
                 {/* Enhanced Quick Actions */}
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: '20px',
+                <TiltCard style={{
+                  background: 'var(--card-bg)',
+                  backdropFilter: 'var(--glass-blur)',
+                  borderRadius: '24px',
                   padding: '24px',
-                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  boxShadow: 'var(--card-shadow)',
+                  border: '1px solid var(--border-color)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}>
@@ -1190,11 +1254,12 @@ const ModernResearchInsights = () => {
                     borderRadius: '20px 20px 0 0'
                   }}></div>
 
-                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e293b', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     🚀 Quick Actions
                   </h3>
                   
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {/* ... (buttons remain the same, just keeping the TiltCard wrapper) ... */}
                     <button
                       onClick={() => navigate('/dashboard')}
                       style={{
@@ -1270,13 +1335,13 @@ const ModernResearchInsights = () => {
                       </div>
                     </button>
                   </div>
-                </div>
+                </TiltCard>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

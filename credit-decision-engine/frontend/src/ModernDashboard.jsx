@@ -4,7 +4,51 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
   Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, PieChart, Pie, Cell 
 } from 'recharts';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import BankAnalysisTab from './components/BankAnalysisTab';
+
+const TiltCard = ({ children, style, className }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const rotateX = useTransform(y, [-100, 100], [10, -10]);
+  const rotateY = useTransform(x, [-100, 100], [-10, 10]);
+
+  function handleMouseMove(event) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+    const xPct = (mouseX / width - 0.5) * 200;
+    const yPct = (mouseY / height - 0.5) * 200;
+    x.set(xPct);
+    y.set(yPct);
+  }
+
+  function handleMouseLeave() {
+    x.set(0);
+    y.set(0);
+  }
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        ...style,
+        rotateX,
+        rotateY,
+        transformStyle: "preserve-3d",
+      }}
+      className={className}
+      whileHover={{ scale: 1.02, translateZ: 20 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    >
+      {children}
+    </motion.div>
+  );
+};
 
 const ModernDashboard = () => {
   const navigate = useNavigate();
@@ -123,15 +167,22 @@ const ModernDashboard = () => {
   const decisionColors = getDecisionColor(company?.ai_analysis?.decision_result?.decision || 'REVIEW REQUIRED');
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: 'var(--dashboard-bg)',
-      position: 'relative',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="mesh-background"
+      style={{ 
+        minHeight: '100vh', 
+        background: 'var(--dashboard-bg)',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        perspective: '1500px',
+        overflowX: 'hidden'
+      }}
+    >
       {/* Enhanced Animated background elements */}
-      <div style={{
+      <motion.div style={{
         position: 'absolute',
         top: '10%',
         left: '5%',
@@ -139,9 +190,12 @@ const ModernDashboard = () => {
         height: '300px',
         background: 'radial-gradient(circle, rgba(255,255,255,0.25) 0%, transparent 70%)',
         borderRadius: '50%',
-        animation: 'float 6s ease-in-out infinite'
-      }}></div>
-      <div style={{
+      }} animate={{ 
+        y: [0, -30, 0],
+        scale: [1, 1.1, 1],
+        opacity: [0.3, 0.5, 0.3]
+      }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}></motion.div>
+      <motion.div style={{
         position: 'absolute',
         top: '60%',
         right: '10%',
@@ -149,9 +203,12 @@ const ModernDashboard = () => {
         height: '250px',
         background: 'radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)',
         borderRadius: '50%',
-        animation: 'float 8s ease-in-out infinite reverse'
-      }}></div>
-      <div style={{
+      }} animate={{ 
+        y: [0, 40, 0],
+        x: [0, 20, 0],
+        opacity: [0.2, 0.4, 0.2]
+      }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}></motion.div>
+      <motion.div style={{
         position: 'absolute',
         bottom: '20%',
         left: '15%',
@@ -159,8 +216,10 @@ const ModernDashboard = () => {
         height: '200px',
         background: 'radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%)',
         borderRadius: '50%',
-        animation: 'float 10s ease-in-out infinite'
-      }}></div>
+      }} animate={{ 
+        y: [0, -50, 0],
+        opacity: [0.1, 0.3, 0.1]
+      }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}></motion.div>
 
       {/* Enhanced Header */}
       <div style={{ 
@@ -481,17 +540,16 @@ const ModernDashboard = () => {
             {activeTab === 'overview' ? (
               <>
                 {/* Enhanced Top Stats Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-              <div style={{
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '24px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -528,18 +586,17 @@ const ModernDashboard = () => {
                 <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
                   {company?.ai_analysis?.risk_analysis?.risk_category || 'Medium Risk'}
                 </p>
-              </div>
+              </TiltCard>
 
-              <div style={{
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '24px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -568,19 +625,18 @@ const ModernDashboard = () => {
                     Final Recommendation
                   </span>
                 </div>
-              </div>
+              </TiltCard>
 
               {/* New Loan Affordability Card */}
-              <div style={{
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '24px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -613,19 +669,18 @@ const ModernDashboard = () => {
                     <span style={{ fontWeight: '600', color: '#059669' }}>{company?.loan_affordability?.affordability_score || 75}/100</span>
                   </div>
                 </div>
-              </div>
+              </TiltCard>
 
               {/* New Financial Health Card */}
-              <div style={{
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '24px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -655,21 +710,20 @@ const ModernDashboard = () => {
                     <span style={{ fontWeight: '600' }}>{company?.financial_metrics?.profit_margin || '12%'}</span>
                   </div>
                 </div>
-              </div>
+              </TiltCard>
             </div>
 
             {/* Interactive Charts Section */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               {/* Financial Performance Chart */}
-              <div style={{
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '24px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
                 height: '400px',
-                transition: 'all 0.3s ease'
               }}>
                 <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px' }}>
                   📈 Financial Overview (Major Metrics)
@@ -688,18 +742,17 @@ const ModernDashboard = () => {
                     <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
-              </div>
+              </TiltCard>
 
               {/* Risk Factor Distribution (Explainable AI) */}
-              <div style={{
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '24px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
                 height: '400px',
-                transition: 'all 0.3s ease'
               }}>
                 <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '20px' }}>
                   🎯 AI Decision Rationale (Factor Weighting)
@@ -725,17 +778,17 @@ const ModernDashboard = () => {
                     <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} />
                   </RadarChart>
                 </ResponsiveContainer>
-              </div>
+              </TiltCard>
             </div>
 
             {/* New Detailed Financial Metrics Section */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               
               {/* Financial Metrics Card */}
-              <div style={{
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '28px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
@@ -791,13 +844,13 @@ const ModernDashboard = () => {
                     </p>
                   </div>
                 </div>
-              </div>
+              </TiltCard>
 
               {/* Liabilities Breakdown Card */}
-              <div style={{
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '28px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
@@ -853,13 +906,13 @@ const ModernDashboard = () => {
                     </p>
                   </div>
                 </div>
-              </div>
+              </TiltCard>
             </div>
 
-              <div style={{
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '24px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
@@ -887,18 +940,17 @@ const ModernDashboard = () => {
                 <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
                   Annual Revenue
                 </p>
-              </div>
+              </TiltCard>
 
-              <div style={{
+              <TiltCard style={{
                 background: 'var(--card-bg)',
                 backdropFilter: 'var(--glass-blur)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '24px',
                 boxShadow: 'var(--card-shadow)',
                 border: '1px solid var(--border-color)',
                 position: 'relative',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -920,15 +972,15 @@ const ModernDashboard = () => {
                 <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>
                   Sector Classification
                 </p>
-              </div>
+              </TiltCard>
             {/* Enhanced Main Content Area */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
               
               {/* Enhanced Left Panel - Company Details */}
-              <div style={{
+              <TiltCard style={{
                 background: 'rgba(255, 255, 255, 0.95)',
                 backdropFilter: 'blur(20px)',
-                borderRadius: '20px',
+                borderRadius: '24px',
                 padding: '32px',
                 boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
@@ -1098,7 +1150,7 @@ const ModernDashboard = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </TiltCard>
 
               {/* Enhanced Right Panel - Quick Actions */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -1204,10 +1256,10 @@ const ModernDashboard = () => {
                   </div>
                 </div>
 
-                <div style={{
+                <TiltCard style={{
                   background: 'rgba(255, 255, 255, 0.95)',
                   backdropFilter: 'blur(20px)',
-                  borderRadius: '20px',
+                  borderRadius: '24px',
                   padding: '24px',
                   boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
                   border: '1px solid rgba(255, 255, 255, 0.3)',
@@ -1267,7 +1319,7 @@ const ModernDashboard = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </TiltCard>
               </div>
             </div>
 
@@ -1487,7 +1539,7 @@ const ModernDashboard = () => {
       </div>
     </div>
   </div>
-</div>
+    </motion.div>
   );
 };
 
