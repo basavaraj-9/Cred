@@ -1,0 +1,29 @@
+{
+  "version": "credit_fusion_policy_v1",
+  "mode": "EXPERIMENTAL",
+  "supported_strategies": ["WEIGHTED_BLEND", "CONSENSUS_GATED"],
+  "weighted_blend": {"rule_weight": 0.6, "ml_weight": 0.4},
+  "gates": {
+    "minimum_rule_confidence": 0.75,
+    "minimum_data_coverage": 0.8,
+    "accepted_rule_statuses": ["VERIFIED", "NEEDS_REVIEW"],
+    "accepted_experimental_ml_readiness": ["PIPELINE_VALIDATED"],
+    "accepted_experimental_ml_lifecycle": ["PIPELINE_VALIDATION_ONLY"],
+    "maximum_drift_level": "MODERATE",
+    "maximum_model_disagreement": "MODERATE_DISAGREEMENT",
+    "required_real_outcomes_production": 100,
+    "required_walk_forward_windows_production": 5
+  },
+  "agreement": {"low_gap_max": 0.15, "review_gap_max": 0.3},
+  "confidence": {
+    "pipeline_validation_cap": 0.5,
+    "synthetic_penalty": 0.1,
+    "insufficient_walk_forward_penalty": 0.1,
+    "moderate_drift_penalty": 0.1,
+    "moderate_disagreement_penalty": 0.1,
+    "review_rule_penalty": 0.05
+  },
+  "fallback_policy": "RULE_ONLY_THEN_NO_OUTPUT",
+  "experimental_threshold": 0.5,
+  "production_use_permitted": false
+}

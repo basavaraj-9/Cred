@@ -1,0 +1,37 @@
+{
+  "version": "credit_recommendation_policy_v1",
+  "engine_version": "credit_recommendation_engine_v1",
+  "summary_version": "credit_recommendation_summary_v1",
+  "acceptable_credit_statuses": ["VERIFIED", "NEEDS_REVIEW"],
+  "acceptable_research_statuses": ["COMPLETED", "PARTIAL", "NEEDS_REVIEW"],
+  "minimum_day10_coverage": 0.65,
+  "minimum_five_cs_completeness": 0.65,
+  "minimum_five_cs_confidence": 0.60,
+  "minimum_capacity_completeness": 0.70,
+  "minimum_capital_completeness": 0.70,
+  "missing_external_confidence_cap": 0.75,
+  "partial_research_confidence_cap": 0.70,
+  "conflict_confidence_cap": 0.55,
+  "critical_risk_codes": {
+    "CAPITAL_NEGATIVE_EQUITY": "CRITICAL_NEGATIVE_EQUITY",
+    "CAPACITY_PERSISTENT_NEGATIVE_OCF": "CRITICAL_PERSISTENT_NEGATIVE_OCF",
+    "CAPACITY_LOW_INTEREST_COVERAGE": "CRITICAL_INTEREST_COVERAGE_BELOW_ONE",
+    "CAPITAL_HIGH_LEVERAGE": "CRITICAL_HIGH_LEVERAGE",
+    "CHARACTER_REGULATORY_ACTION_REPORTED": "CRITICAL_REGULATORY_ACTION",
+    "CHARACTER_INSOLVENCY_PROCEEDING": "CRITICAL_INSOLVENCY_PROCEEDING",
+    "CONDITIONS_RATING_DOWNGRADE": "CRITICAL_RECENT_RATING_DOWNGRADE"
+  },
+  "severe_anomaly_behavior": "CRITICAL_RISK_REVIEW",
+  "legal_regulatory_behavior": "HUMAN_REVIEW_REQUIRED",
+  "rating_downgrade_behavior": "HUMAN_REVIEW_REQUIRED",
+  "collateral_behavior": "MISSING_EVIDENCE_NOT_BORROWER_WEAKNESS",
+  "ml_fusion_usage": "SUPPORTING_EXPERIMENTAL_CONTEXT_ONLY",
+  "readiness_states": [
+    "READY_FOR_DECISION_REVIEW",
+    "CONDITIONAL_REVIEW_REQUIRED",
+    "INSUFFICIENT_EVIDENCE",
+    "CRITICAL_RISK_REVIEW",
+    "DATA_CONFLICT_REVIEW",
+    "NOT_READY"
+  ]
+}

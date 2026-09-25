@@ -1,0 +1,18 @@
+{
+  "version": "financial_ratios_v1",
+  "ratios": [
+    {"name":"current_ratio","display_name":"Current Ratio","category":"liquidity","formula":"current_assets / current_liabilities","required_inputs":["current_assets","current_liabilities"],"unit":"x","description":"Current assets available per unit of current liabilities."},
+    {"name":"quick_ratio","display_name":"Quick Ratio","category":"liquidity","formula":"(current_assets - inventory) / current_liabilities","required_inputs":["current_assets","inventory","current_liabilities"],"unit":"x","description":"Liquid current assets per unit of current liabilities."},
+    {"name":"debt_to_equity","display_name":"Debt / Equity","category":"leverage","formula":"total_debt / total_equity","required_inputs":["total_debt","total_equity"],"unit":"x","description":"Debt relative to equity."},
+    {"name":"debt_to_assets","display_name":"Debt / Assets","category":"leverage","formula":"total_debt / total_assets","required_inputs":["total_debt","total_assets"],"unit":"x","description":"Debt relative to total assets."},
+    {"name":"interest_coverage","display_name":"Interest Coverage","category":"coverage","formula":"ebit / finance_cost","required_inputs":["ebit","finance_cost"],"unit":"x","description":"Operating earnings available for finance cost."},
+    {"name":"debt_to_ebitda","display_name":"Debt / EBITDA","category":"coverage","formula":"total_debt / ebitda","required_inputs":["total_debt","ebitda"],"unit":"x","description":"Debt relative to EBITDA."},
+    {"name":"ebitda_margin","display_name":"EBITDA Margin","category":"profitability","formula":"ebitda / revenue","required_inputs":["ebitda","revenue"],"unit":"%","description":"EBITDA as a percentage of revenue."},
+    {"name":"ebit_margin","display_name":"EBIT Margin","category":"profitability","formula":"ebit / revenue","required_inputs":["ebit","revenue"],"unit":"%","description":"EBIT as a percentage of revenue."},
+    {"name":"net_profit_margin","display_name":"Net Profit Margin","category":"profitability","formula":"profit_after_tax / revenue","required_inputs":["profit_after_tax","revenue"],"unit":"%","description":"Profit after tax as a percentage of revenue."},
+    {"name":"return_on_assets","display_name":"Return on Assets","category":"profitability","formula":"profit_after_tax / average(total_assets)","required_inputs":["profit_after_tax","total_assets"],"unit":"%","description":"Profit after tax relative to average or ending assets."},
+    {"name":"return_on_equity","display_name":"Return on Equity","category":"profitability","formula":"profit_after_tax / average(total_equity)","required_inputs":["profit_after_tax","total_equity"],"unit":"%","description":"Profit after tax relative to average or ending equity."},
+    {"name":"operating_cash_flow_to_debt","display_name":"Operating Cash Flow / Debt","category":"cash","formula":"cash_flow_from_operations / total_debt","required_inputs":["cash_flow_from_operations","total_debt"],"unit":"x","description":"Operating cash flow relative to debt."},
+    {"name":"asset_turnover","display_name":"Asset Turnover","category":"efficiency","formula":"revenue / average(total_assets)","required_inputs":["revenue","total_assets"],"unit":"x","description":"Revenue generated per unit of average or ending assets."}
+  ]
+}

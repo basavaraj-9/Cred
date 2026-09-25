@@ -1,0 +1,9 @@
+{
+  "version": "credit_split_policy_v1",
+  "train_fraction": 0.70,
+  "validation_fraction": 0.15,
+  "test_fraction": 0.15,
+  "company_isolation": true,
+  "chronological_company_order": true,
+  "minimum_readiness": {"total_examples": 100, "positive_examples": 20, "negative_examples": 20, "test_positives": 5, "unique_companies": 30}
+}

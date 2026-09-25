@@ -1,0 +1,44 @@
+# Environment / secrets
+.env
+.env.local
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.coverage
+htmlcov/
+
+# Node / Next.js
+node_modules/
+.next/
+*.tsbuildinfo
+
+# Temporary test / verification directories
+.test-tmp-*/
+
+# Logs
+*.log
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Generated storage
+storage/uploads/*
+storage/processed/*
+storage/reports/*
+storage/models/*
+storage/research/*
+
+# Keep storage directory structure
+!storage/**/.gitkeep
+
+storage/day*-smoke/

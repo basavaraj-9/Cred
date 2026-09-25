@@ -1,0 +1,150 @@
+{
+  "censored_count": 0,
+  "curated_real_count": 0,
+  "dataset_version": "credit_dataset_v1",
+  "default_rate": 0.3,
+  "excluded": {},
+  "feature_builder_version": "credit_ml_feature_builder_v1",
+  "feature_count": 8,
+  "feature_group": "ANOMALY_ENRICHED_V1",
+  "feature_schema_version": "credit_ml_features_v1",
+  "horizon_days": 365,
+  "label_policy_version": "credit_label_policy_v1",
+  "label_quality": {
+    "SYNTHETIC": 10
+  },
+  "leakage": {
+    "company_overlap": {
+      "count": 0,
+      "status": "PASS"
+    },
+    "critical_failure": false,
+    "duplicate_observations": {
+      "count": 0,
+      "status": "PASS"
+    },
+    "exact_feature_overlap": {
+      "count": 0,
+      "status": "PASS"
+    },
+    "future_financial_period": {
+      "count": 0,
+      "enforced_by": "credit_ml_feature_builder_v1",
+      "status": "PASS"
+    },
+    "future_source_timestamp": {
+      "count": 0,
+      "status": "PASS"
+    },
+    "outcome_date_in_features": {
+      "count": 0,
+      "status": "PASS"
+    },
+    "target_in_features": {
+      "count": 0,
+      "status": "PASS"
+    },
+    "unknown_source_availability": {
+      "count": 10,
+      "status": "WARN"
+    }
+  },
+  "missingness": {
+    "anomaly_persistent_net_loss": {
+      "available": 10,
+      "missing": 0,
+      "missing_percent": 0.0
+    },
+    "current_ratio": {
+      "available": 9,
+      "missing": 1,
+      "missing_percent": 0.1
+    },
+    "current_ratio_confidence": {
+      "available": 10,
+      "missing": 0,
+      "missing_percent": 0.0
+    },
+    "debt_to_equity": {
+      "available": 10,
+      "missing": 0,
+      "missing_percent": 0.0
+    },
+    "financial_completeness": {
+      "available": 10,
+      "missing": 0,
+      "missing_percent": 0.0
+    },
+    "sector": {
+      "available": 10,
+      "missing": 0,
+      "missing_percent": 0.0
+    },
+    "statement_scope": {
+      "available": 10,
+      "missing": 0,
+      "missing_percent": 0.0
+    },
+    "trend_revenue_direction": {
+      "available": 10,
+      "missing": 0,
+      "missing_percent": 0.0
+    }
+  },
+  "negative_by_split": {
+    "TEST": 1,
+    "TRAIN": 5,
+    "VALIDATION": 1
+  },
+  "negative_count": 7,
+  "positive_by_split": {
+    "TRAIN": 2,
+    "VALIDATION": 1
+  },
+  "positive_count": 3,
+  "proxy_count": 0,
+  "publication_availability_limitation": "Source timestamps use system ingestion/creation time; original filing publication dates are not yet stored.",
+  "quality_status": "NEEDS_REVIEW",
+  "real_count": 0,
+  "record_count": 10,
+  "sha256": "9d2448c3139d375e242a2b98867f4b94a87539d96f381663c1a3966967a109b7",
+  "split_counts": {
+    "TEST": 1,
+    "TRAIN": 7,
+    "VALIDATION": 2
+  },
+  "split_date_ranges": {
+    "TEST": {
+      "end": "2018-12-30",
+      "start": "2018-12-30"
+    },
+    "TRAIN": {
+      "end": "2015-12-31",
+      "start": "2010-01-01"
+    },
+    "VALIDATION": {
+      "end": "2017-12-30",
+      "start": "2016-12-30"
+    }
+  },
+  "split_policy_version": "credit_split_policy_v1",
+  "split_rates": {
+    "TEST": {
+      "negative_rate": 1.0,
+      "positive_rate": 0.0
+    },
+    "TRAIN": {
+      "negative_rate": 0.7143,
+      "positive_rate": 0.2857
+    },
+    "VALIDATION": {
+      "negative_rate": 0.5,
+      "positive_rate": 0.5
+    }
+  },
+  "synthetic_count": 10,
+  "target_name": "default_within_365_days",
+  "training_readiness": "PIPELINE_VALIDATED",
+  "unique_companies": 10,
+  "verified_real_count": 0
+}

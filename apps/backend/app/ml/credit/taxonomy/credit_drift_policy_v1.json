@@ -1,0 +1,15 @@
+{
+  "version": "credit_drift_policy_v1",
+  "minimum_samples": 5,
+  "psi_bins": 5,
+  "psi_epsilon": 0.0001,
+  "psi_moderate": 0.1,
+  "psi_high": 0.25,
+  "categorical_moderate": 0.1,
+  "categorical_high": 0.25,
+  "prediction_moderate": 0.1,
+  "prediction_high": 0.2,
+  "calibration_moderate": 0.05,
+  "calibration_high": 0.1,
+  "interpretation": "Development diagnostics only; thresholds are not regulatory standards."
+}

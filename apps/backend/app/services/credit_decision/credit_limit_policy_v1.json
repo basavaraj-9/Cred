@@ -1,0 +1,15 @@
+{
+  "version": "credit_limit_policy_v1",
+  "aggregation": "MINIMUM_ELIGIBLE_CAP",
+  "lower_bound_factor": 0.80,
+  "cash_flow_capacity": {"enabled": true, "multiplier": 3.0, "formula_version": "cash_flow_capacity_v1"},
+  "revenue_cap": {"enabled": true, "fraction": 0.10, "formula_version": "revenue_cap_v1"},
+  "leverage_cap": {"enabled": true, "maximum_debt_to_equity": 1.50, "formula_version": "leverage_cap_v1"},
+  "working_capital_need": {"enabled": true, "eligible_fraction": 0.75, "formula_version": "working_capital_need_v1"},
+  "collateral_cap": {"enabled": true, "advance_rate": 0.60, "formula_version": "collateral_cap_v1"},
+  "currency_mismatch_behavior": "BLOCK_METHOD",
+  "negative_equity_behavior": "BLOCK_LEVERAGE_METHOD",
+  "financial_conflict_behavior": "BLOCK_ALL_METHODS",
+  "existing_exposure_missing_behavior": "INCOMPLETE_NOT_ZERO",
+  "synthetic_ml_weight": 0.0
+}

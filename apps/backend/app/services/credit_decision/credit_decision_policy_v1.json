@@ -1,0 +1,27 @@
+{
+  "version": "credit_decision_policy_v1",
+  "engine_version": "credit_decision_support_engine_v1",
+  "summary_version": "credit_decision_summary_v1",
+  "recommendation_states": ["FAVORABLE_REVIEW", "CONDITIONAL_REVIEW", "MANUAL_REVIEW_REQUIRED", "ADVERSE_REVIEW", "INSUFFICIENT_EVIDENCE", "POLICY_EXCEPTION_REVIEW"],
+  "precedence": ["INSUFFICIENT_EVIDENCE", "POLICY_EXCEPTION_REVIEW", "ADVERSE_REVIEW", "MANUAL_REVIEW_REQUIRED", "CONDITIONAL_REVIEW", "FAVORABLE_REVIEW"],
+  "minimum_financial_coverage": 0.65,
+  "minimum_five_cs_completeness": 0.60,
+  "minimum_decision_confidence": 0.55,
+  "capacity_minimum": 0.65,
+  "capital_minimum": 0.65,
+  "research_required_scopes": ["LEGAL", "RATINGS"],
+  "critical_adverse_combinations": [["CRITICAL_NEGATIVE_EQUITY", "CRITICAL_PERSISTENT_NEGATIVE_OCF"]],
+  "adverse_single_codes": ["CRITICAL_INSOLVENCY_PROCEEDING"],
+  "exception_rules": {
+    "CRITICAL_HIGH_LEVERAGE": ["HIGH_LEVERAGE_EXCEPTION", "Senior Credit Reviewer"],
+    "CRITICAL_INTEREST_COVERAGE_BELOW_ONE": ["LOW_INTEREST_COVERAGE_EXCEPTION", "Senior Credit Reviewer"],
+    "CRITICAL_RECENT_RATING_DOWNGRADE": ["RATING_DOWNGRADE_EXCEPTION", "Senior Credit Reviewer"],
+    "CRITICAL_REGULATORY_ACTION": ["LEGAL_RISK_EXCEPTION", "Credit Committee"],
+    "COLLATERAL_INFORMATION_INCOMPLETE": ["COLLATERAL_COVERAGE_EXCEPTION", "Senior Credit Reviewer"],
+    "LOW_DATA_COMPLETENESS": ["LOW_DATA_COMPLETENESS_EXCEPTION", "Credit Committee"]
+  },
+  "confidence_penalties": {"missing_collateral": 0.08, "partial_research": 0.10, "legal_review": 0.10, "conflict": 0.25, "missing_exposure": 0.08},
+  "human_review_required": true,
+  "production_ml_weight": 0.0,
+  "protected_attributes": []
+}

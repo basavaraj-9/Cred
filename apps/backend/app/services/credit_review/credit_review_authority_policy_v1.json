@@ -1,0 +1,42 @@
+{
+  "version": "credit_review_authority_policy_v1",
+  "roles": {
+    "CREDIT_ANALYST": {
+      "actions": ["REVIEW", "COMMENT", "ACKNOWLEDGE", "CHECKLIST", "RFI", "REFER_TO_COMMITTEE"],
+      "decisions": ["RETURNED_FOR_INFORMATION", "REFERRED_TO_COMMITTEE"],
+      "exception_actions": ["REQUEST_INFORMATION", "REFER_HIGHER"],
+      "approved_limit_max": null
+    },
+    "SENIOR_CREDIT_REVIEWER": {
+      "actions": ["REVIEW", "COMMENT", "ACKNOWLEDGE", "CHECKLIST", "RFI", "REFER_TO_COMMITTEE", "PREPARE_COMMITTEE"],
+      "decisions": ["APPROVED", "DECLINED", "RETURNED_FOR_INFORMATION", "REFERRED_TO_COMMITTEE"],
+      "exception_actions": ["APPROVE_EXCEPTION", "REJECT_EXCEPTION", "REQUEST_INFORMATION", "REFER_HIGHER"],
+      "approved_limit_max": "50000000"
+    },
+    "CREDIT_MANAGER": {
+      "actions": ["REVIEW", "COMMENT", "ACKNOWLEDGE", "CHECKLIST", "RFI", "REFER_TO_COMMITTEE", "PREPARE_COMMITTEE", "MARK_COMMITTEE_READY"],
+      "decisions": ["APPROVED", "DECLINED", "RETURNED_FOR_INFORMATION", "REFERRED_TO_COMMITTEE"],
+      "exception_actions": ["APPROVE_EXCEPTION", "REJECT_EXCEPTION", "REQUEST_INFORMATION", "REFER_HIGHER"],
+      "approved_limit_max": "250000000"
+    },
+    "CREDIT_COMMITTEE_MEMBER": {
+      "actions": ["REVIEW", "COMMENT", "ACKNOWLEDGE", "CHECKLIST", "RFI", "REFER_TO_COMMITTEE", "PREPARE_COMMITTEE", "MARK_COMMITTEE_READY"],
+      "decisions": ["APPROVED", "DECLINED", "RETURNED_FOR_INFORMATION", "REFERRED_TO_COMMITTEE"],
+      "exception_actions": ["APPROVE_EXCEPTION", "REJECT_EXCEPTION", "REQUEST_INFORMATION", "REFER_HIGHER"],
+      "approved_limit_max": null
+    },
+    "ADMIN": {
+      "actions": ["REVIEW", "COMMENT", "ACKNOWLEDGE", "CHECKLIST", "RFI", "REFER_TO_COMMITTEE", "PREPARE_COMMITTEE", "MARK_COMMITTEE_READY", "ASSIGN"],
+      "decisions": ["APPROVED", "DECLINED", "RETURNED_FOR_INFORMATION", "REFERRED_TO_COMMITTEE"],
+      "exception_actions": ["APPROVE_EXCEPTION", "REJECT_EXCEPTION", "REQUEST_INFORMATION", "REFER_HIGHER"],
+      "approved_limit_max": null
+    }
+  },
+  "assignment_roles": ["CREDIT_MANAGER", "ADMIN"],
+  "require_distinct_exception_approver": true,
+  "require_distinct_final_decision_reviewer": false,
+  "blocking_rfi_statuses": ["OPEN", "PARTIALLY_RECEIVED"],
+  "committee_referral_threshold": "250000000",
+  "development_policy_only": true,
+  "protected_attributes": []
+}

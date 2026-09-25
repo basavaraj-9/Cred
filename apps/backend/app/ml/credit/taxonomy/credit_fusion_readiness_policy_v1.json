@@ -1,0 +1,9 @@
+{
+  "version": "credit_fusion_readiness_policy_v1",
+  "minimum_real_outcomes": 100,
+  "minimum_valid_walk_forward_windows": 3,
+  "require_production_permitted_model": true,
+  "block_on_high_drift": true,
+  "require_rule_ml_comparison": true,
+  "synthetic_data_permits_production_fusion": false
+}

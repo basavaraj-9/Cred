@@ -1,0 +1,9 @@
+{
+  "version": "credit_model_selection_policy_v1",
+  "primary_metric": "pr_auc",
+  "secondary_metrics": ["roc_auc", "brier_score"],
+  "higher_is_better": ["pr_auc", "roc_auc"],
+  "lower_is_better": ["brier_score"],
+  "tie_break_order": ["logistic_regression", "random_forest", "xgboost"],
+  "fallback_model": "logistic_regression"
+}

@@ -1,0 +1,17 @@
+{
+  "version": "financial_anomaly_rules_v1",
+  "thresholds": {
+    "revenue_decline_percent": 10,
+    "profit_decline_percent": 15,
+    "margin_compression_percentage_points": 2,
+    "rapid_debt_growth_percent": 25,
+    "debt_revenue_growth_gap_percent": 10,
+    "working_capital_growth_gap_percent": 10,
+    "cross_metric_growth_gap_percent": 15,
+    "ratio_deterioration_percent": 10,
+    "interest_coverage_alert": 1.5,
+    "current_ratio_alert": 1.0,
+    "asset_growth_percent": 10,
+    "weak_revenue_growth_percent": 0
+  }
+}

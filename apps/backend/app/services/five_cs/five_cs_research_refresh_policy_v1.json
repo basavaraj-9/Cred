@@ -1,0 +1,19 @@
+{
+  "version": "five_cs_research_refresh_v1",
+  "engine_version": "five_cs_engine_v2",
+  "summary_version": "five_cs_summary_v2",
+  "minimum_source_quality": 0.75,
+  "minimum_finding_confidence": 0.70,
+  "eligible_finding_statuses": ["VERIFIED", "CORROBORATED", "SINGLE_SOURCE", "NEEDS_REVIEW"],
+  "eligible_freshness": ["CURRENT", "HISTORICAL"],
+  "stale_behavior": "VISIBLE_NOT_APPLIED",
+  "contradiction_behavior": "REVIEW_NOT_APPLIED",
+  "single_source_behavior": "PARTIAL_OR_REVIEW",
+  "precedence": ["REGULATOR", "GOVERNMENT", "RATING_AGENCY", "OFFICIAL", "REPUTABLE_NEWS", "INDUSTRY_BODY", "OTHER"],
+  "confidence_external_weight": 0.30,
+  "character_completeness_increment": 0.20,
+  "conditions_single_category_increment": 0.15,
+  "conditions_multi_category_increment": 0.25,
+  "verified_completeness_min": 0.85,
+  "verified_confidence_min": 0.80
+}

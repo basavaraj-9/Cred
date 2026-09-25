@@ -1,0 +1,34 @@
+{
+  "version": "five_cs_policy_v1",
+  "engine_version": "five_cs_engine_v1",
+  "summary_version": "five_cs_summary_v1",
+  "collateral_extractor_version": "collateral_evidence_extractor_v1",
+  "sections": ["CHARACTER", "CAPACITY", "CAPITAL", "COLLATERAL", "CONDITIONS"],
+  "statuses": ["VERIFIED", "NEEDS_REVIEW", "PARTIAL", "UNAVAILABLE", "CONFLICTING"],
+  "confidence": {"verified_min": 0.75, "review_min": 0.50},
+  "completeness": {"verified_min": 0.75, "partial_min": 0.20, "overall_method": "SIMPLE_MEAN"},
+  "required_evidence": {
+    "CHARACTER": ["identity", "reporting", "promoter_background", "repayment_history", "legal_background"],
+    "CAPACITY": ["repayment_subscore", "interest_coverage", "debt_to_ebitda", "ocf_to_debt", "cash_flow"],
+    "CAPITAL": ["financial_strength_subscore", "total_equity", "debt_to_equity", "debt_to_assets", "equity_trend"],
+    "COLLATERAL": ["security_description", "asset_type", "collateral_value", "external_valuation"],
+    "CONDITIONS": ["business_profile", "domain", "revenue_trend", "margin_trend", "external_outlook", "regulatory_research"]
+  },
+  "critical_evidence": {
+    "CAPACITY": ["repayment_subscore", "interest_coverage"],
+    "CAPITAL": ["financial_strength_subscore", "total_equity"]
+  },
+  "thresholds": {
+    "interest_coverage_strong_min": 3.0,
+    "interest_coverage_low_max": 1.5,
+    "debt_to_ebitda_low_max": 2.0,
+    "debt_to_ebitda_high_min": 4.0,
+    "debt_to_equity_low_max": 1.0,
+    "debt_to_equity_high_min": 2.0,
+    "debt_to_assets_low_max": 0.4,
+    "ocf_to_debt_positive_min": 0.0
+  },
+  "external_categories": ["PROMOTER_BACKGROUND", "LEGAL_CASES", "CREDIT_BUREAU", "EXTERNAL_RATING", "INDUSTRY_OUTLOOK", "REGULATORY_RISK", "COLLATERAL_VALUATION"],
+  "no_total_credit_score": true,
+  "lending_decision_permitted": false
+}

@@ -1,0 +1,9 @@
+{
+  "version": "credit_label_policy_v1",
+  "target_name": "default_within_365_days",
+  "default_prediction_horizon_days": 365,
+  "default_events": ["DEFAULT", "DELINQUENCY_90", "WRITE_OFF", "BANKRUPTCY", "INSOLVENCY"],
+  "non_default_evidence": ["NO_DEFAULT", "LOAN_CLOSED_PERFORMING"],
+  "review_events": ["DELINQUENCY_30", "DELINQUENCY_60", "RESTRUCTURED", "UNKNOWN"],
+  "description": "Development label policy; it is not represented as a regulatory default definition."
+}

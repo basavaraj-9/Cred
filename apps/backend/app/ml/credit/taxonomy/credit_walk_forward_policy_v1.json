@@ -1,0 +1,17 @@
+{
+  "version": "credit_walk_forward_policy_v1",
+  "default_mode": "EXPANDING_WINDOW",
+  "supported_modes": ["EXPANDING_WINDOW", "ROLLING_WINDOW"],
+  "minimum_training_examples": 6,
+  "minimum_evaluation_examples": 2,
+  "minimum_positives_training": 2,
+  "minimum_negatives_training": 2,
+  "minimum_positives_evaluation": 1,
+  "minimum_negatives_evaluation": 1,
+  "training_window_length": 6,
+  "evaluation_window_length": 2,
+  "step_size": 2,
+  "calibration_policy": "TRAIN_INTERNAL_CV_SIGMOID",
+  "company_isolation_policy": "STRICT_WINDOW_ISOLATION",
+  "model_families": ["logistic_regression", "random_forest", "xgboost"]
+}

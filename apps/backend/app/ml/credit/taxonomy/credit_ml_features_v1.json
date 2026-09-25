@@ -1,0 +1,15 @@
+{
+  "version": "credit_ml_features_v1",
+  "forbidden_features": ["target", "target_value", "outcome_date", "company_id", "document_id", "company_name", "label_quality", "split"],
+  "feature_groups": {
+    "BASE_FINANCIAL_V1": ["ratios", "financial_values", "data_quality", "business_metadata"],
+    "TREND_ENRICHED_V1": ["ratios", "financial_values", "trends", "data_quality", "business_metadata"],
+    "ANOMALY_ENRICHED_V1": ["ratios", "financial_values", "trends", "anomalies", "data_quality", "business_metadata"],
+    "RULE_SCORE_ENRICHED_V1": ["ratios", "financial_values", "trends", "anomalies", "data_quality", "business_metadata", "rule_score"]
+  },
+  "default_feature_group": "ANOMALY_ENRICHED_V1",
+  "numeric_nullable": ["current_ratio", "quick_ratio", "debt_to_equity", "debt_to_assets", "interest_coverage", "debt_to_ebitda", "ebitda_margin", "ebit_margin", "net_profit_margin", "return_on_assets", "return_on_equity", "operating_cash_flow_to_debt", "asset_turnover", "revenue", "profit_after_tax", "total_assets", "total_equity", "total_debt", "cash_flow_from_operations", "trade_receivables", "inventory", "financial_completeness", "validation_error_count", "review_input_count", "conflict_count", "credit_score"],
+  "categorical_nullable": ["statement_scope", "sector", "industry", "domain"],
+  "binary_prefix": "anomaly_",
+  "confidence_suffix": "_confidence"
+}
