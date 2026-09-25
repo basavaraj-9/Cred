@@ -1,6 +1,6 @@
 import { API_BASE_URL, API_V1_PATH, BROWSER_API_BASE_URL } from "@/lib/config";
 import type { ClassificationEvidence, CompanyProfile, CreditAssessment, CreditEvidence, CreditFusionExperiment, CreditMLEvaluationSummary, CreditReason, DocumentMetadata, DomainClassification, FinancialAnalysisSummary, FinancialAnomaly, FinancialAnomalyDetail, FinancialExtractionSummary, FinancialLineItem, FinancialRatio, FinancialRatioDetail, FinancialStatement, FinancialTrend, FinancialTrendAnalysisSummary, FinancialTrendDetail, FinancialValidation, FiveCsAssessment, FiveCsEvidence, FiveCsReviewItem, HealthResponse, PageSummary, ParseSummary, ProfileEvidence, StatusResponse, UploadResult } from "@/types/api";
-import type { CommitteePackage, CreditDecisionSupport, CreditRecommendation, CreditReviewCase, FiveCsRefresh, ResearchCandidates, ResearchFinding, ResearchRun, ResearchSource } from "@/types/api";
+import type { CommitteePackage, CreditDecisionSupport, CreditRecommendation, CreditReviewCase, FiveCsRefresh, GeneratedReport, ReportEvidenceLink, ReportSnapshot, ResearchCandidates, ResearchFinding, ResearchRun, ResearchSource } from "@/types/api";
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${API_V1_PATH}${path}`, {
@@ -104,6 +104,24 @@ export const listCommitteePackages = async (caseId: string) => {
   if (!response.ok) throw new Error(`Committee package lookup failed (${response.status})`);
   return (await response.json()) as CommitteePackage[];
 };
+export const generateCreditReport = (caseId: string, body: Record<string, unknown>) => reviewMutation<GeneratedReport>(`/credit-review-cases/${encodeURIComponent(caseId)}/reports`, body);
+export const listCreditReports = async (caseId: string) => {
+  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-review-cases/${encodeURIComponent(caseId)}/reports`);
+  if (!response.ok) throw new Error(`Credit report lookup failed (${response.status})`);
+  return (await response.json()) as GeneratedReport[];
+};
+export const finalizeCreditReport = (reportId: string, actorId: string, rationale: string) => reviewMutation<GeneratedReport>(`/reports/${encodeURIComponent(reportId)}/finalize`, { actor_user_id: actorId, rationale });
+export const getCreditReportSnapshot = async (reportId: string, actorId: string) => {
+  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/reports/${encodeURIComponent(reportId)}/snapshot?actor_user_id=${encodeURIComponent(actorId)}`);
+  if (!response.ok) throw new Error(`Report preview failed (${response.status})`);
+  return (await response.json()) as ReportSnapshot;
+};
+export const getCreditReportEvidence = async (reportId: string, actorId: string) => {
+  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/reports/${encodeURIComponent(reportId)}/evidence?actor_user_id=${encodeURIComponent(actorId)}`);
+  if (!response.ok) throw new Error(`Report evidence lookup failed (${response.status})`);
+  return (await response.json()) as ReportEvidenceLink[];
+};
+export const creditReportDownloadUrl = (reportId: string, actorId: string) => `${BROWSER_API_BASE_URL}${API_V1_PATH}/reports/${encodeURIComponent(reportId)}/download?actor_user_id=${encodeURIComponent(actorId)}`;
 
 export async function startCompanyResearch(companyId: string, scopes: string[], refresh: boolean): Promise<ResearchRun> {
   const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/companies/${encodeURIComponent(companyId)}/research`, {

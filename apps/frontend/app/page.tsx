@@ -20,5 +20,7 @@ export default function Home() {
     <Link className="button" href="/credit-review">Human credit review →</Link>
     {" "}
     <Link className="button" href="/credit-committee">Credit committee →</Link>
+    {" "}
+    <Link className="button" href="/credit-reports">Credit reports →</Link>
   </>;
 }

@@ -238,7 +238,7 @@ def test_status_reports_day_3_and_health_reports_storage(upload_context: UploadC
     assert status.json()["components"]["local_storage"] == "ready"
     assert status.json()["components"]["duplicate_detection"] == "ready"
     assert status.json()["components"]["document_intelligence"] == "foundation_ready"
-    assert status.json()["development_stage"]["day"] == 19
+    assert status.json()["development_stage"]["day"] == 20
     assert health.json()["dependencies"] == {
         "database": "connected",
         "storage": "ready",

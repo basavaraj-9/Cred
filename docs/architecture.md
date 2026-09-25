@@ -241,3 +241,23 @@ Future Committee Decision Workflow
 ```
 
 Review cases reference a fixed decision-support ID. Governance records are stored separately from analytical records. Backend authorization reads the versioned development authority policy, while audit records preserve the human actor for assignments, review activity, exception actions, decisions, overrides, and committee preparation.
+
+## Day 20 report architecture
+
+```text
+Fixed Day 19 Review Basis
+        ↓
+Deterministic Input Hash
+        ↓
+Immutable Report Snapshot + Source Links
+        ↓
+Versioned Template + Report Renderer
+        ↓
+PDF or JSON Artifact + SHA-256
+        ↓
+Role-Governed Finalization / Explicit Supersession
+```
+
+`generated_reports` is the report identity and lifecycle record. `report_snapshots` freezes the exact serialized inputs used by the renderer. `report_source_links` identifies the analytical, research, governance, page, gate, exception, and committee records that support the report. `report_artifacts` stores the safe relative path, MIME type, format, size, and digest. `report_finalization_actions` records the human actor and rationale for issuance and supersession.
+
+The reporting service reads prior stages and never updates them. Idempotency includes the snapshot content, report type, artifact format, template version, and renderer version. Finalization changes report governance state without regenerating bytes. Supersession links a finalized version to a newer generated or finalized version while retaining both artifacts.

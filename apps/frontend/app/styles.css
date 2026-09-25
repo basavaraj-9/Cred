@@ -40,3 +40,4 @@ fieldset { border: 1px solid #dce4ee; border-radius: 8px; padding: 14px; }
 .research-card dl { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
 .research-card dt { color: #526177; }
 .research-card dd { margin: 0; font-weight: 700; }
+.snapshot-preview { max-height: 520px; overflow: auto; padding: 16px; border-radius: 8px; background: #111b2e; color: #e8eef8; white-space: pre-wrap; overflow-wrap: anywhere; }

@@ -231,3 +231,17 @@
 - Day 10 through Day 18 analytical records remain unchanged by governance actions.
 - Protected personal attributes are excluded from the workflow and development authority policy.
 - Day 19 performs no borrower notification, pricing, facility booking, sanction generation, or disbursement.
+
+## Day 20 report governance guarantees
+
+- A report renders persisted data from one fixed review basis and introduces no new credit score, recommendation, approval, rejection, limit, pricing, collateral value, or sanction term.
+- Missing values remain visibly unavailable; the renderer never substitutes zero or invents supporting evidence.
+- Template version, renderer version, input hash, snapshot hash, artifact SHA-256, byte size, format, and MIME type are persisted.
+- Exact repeated inputs are idempotent. Material input changes create a later report version.
+- Generated files use a bounded safe path beneath the configured storage root. Downloads verify path containment and SHA-256 before returning bytes.
+- Report preview and download require an active authorized actor. Finalization and supersession use report-type-specific backend roles.
+- Finalization does not regenerate an artifact. Supersession preserves the prior bytes, status history, actor, rationale, and explicit successor link.
+- Report snapshots exclude user credentials and do not serialize user records.
+- Experimental ML remains labeled pipeline-only with zero decision weight.
+- The reporting layer never changes Day 10 through Day 19 analytical or governance records.
+- Local filesystem storage and the development authority policy are not production substitutes for enterprise identity, durable object storage, retention, signing, or jurisdiction-specific reporting controls.

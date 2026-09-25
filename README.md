@@ -327,6 +327,31 @@ See [architecture](docs/architecture.md), [data flow](docs/data-flow.md), [relia
 
 Day 19 adds a governance layer over the immutable Day 18 decision-support record. A review case remains bound to one Day 18 version and records assignments, append-only comments, evidence acknowledgements, checklist actions, information requests, policy-exception actions, and a chronological audit trail. Newer Day 18 analysis produces an `UPDATED_ANALYSIS_AVAILABLE` warning and never silently changes the case basis.
 
+## Day 20: controlled credit reports and exports
+
+Day 20 turns one fixed Day 19 review basis into versioned report artifacts. It generates a credit appraisal memorandum, credit committee memo, decision evidence pack, or structured JSON export from persisted records only. The renderer does not recalculate financial values, create a new credit judgment, fill missing evidence, or allow experimental ML to influence the report.
+
+- **CAM:** company and reporting basis, financial statements and normalized values, ratios, trends, anomalies, rule-based credit assessment, Five Cs, research, recommendation factors, policy gates and exceptions, analytical and approved limits, review activity, decisions, overrides, committee context, experimental ML disclosure, and limitations.
+- **Committee memo:** a shorter committee-labelled view of the fixed package, material assessment and Five Cs facts, research, gates, exceptions, analytical limit, review activity, human decision history, and committee summary.
+- **Evidence pack:** the detailed snapshot and source-link graph for financial records, source pages, research URLs and findings, recommendation evidence, gate and exception history, review actions, decisions, overrides, and limit methods.
+- **Exports:** conservative A4 PDFs through ReportLab and stable structured JSON. Missing values render as unavailable or not recorded.
+
+Every report stores its type, report version, template and renderer versions, deterministic input hash, confidentiality label, human actor, immutable JSON snapshot, source links, artifact metadata, byte size, and SHA-256. Repeating an identical request returns the existing report. Changed persisted inputs create a new version. Authorized users can finalize a generated report; a later version can explicitly supersede a finalized report without changing or deleting the earlier artifact.
+
+Internal APIs:
+
+- `POST /api/v1/credit-review-cases/{review_case_id}/reports`
+- `GET /api/v1/credit-review-cases/{review_case_id}/reports`
+- `GET /api/v1/reports/{report_id}`
+- `GET /api/v1/reports/{report_id}/snapshot`
+- `GET /api/v1/reports/{report_id}/evidence`
+- `GET /api/v1/reports/{report_id}/download`
+- `POST /api/v1/reports/{report_id}/finalize`
+- `POST /api/v1/reports/{report_id}/supersede`
+- `GET /api/v1/reports/{report_id}/versions`
+
+The internal `/credit-reports` page generates and lists report versions, previews the frozen snapshot and its hash, displays artifact integrity metadata, finalizes generated reports, warns when a version is superseded, and provides authorized downloads. Local filesystem storage and the development authority policy are current deployment constraints. Production use still needs enterprise identity, durable object storage, retention controls, electronic signing, and jurisdiction-specific report templates.
+
 The development authority policy `credit_review_authority_policy_v1` defines reviewer roles, decision and exception permissions, limit bands, committee thresholds, and maker-checker controls. These permissions are enforced by backend services. Human decisions are explicit, attributable actions with required rationale and immutable versions. `APPROVED`, `DECLINED`, `RETURNED_FOR_INFORMATION`, and `REFERRED_TO_COMMITTEE` remain separate from the system recommendation.
 
 The Day 18 analytical ceiling and a human-entered approved limit remain separate. A higher human limit requires authority and recorded override rationale. An approved policy exception does not approve credit. Committee packages are deterministic structured data, versioned by input hash, and immutable after they are marked `READY`.

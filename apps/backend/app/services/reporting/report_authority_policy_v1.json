@@ -1,0 +1,14 @@
+{
+  "version": "report_authority_policy_v1",
+  "generate_roles": ["CREDIT_ANALYST", "SENIOR_CREDIT_REVIEWER", "CREDIT_MANAGER", "CREDIT_COMMITTEE_MEMBER", "ADMIN"],
+  "finalize": {
+    "CAM": ["SENIOR_CREDIT_REVIEWER", "CREDIT_MANAGER", "ADMIN"],
+    "CREDIT_COMMITTEE_MEMO": ["CREDIT_MANAGER", "CREDIT_COMMITTEE_MEMBER", "ADMIN"],
+    "DECISION_EVIDENCE_PACK": ["SENIOR_CREDIT_REVIEWER", "CREDIT_MANAGER", "CREDIT_COMMITTEE_MEMBER", "ADMIN"],
+    "STRUCTURED_JSON_EXPORT": ["SENIOR_CREDIT_REVIEWER", "CREDIT_MANAGER", "ADMIN"]
+  },
+  "download_roles": ["CREDIT_ANALYST", "SENIOR_CREDIT_REVIEWER", "CREDIT_MANAGER", "CREDIT_COMMITTEE_MEMBER", "ADMIN"],
+  "require_distinct_finalizer": false,
+  "development_policy_only": true,
+  "protected_attributes": []
+}

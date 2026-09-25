@@ -65,6 +65,13 @@ from app.models.recommendation import (
     FiveCsRefreshRun,
     FiveCsResearchEvidenceLink,
 )
+from app.models.reporting import (
+    GeneratedReport,
+    ReportArtifact,
+    ReportFinalizationAction,
+    ReportSnapshot,
+    ReportSourceLink,
+)
 from app.models.research import (
     ResearchEvidence,
     ResearchFinding,
@@ -166,5 +173,10 @@ __all__ = [
     "CreditDecisionOverride",
     "CreditCommitteePackage",
     "CreditCommitteePackageSection",
+    "GeneratedReport",
+    "ReportSnapshot",
+    "ReportArtifact",
+    "ReportSourceLink",
+    "ReportFinalizationAction",
     "User",
 ]

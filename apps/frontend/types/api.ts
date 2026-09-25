@@ -172,6 +172,11 @@ export type HumanDecision = { id: string; decision: string; rationale: string; d
 export type CreditReviewCase = { id: string; decision_support_id: string; company_id: string; document_id: string; workflow_status: string; stored_workflow_status: string; primary_reviewer_id: string | null; priority: string; sla_due_at: string | null; case_version: number; human_decision: HumanDecision | null; updated_analysis_available: boolean; created_at: string; updated_at: string };
 export type CommitteePackage = { id: string; review_case_id: string; decision_support_id: string; package_version: number; status: string; summary: string; summary_version: string; prepared_by_user_id: string; prepared_at: string; ready_at: string | null; sections: Array<{ id: string; section_code: string; title: string; payload: Record<string, unknown>; source_count: number }> };
 
+export type ReportArtifact = { id: string; format: "PDF" | "JSON"; mime_type: string; file_size_bytes: number; sha256: string; download_available: boolean };
+export type GeneratedReport = { id: string; review_case_id: string; decision_support_id: string; human_decision_id: string | null; committee_package_id: string | null; report_type: "CAM" | "CREDIT_COMMITTEE_MEMO" | "DECISION_EVIDENCE_PACK" | "STRUCTURED_JSON_EXPORT"; status: "DRAFT" | "GENERATED" | "FINALIZED" | "SUPERSEDED" | "FAILED"; report_version: number; template_version: string; renderer_version: string; input_hash: string; confidentiality_label: string; generated_by_user_id: string; finalized_by_user_id: string | null; generated_at: string; finalized_at: string | null; supersedes_report_id: string | null; superseded_by_report_id: string | null; artifact: ReportArtifact | null; snapshot_hash: string | null };
+export type ReportSnapshot = { report_id: string; snapshot_version: number; payload_hash: string; payload: Record<string, unknown> };
+export type ReportEvidenceLink = { id: string; source_type: string; source_reference_id: string; lineage_role: string; metadata: Record<string, unknown> | null };
+
 export type DocumentStatus = "REGISTERED" | "UPLOADED" | "PROCESSING" | "PROCESSED" | "FAILED" | "REJECTED";
 export type ParserStatus = "NOT_STARTED" | "PARSING" | "PARSED" | "PARTIAL" | "FAILED" | "REVIEW_REQUIRED";
 export type DocumentExtractionMethod = "NATIVE_TEXT" | "OCR" | "HYBRID" | "BLANK" | "FAILED";

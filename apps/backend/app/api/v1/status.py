@@ -86,6 +86,11 @@ def _financial_schema_ready(database_url: str | None) -> bool:
             "credit_decision_overrides",
             "credit_committee_packages",
             "credit_committee_package_sections",
+            "generated_reports",
+            "report_snapshots",
+            "report_artifacts",
+            "report_source_links",
+            "report_finalization_actions",
         }.issubset(inspect(get_engine(database_url)).get_table_names())
     except Exception:
         return False
@@ -180,7 +185,13 @@ def status(request: Request) -> StatusResponse:
     components["credit_committee_package"] = "ready" if schema_ready else "unavailable"
     components["facility_booking"] = "not_implemented"
     components["disbursement"] = "not_implemented"
-    components["cam_pdf"] = "not_implemented"
+    components["cam_pdf"] = "ready" if schema_ready else "unavailable"
+    components["cam_generation"] = "ready" if schema_ready else "unavailable"
+    components["committee_memo"] = "ready" if schema_ready else "unavailable"
+    components["decision_evidence_pack"] = "ready" if schema_ready else "unavailable"
+    components["pdf_export"] = "ready" if schema_ready else "unavailable"
+    components["json_export"] = "ready" if schema_ready else "unavailable"
+    components["finalized_report_versioning"] = "ready" if schema_ready else "unavailable"
     components["character_external_research"] = "ready" if schema_ready else "unavailable"
     components["collateral_valuation"] = "not_implemented"
     components["industry_research"] = "ready" if schema_ready else "unavailable"
@@ -216,8 +227,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 19,
-            "name": "Human Credit Review + Decision Recording + Committee Preparation",
+            "day": 20,
+            "name": "CAM + Committee Memo + Evidence Pack + Report Export",
         },
         core_models={
             "user": "ready",
@@ -290,5 +301,10 @@ def status(request: Request) -> StatusResponse:
             "credit_information_request": "ready",
             "credit_human_decision": "ready",
             "credit_committee_package": "ready",
+            "generated_report": "ready",
+            "report_snapshot": "ready",
+            "report_artifact": "ready",
+            "report_source_link": "ready",
+            "report_finalization_action": "ready",
         },
     )

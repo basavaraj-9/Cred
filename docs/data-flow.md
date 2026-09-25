@@ -223,3 +223,22 @@ Decision History and Timeline
 ```
 
 Committee inputs are hashed from the fixed review basis and current governance records. Meaningful changes create another package version. A ready package is retained unchanged.
+
+## Day 20 reporting flow
+
+```text
+Credit Review Case + Human Decision History + Committee Package
+  + Day 10 Assessment + Financial Ratios / Trends / Anomalies
+  + Day 15/17 Five Cs + Day 16 Research
+  + Day 18 Gates / Exceptions / Analytical Limit
+        ↓
+Canonical Snapshot + Input Hash
+        ↓
+CAM / Committee Memo / Evidence Pack / JSON Export
+        ↓
+Artifact SHA-256 + Source Links + Audit Event
+        ↓
+Authorized Preview / Download / Finalization / Supersession
+```
+
+The snapshot preserves missing values as unavailable and includes the selected upstream record IDs. Document pages, financial outputs, research sources and findings, policy gates, exceptions, review activity, and decision history receive direct report-source edges. Existing upstream lineage continues from those records to extracted evidence and original pages. Newer analysis raises a warning in the snapshot; it never replaces the report basis automatically.
