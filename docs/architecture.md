@@ -217,3 +217,27 @@ Verified Financial Values → Independent Limit Methods
 
 Decision records, gates, exceptions, checklist items, limit preparations, and limit methods are immutable derived rows. Experimental ML is context with zero weight. A human credit officer remains the final authority.
 
+
+## Day 19 human governance
+
+```text
+Day 18 Decision Support
+        ↓
+Human Review Case
+        ↓
+Evidence Acknowledgement / Checklist / RFI
+        ↓
+Policy Exception Actions
+        ↓
+Explicit Human Decision
+        ↓
+Immutable Decision History
+
+Review Case
+        ↓
+Versioned Committee Package
+        ↓
+Future Committee Decision Workflow
+```
+
+Review cases reference a fixed decision-support ID. Governance records are stored separately from analytical records. Backend authorization reads the versioned development authority policy, while audit records preserve the human actor for assignments, review activity, exception actions, decisions, overrides, and committee preparation.

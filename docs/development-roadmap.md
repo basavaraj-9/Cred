@@ -18,7 +18,8 @@
 - Day 16 — **Complete:** provider-based external company, promoter, legal, rating, industry, and sector research; source quality and freshness; entity matching; deduplication; immutable evidence and findings; 5 Cs candidates; safe retrieval controls; APIs; and an internal research view.
 - Day 17 — **Complete:** research-enriched 5 Cs refresh, immutable refresh lineage, deterministic recommendation preparation, neutral readiness states, critical review flags, confidence caps, APIs, audits, and internal review pages.
 - Day 18 — **Complete:** deterministic human-review recommendations, policy gates, explicit exceptions, review checklists, analytical exposure-ceiling methods, immutable lineage, APIs, audits, and internal review UI.
-- Day 19+ — **Planned:** human decision recording, policy-exception approval, credit committee preparation, stock intelligence, RAG, CAM, and reports.
+- Day 19 — **Complete:** role-governed human review cases, assignment history, evidence acknowledgement, checklist actions, information requests, policy-exception actions, explicit versioned human decisions, overrides, timelines, and immutable committee packages.
+- Day 20+ — **Planned:** CAM and committee memorandum generation, decision evidence packs, PDF/report export, stock intelligence, and full RAG.
 
 Each later increment should define its data contracts, failure behavior, and review requirements before implementation.
 

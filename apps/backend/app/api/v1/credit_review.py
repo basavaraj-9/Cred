@@ -86,6 +86,12 @@ class ExceptionActionRequest(ActorRequest):
     rationale: str = Field(min_length=1)
 
 
+class LimitOverrideRequest(ActorRequest):
+    requested_limit: Decimal
+    currency: str
+    rationale: str = Field(min_length=1)
+
+
 class DecisionRequest(ActorRequest):
     decision: str
     decision_rationale: str = Field(min_length=1)
@@ -374,6 +380,30 @@ def exception_action(
         "actor_user_id": x.actor_user_id,
         "authority_role": x.authority_role,
         "created_at": x.created_at,
+    }
+
+
+@router.post("/credit-review-cases/{review_case_id}/limit-override-exception")
+def request_limit_override(
+    review_case_id: UUID,
+    body: LimitOverrideRequest,
+    session: Session = Depends(get_db),
+) -> dict[str, object]:
+    with session.begin():
+        row = CreditReviewService(session).request_limit_override(
+            review_case_id,
+            body.actor_user_id,
+            body.requested_limit,
+            body.currency,
+            body.rationale,
+        )
+    return {
+        "id": row.id,
+        "exception_code": row.exception_code,
+        "status": row.status,
+        "resolved": row.resolved,
+        "required_authority": row.required_authority,
+        "reason": row.reason,
     }
 
 

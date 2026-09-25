@@ -213,3 +213,21 @@
 - Missing evidence never becomes zero, and missing research never becomes low risk.
 - An analytical ceiling is not a sanctioned amount, and collateral is used only when independently verified.
 - Historical decision-support graphs remain immutable with gate and limit-method source lineage.
+
+## Human credit governance
+
+- Human decisions are explicit and are never inferred from system recommendations, scores, ML, or workflow state.
+- System recommendations and human decisions remain separate historical facts.
+- Every decision, exception action, assignment, and committee action identifies its human actor.
+- Human decisions and material overrides require rationale.
+- An approved exception is not a credit approval.
+- The analytical ceiling is not the human-approved limit.
+- Role permissions, ownership, authority limits, and configured maker-checker controls are enforced in backend services.
+- Review comments and action histories are append-only.
+- Superseding decisions create new versions and preserve the earlier decision.
+- Committee packages are immutable after `READY`; meaningful input changes create a new version.
+- Blocking RFIs and unresolved review items prevent readiness where policy requires it.
+- A newer analysis raises an updated-analysis warning and never silently replaces the review basis.
+- Day 10 through Day 18 analytical records remain unchanged by governance actions.
+- Protected personal attributes are excluded from the workflow and development authority policy.
+- Day 19 performs no borrower notification, pricing, facility booking, sanction generation, or disbursement.

@@ -322,3 +322,13 @@ From `apps/frontend`: `npm run typecheck`, `npm run lint`, and `npm run build`.
 `docker compose up --build` runs PostgreSQL, backend, and frontend after the root environment is configured. Apply migrations with `docker compose exec backend alembic upgrade head`. The named `postgres_data` volume persists local database data. This Compose file is for development.
 
 See [architecture](docs/architecture.md), [data flow](docs/data-flow.md), [reliability principles](docs/reliability-principles.md), and [roadmap](docs/development-roadmap.md).
+
+## Day 19: human credit review and committee preparation
+
+Day 19 adds a governance layer over the immutable Day 18 decision-support record. A review case remains bound to one Day 18 version and records assignments, append-only comments, evidence acknowledgements, checklist actions, information requests, policy-exception actions, and a chronological audit trail. Newer Day 18 analysis produces an `UPDATED_ANALYSIS_AVAILABLE` warning and never silently changes the case basis.
+
+The development authority policy `credit_review_authority_policy_v1` defines reviewer roles, decision and exception permissions, limit bands, committee thresholds, and maker-checker controls. These permissions are enforced by backend services. Human decisions are explicit, attributable actions with required rationale and immutable versions. `APPROVED`, `DECLINED`, `RETURNED_FOR_INFORMATION`, and `REFERRED_TO_COMMITTEE` remain separate from the system recommendation.
+
+The Day 18 analytical ceiling and a human-entered approved limit remain separate. A higher human limit requires authority and recorded override rationale. An approved policy exception does not approve credit. Committee packages are deterministic structured data, versioned by input hash, and immutable after they are marked `READY`.
+
+No borrower notification, pricing, sanction document, facility booking, repayment schedule, disbursement, CAM PDF, or automatic human decision is produced. ML and fusion remain experimental pipeline-validation context with zero decision weight. No protected personal attributes are included in the authority policy or workflow.

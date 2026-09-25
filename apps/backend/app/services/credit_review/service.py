@@ -406,6 +406,51 @@ class CreditReviewService:
         )
         return row
 
+    def request_limit_override(
+        self,
+        case_id: UUID,
+        actor_id: UUID,
+        requested_limit: Decimal,
+        currency: str,
+        rationale: str,
+    ) -> CreditPolicyException:
+        case = self._case(case_id)
+        actor = self._user(actor_id)
+        self._require_owner(case, actor)
+        if requested_limit < 0 or not currency or not rationale.strip():
+            raise AppError(
+                "INVALID_LIMIT_OVERRIDE_REQUEST",
+                "Requested limit, currency, and rationale are required",
+                422,
+            )
+        existing = self.session.scalar(
+            select(CreditPolicyException).where(
+                CreditPolicyException.credit_decision_support_id == case.decision_support_id,
+                CreditPolicyException.exception_code == "LIMIT_OVERRIDE_EXCEPTION",
+            )
+        )
+        if existing:
+            return existing
+        row = CreditPolicyException(
+            credit_decision_support_id=case.decision_support_id,
+            exception_code="LIMIT_OVERRIDE_EXCEPTION",
+            reason=f"Human requested {currency} {requested_limit}: {rationale.strip()}",
+            required_authority="CREDIT_MANAGER",
+            status="OPEN",
+            resolved=False,
+            source_type="credit_review_case",
+            source_reference_id=case.id,
+        )
+        self.session.add(row)
+        self.session.flush()
+        self._audit(
+            case,
+            actor,
+            "CREDIT_EXCEPTION_ACTION_RECORDED",
+            {"exception_id": str(row.id), "action": "LIMIT_OVERRIDE_REQUESTED"},
+        )
+        return row
+
     def _ready_checks(self, case: CreditReviewCase) -> None:
         open_rfi = self.session.scalar(
             select(CreditInformationRequest.id).where(
@@ -513,6 +558,35 @@ class CreditReviewService:
                 "System recommendation override rationale is required",
                 422,
             )
+        if limit_override:
+            approved_override = self.session.scalar(
+                select(CreditPolicyException.id).where(
+                    CreditPolicyException.credit_decision_support_id == case.decision_support_id,
+                    CreditPolicyException.exception_code == "LIMIT_OVERRIDE_EXCEPTION",
+                    CreditPolicyException.status == "APPROVED_BY_HUMAN",
+                    CreditPolicyException.resolved.is_(True),
+                )
+            )
+            if approved_override is None:
+                raise AppError(
+                    "LIMIT_OVERRIDE_EXCEPTION_REQUIRED",
+                    "An approved limit override exception is required",
+                    409,
+                )
+        committee_threshold = Decimal(authority_policy()["committee_referral_threshold"])
+        if approved_limit is not None and approved_limit > committee_threshold:
+            ready_package = self.session.scalar(
+                select(CreditCommitteePackage.id).where(
+                    CreditCommitteePackage.review_case_id == case.id,
+                    CreditCommitteePackage.status == "READY",
+                )
+            )
+            if ready_package is None:
+                raise AppError(
+                    "COMMITTEE_REVIEW_REQUIRED",
+                    "A ready committee package is required above the referral threshold",
+                    409,
+                )
         current = self.session.scalar(
             select(CreditHumanDecision).where(
                 CreditHumanDecision.review_case_id == case.id,

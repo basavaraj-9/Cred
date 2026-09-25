@@ -205,3 +205,21 @@ Normalized Financial Values → Cash Flow / Revenue / Leverage / Working Capital
 ```
 
 The decision hash includes the Day 17 preparation, Day 10 and refreshed 5 Cs hashes, research, financial values, scope, and both Day 18 policies. Limit method inputs retain source value IDs. Missing existing exposure stays missing and projected interest coverage stays unavailable without a supported rate assumption.
+
+## Day 19 review flow
+
+```text
+System Recommendation
+      ↓
+Assigned Reviewer
+      ↓
+Comments / Evidence / Checklist
+      ↓
+Information Requests / Exception Actions
+      ↓
+Human Decision or Committee Referral
+      ↓
+Decision History and Timeline
+```
+
+Committee inputs are hashed from the fixed review basis and current governance records. Meaningful changes create another package version. A ready package is retained unchanged.

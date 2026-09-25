@@ -36,7 +36,15 @@ def test_url() -> str:
 def database_engine(test_url: str) -> Iterator[Engine]:
     assert os.getenv("APP_ENV") == "test", "Database tests require APP_ENV=test"
     get_settings.cache_clear()
-    command.upgrade(Config("alembic.ini"), "head")
+    previous_database_url = os.environ.get("DATABASE_URL")
+    os.environ["DATABASE_URL"] = test_url
+    try:
+        command.upgrade(Config("alembic.ini"), "head")
+    finally:
+        if previous_database_url is None:
+            os.environ.pop("DATABASE_URL", None)
+        else:
+            os.environ["DATABASE_URL"] = previous_database_url
     engine = create_engine(test_url, pool_pre_ping=True)
     yield engine
     engine.dispose()
