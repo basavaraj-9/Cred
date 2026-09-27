@@ -1,0 +1,10 @@
+{
+  "version": "credit_analyst_answer_policy_v1",
+  "prompt_version": "credit_analyst_prompt_v1",
+  "insufficient_evidence_text": "Insufficient evidence in the indexed sources.",
+  "require_material_claim_citations": true,
+  "preserve_legal_status": true,
+  "separate_system_and_human_decisions": true,
+  "separate_analytical_and_approved_limits": true,
+  "autonomous_lending_decisions": false
+}

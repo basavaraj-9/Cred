@@ -245,3 +245,16 @@
 - Experimental ML remains labeled pipeline-only with zero decision weight.
 - The reporting layer never changes Day 10 through Day 19 analytical or governance records.
 - Local filesystem storage and the development authority policy are not production substitutes for enterprise identity, durable object storage, retention, signing, or jurisdiction-specific reporting controls.
+
+## Day 21 RAG reliability guarantees
+
+- RAG is a derived read layer and does not update source financial, research, credit, review, decision, committee, or report records.
+- Chunk and embedding versions, manifest hashes, source identities, and current or historical state are persisted. Exact rebuilds are idempotent.
+- Every retrieval is company scoped. Optional financial scope and period filters are recorded with the query.
+- The default embedding and answer providers are deterministic and operate offline. PostgreSQL JSON vectors provide a portable fallback before a governed vector extension is introduced.
+- Answers cite persisted chunks. Missing, conflicting, and human-review-required states remain explicit, and unsupported claim counts are stored.
+- The assistant reports system recommendations and recorded human decisions as different facts. It cannot choose a sanctioned limit or create an approval, decline, price, facility, or disbursement.
+- Document and external research text is untrusted. Control characters, scripts, known prompt-injection phrases, and configured secret terms are removed or excluded before indexing.
+- Analyst roles are checked by backend services; raw retrieval diagnostics require an administrative role.
+- Evaluation reports observed retrieval recall, reciprocal rank, hit rate, citation precision and recall, citation coverage, and unsupported claim rate. Metrics are never hard-coded as passing.
+- Day 21 does not provide production identity, a production LLM, jurisdiction-specific legal conclusions, semantic reranking, or a native vector database.

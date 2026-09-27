@@ -18,6 +18,7 @@ li strong { font-size: .9rem; }
 form { display: grid; gap: 10px; }
 label { font-weight: 700; margin-top: 8px; }
 input { border: 1px solid #bac8d9; border-radius: 6px; padding: 12px; font: inherit; min-width: 0; }
+textarea { border: 1px solid #bac8d9; border-radius: 6px; padding: 12px; font: inherit; resize: vertical; }
 select { border: 1px solid #bac8d9; border-radius: 6px; padding: 12px; font: inherit; background: white; }
 input:focus { outline: 2px solid #3269aa; outline-offset: 2px; }
 button { justify-self: start; border: 0; border-radius: 8px; padding: 13px 20px; background: #173b74; color: white; font: inherit; font-weight: 700; cursor: pointer; }
@@ -41,3 +42,5 @@ fieldset { border: 1px solid #dce4ee; border-radius: 8px; padding: 14px; }
 .research-card dt { color: #526177; }
 .research-card dd { margin: 0; font-weight: 700; }
 .snapshot-preview { max-height: 520px; overflow: auto; padding: 16px; border-radius: 8px; background: #111b2e; color: #e8eef8; white-space: pre-wrap; overflow-wrap: anywhere; }
+.answer-text { white-space: pre-wrap; line-height: 1.65; padding: 18px; border-left: 4px solid #3269aa; background: #f7f9fc; }
+details summary { cursor: pointer; font-weight: 700; text-transform: capitalize; }

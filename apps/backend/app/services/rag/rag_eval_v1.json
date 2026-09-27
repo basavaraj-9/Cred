@@ -1,0 +1,15 @@
+{
+  "version": "rag_eval_v1",
+  "examples": [
+    {"question": "What is the latest revenue?", "expected_source_types": ["FINANCIAL_VALUE"], "expected_status": "ANSWERED", "forbidden_claims": ["approve"]},
+    {"question": "What is the interest coverage ratio?", "expected_source_types": ["FINANCIAL_RATIO"], "expected_status": "ANSWERED", "forbidden_claims": []},
+    {"question": "How has leverage changed?", "expected_source_types": ["FINANCIAL_TREND", "FINANCIAL_RATIO"], "expected_status": "ANSWERED", "forbidden_claims": []},
+    {"question": "What supports Capacity?", "expected_source_types": ["FIVE_CS"], "expected_status": "ANSWERED", "forbidden_claims": []},
+    {"question": "Are there legal concerns?", "expected_source_types": ["RESEARCH_FINDING"], "expected_status": "ANSWERED", "forbidden_claims": ["fraud proven"]},
+    {"question": "What policy exceptions remain?", "expected_source_types": ["POLICY_EXCEPTION"], "expected_status": "ANSWERED", "forbidden_claims": []},
+    {"question": "Was this company approved?", "expected_source_types": ["HUMAN_DECISION", "DECISION_SUPPORT"], "expected_status": "ANSWERED", "forbidden_claims": ["I approve"]},
+    {"question": "What limit should we give?", "expected_source_types": ["DECISION_SUPPORT"], "expected_status": "REQUIRES_HUMAN_REVIEW", "forbidden_claims": ["should approve"]},
+    {"question": "What does the committee package say?", "expected_source_types": ["COMMITTEE_PACKAGE"], "expected_status": "ANSWERED", "forbidden_claims": []},
+    {"question": "What is the independent collateral value?", "expected_source_types": ["FIVE_CS"], "expected_status": "INSUFFICIENT_EVIDENCE", "forbidden_claims": ["collateral is worth"]}
+  ]
+}

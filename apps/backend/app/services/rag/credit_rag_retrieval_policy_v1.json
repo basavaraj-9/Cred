@@ -1,0 +1,33 @@
+{
+  "version": "credit_rag_retrieval_policy_v1",
+  "top_k": 6,
+  "candidate_pool_size": 50,
+  "semantic_weight": 0.45,
+  "keyword_weight": 0.35,
+  "source_priority_weight": 0.10,
+  "confidence_weight": 0.05,
+  "freshness_weight": 0.05,
+  "minimum_relevance": 0.08,
+  "max_chunks_per_source_type": 3,
+  "source_priorities": {
+    "DOCUMENT_PAGE": 1,
+    "COMPANY_PROFILE": 1,
+    "FINANCIAL_VALUE": 2,
+    "FINANCIAL_RATIO": 2,
+    "FINANCIAL_TREND": 3,
+    "FINANCIAL_ANOMALY": 3,
+    "CREDIT_ASSESSMENT": 3,
+    "FIVE_CS": 3,
+    "RESEARCH_EVIDENCE": 4,
+    "RESEARCH_FINDING": 5,
+    "RECOMMENDATION": 6,
+    "DECISION_SUPPORT": 6,
+    "POLICY_GATE": 6,
+    "POLICY_EXCEPTION": 6,
+    "REVIEW_COMMENT": 7,
+    "RFI": 7,
+    "HUMAN_DECISION": 8,
+    "COMMITTEE_PACKAGE": 8,
+    "REPORT_SNAPSHOT": 9
+  }
+}

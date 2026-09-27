@@ -91,6 +91,16 @@ def _financial_schema_ready(database_url: str | None) -> bool:
             "report_artifacts",
             "report_source_links",
             "report_finalization_actions",
+            "rag_index_runs",
+            "rag_chunks",
+            "rag_embeddings",
+            "analyst_chat_sessions",
+            "analyst_chat_messages",
+            "rag_query_runs",
+            "rag_retrieval_results",
+            "rag_answers",
+            "rag_answer_citations",
+            "rag_answer_feedback",
         }.issubset(inspect(get_engine(database_url)).get_table_names())
     except Exception:
         return False
@@ -219,6 +229,14 @@ def status(request: Request) -> StatusResponse:
     components["production_credit_ml"] = "unavailable"
     components["credit_ml_rule_fusion"] = "ready"
     components["credit_ml_prediction"] = "ready"
+    components["rag_index"] = "ready" if schema_ready else "unavailable"
+    components["hybrid_retrieval"] = "ready" if schema_ready else "unavailable"
+    components["company_intelligence_qa"] = "ready" if schema_ready else "unavailable"
+    components["credit_analyst_assistant"] = "ready" if schema_ready else "unavailable"
+    components["citation_validation"] = "ready" if schema_ready else "unavailable"
+    components["prompt_injection_defense"] = "ready" if schema_ready else "unavailable"
+    components["production_ml_decisioning"] = "disabled"
+    components["autonomous_lending_decision"] = "disabled"
     return StatusResponse(
         application=ApplicationInfo(
             name=settings.app_name,
@@ -227,8 +245,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 20,
-            "name": "CAM + Committee Memo + Evidence Pack + Report Export",
+            "day": 21,
+            "name": "RAG + Company Intelligence Q&A + Credit Analyst Assistant",
         },
         core_models={
             "user": "ready",
@@ -306,5 +324,15 @@ def status(request: Request) -> StatusResponse:
             "report_artifact": "ready",
             "report_source_link": "ready",
             "report_finalization_action": "ready",
+            "rag_index_run": "ready",
+            "rag_chunk": "ready",
+            "rag_embedding": "ready",
+            "analyst_chat_session": "ready",
+            "analyst_chat_message": "ready",
+            "rag_query_run": "ready",
+            "rag_retrieval_result": "ready",
+            "rag_answer": "ready",
+            "rag_answer_citation": "ready",
+            "rag_answer_feedback": "ready",
         },
     )

@@ -10,7 +10,7 @@ def test_status_marks_future_components_as_planned(client: TestClient) -> None:
     assert payload["components"]["database"] == "not_configured"
     assert payload["components"]["credit_engine"] == "unavailable"
     assert payload["components"]["credit_ml"] == "unavailable"
-    assert payload["development_stage"]["day"] == 20
+    assert payload["development_stage"]["day"] == 21
     assert payload["components"]["credit_ml_rule_fusion"] == "ready"
     assert payload["components"]["production_credit_fusion"] == "unavailable"
     assert payload["components"]["five_cs"] == "unavailable"

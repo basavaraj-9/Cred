@@ -1,6 +1,7 @@
 import { API_BASE_URL, API_V1_PATH, BROWSER_API_BASE_URL } from "@/lib/config";
 import type { ClassificationEvidence, CompanyProfile, CreditAssessment, CreditEvidence, CreditFusionExperiment, CreditMLEvaluationSummary, CreditReason, DocumentMetadata, DomainClassification, FinancialAnalysisSummary, FinancialAnomaly, FinancialAnomalyDetail, FinancialExtractionSummary, FinancialLineItem, FinancialRatio, FinancialRatioDetail, FinancialStatement, FinancialTrend, FinancialTrendAnalysisSummary, FinancialTrendDetail, FinancialValidation, FiveCsAssessment, FiveCsEvidence, FiveCsReviewItem, HealthResponse, PageSummary, ParseSummary, ProfileEvidence, StatusResponse, UploadResult } from "@/types/api";
 import type { CommitteePackage, CreditDecisionSupport, CreditRecommendation, CreditReviewCase, FiveCsRefresh, GeneratedReport, ReportEvidenceLink, ReportSnapshot, ResearchCandidates, ResearchFinding, ResearchRun, ResearchSource } from "@/types/api";
+import type { AnalystAnswer, RagIndexStatus } from "@/types/api";
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${API_V1_PATH}${path}`, {
@@ -15,6 +16,33 @@ export const getHealth = () => getJson<HealthResponse>("/health");
 export const getStatus = () => getJson<StatusResponse>("/status");
 export const getCreditMLEvaluations = () =>
   getJson<CreditMLEvaluationSummary[]>("/ml/credit/evaluations");
+
+async function analystMutation<T>(path: string, body: Record<string, unknown>): Promise<T> {
+  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload?.error?.message ?? `Analyst request failed (${response.status})`);
+  return payload as T;
+}
+
+export const buildRagIndex = (companyId: string, actorId: string) =>
+  analystMutation<RagIndexStatus>(`/companies/${encodeURIComponent(companyId)}/rag/index`, { actor_user_id: actorId });
+
+export async function getRagIndex(companyId: string, actorId: string): Promise<RagIndexStatus> {
+  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/companies/${encodeURIComponent(companyId)}/rag/index?actor_user_id=${encodeURIComponent(actorId)}`);
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload?.error?.message ?? `Index lookup failed (${response.status})`);
+  return payload as RagIndexStatus;
+}
+
+export const askCreditAnalyst = (companyId: string, body: Record<string, unknown>) =>
+  analystMutation<AnalystAnswer>(`/companies/${encodeURIComponent(companyId)}/analyst/ask`, body);
+
+export const submitAnalystFeedback = (answerId: string, actorId: string, rating: string, comment?: string) =>
+  analystMutation<Record<string, unknown>>(`/analyst/answers/${encodeURIComponent(answerId)}/feedback`, { actor_user_id: actorId, rating, comment: comment || null });
 
 export async function createCreditFusionExperiment(
   creditAssessmentId: string,

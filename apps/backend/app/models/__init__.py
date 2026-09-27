@@ -58,6 +58,18 @@ from app.models.financial_trend import (
 )
 from app.models.five_cs import FiveCsAssessment, FiveCsEvidence, FiveCsReviewItem, FiveCsSection
 from app.models.ml import MLDataset, MLMetric, MLModel, MLRun
+from app.models.rag import (
+    AnalystChatMessage,
+    AnalystChatSession,
+    RagAnswer,
+    RagAnswerCitation,
+    RagAnswerFeedback,
+    RagChunk,
+    RagEmbedding,
+    RagIndexRun,
+    RagQueryRun,
+    RagRetrievalResult,
+)
 from app.models.recommendation import (
     CreditRecommendationFactor,
     CreditRecommendationPreparation,
@@ -178,5 +190,15 @@ __all__ = [
     "ReportArtifact",
     "ReportSourceLink",
     "ReportFinalizationAction",
+    "RagIndexRun",
+    "RagChunk",
+    "RagEmbedding",
+    "AnalystChatSession",
+    "AnalystChatMessage",
+    "RagQueryRun",
+    "RagRetrievalResult",
+    "RagAnswer",
+    "RagAnswerCitation",
+    "RagAnswerFeedback",
     "User",
 ]

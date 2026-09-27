@@ -17,6 +17,7 @@ from app.api.v1 import (
     financial_trends,
     five_cs,
     health,
+    rag,
     reports,
     research,
     status,
@@ -42,3 +43,4 @@ router.include_router(credit_review.router)
 router.include_router(five_cs.router)
 router.include_router(research.router)
 router.include_router(reports.router)
+router.include_router(rag.router)

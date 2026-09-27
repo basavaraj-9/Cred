@@ -1,6 +1,6 @@
 # Company Intelligence Platform
 
-Day 15 foundation for a future company intelligence, credit decision, and Indian stock intelligence platform. The current build accepts PDF uploads, extracts versioned page text, builds an evidence-backed company profile, classifies its domain, extracts and validates financial statements, calculates explainable ratios, analyzes multi-year trends, produces a deterministic credit-risk assessment, prepares leakage-checked historical credit ML datasets, validates baseline model training, runs versioned walk-forward evaluation, supports explainable internal fusion experiments, and structures source-backed evidence under the 5 Cs of Credit. Authentication remains planned.
+Day 21 foundation for a company intelligence and governed credit analysis platform. The current build carries source evidence through financial analysis, credit assessment, external research, human review, controlled reporting, and an evidence-grounded analyst assistant. Authentication remains planned.
 
 ## Requirements
 
@@ -34,6 +34,14 @@ npm run dev
 Open http://localhost:3000/upload to upload a PDF and http://localhost:3000/health to view status. The API health endpoint is at http://localhost:8000/api/v1/health; API docs are at http://localhost:8000/docs.
 
 The internal model-validation summary is available at http://localhost:3000/model-validation. It reports development diagnostics and keeps production fusion explicitly blocked for synthetic-only datasets.
+
+The analyst assistant is available at http://localhost:3000/analyst-assistant. Build a company index with an authorized internal user ID, then ask questions across document, financial, research, credit, workflow, decision, committee, and report evidence. Answers include persisted citations and never make or change a lending decision.
+
+## Day 21: RAG and credit analyst assistant
+
+Day 21 adds an immutable derived index over existing records. `credit_rag_index_v1` and `credit_rag_chunk_builder_v1` preserve source versions, company boundaries, periods, scope, status, confidence, and current or historical state. The default offline embedding provider is deterministic and stores vectors as portable JSON in PostgreSQL. The retrieval layer combines embedding similarity, keyword overlap, source priority, evidence confidence, and recency under `credit_rag_retrieval_policy_v1`.
+
+`credit_analyst_query_classifier_v1` routes questions to relevant source families. `credit_analyst_prompt_v1` and `credit_analyst_answer_policy_v1` require cited answers, explicit insufficient or conflicting evidence states, and clear separation between system recommendations and human decisions. External text is treated as untrusted data, known instruction patterns and secrets are excluded from indexed context, and debug retrieval requires an administrative role. The deterministic answer provider supports offline testing; the provider interface allows a later governed LLM integration without changing retrieval or citation records.
 
 The root `.env.example` lists all current environment variables. The backend reads `apps/backend/.env`; the frontend reads `apps/frontend/.env.local`. Change `FRONTEND_URL` when the frontend runs on another origin. The status page fetches from `API_INTERNAL_BASE_URL` on the server; use `http://backend:8000` inside Compose and `http://localhost:8000` when running locally. Rebuild the frontend after changing `NEXT_PUBLIC_API_BASE_URL` for future browser requests.
 

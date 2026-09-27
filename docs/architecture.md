@@ -261,3 +261,19 @@ Role-Governed Finalization / Explicit Supersession
 `generated_reports` is the report identity and lifecycle record. `report_snapshots` freezes the exact serialized inputs used by the renderer. `report_source_links` identifies the analytical, research, governance, page, gate, exception, and committee records that support the report. `report_artifacts` stores the safe relative path, MIME type, format, size, and digest. `report_finalization_actions` records the human actor and rationale for issuance and supersession.
 
 The reporting service reads prior stages and never updates them. Idempotency includes the snapshot content, report type, artifact format, template version, and renderer version. Finalization changes report governance state without regenerating bytes. Supersession links a finalized version to a newer generated or finalized version while retaining both artifacts.
+
+## Day 21 RAG architecture
+
+```text
+Immutable internal records + untrusted document/research text
+        ↓ sanitize, filter, version, chunk
+Company-scoped immutable chunks → deterministic embedding abstraction
+        ↓
+PostgreSQL JSON vectors + keyword fields
+        ↓ semantic + keyword + priority + confidence + current-state scoring
+Ranked retrieval results → policy-controlled answer provider
+        ↓
+Grounded answer + claim citations + status + audit + feedback
+```
+
+Every chunk records its company, original source identity and version, section, page, period, scope, confidence, source priority, and current flag. A changed source creates a new chunk and marks the previous version historical. Exact manifests return the existing index run. Query, retrieval, answer, citation, chat, and feedback records preserve the full analyst lineage. Embedding and answer providers are interfaces; Day 21 uses deterministic offline implementations and requires no external model service.

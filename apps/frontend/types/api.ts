@@ -10,13 +10,48 @@ export type HealthResponse = {
   };
 };
 
-export type ComponentState = "ready" | "connected" | "unavailable" | "not_configured" | "not_implemented" | "foundation_ready" | "pipeline_validated" | "experimental";
+export type ComponentState = "ready" | "connected" | "unavailable" | "not_configured" | "not_implemented" | "foundation_ready" | "pipeline_validated" | "experimental" | "disabled" | "not_recorded";
 
 export type StatusResponse = {
   application: { name: string; version: string; environment: string };
   components: Record<string, ComponentState>;
   core_models: Record<string, "ready">;
   development_stage: { day: number; name: string };
+};
+
+export type RagIndexStatus = {
+  id: string;
+  index_version: string;
+  status: string;
+  chunk_count: number;
+  source_count: number;
+  source_coverage?: Record<string, number>;
+  embedding_provider: string;
+  embedding_model: string;
+  completed_at: string | null;
+};
+
+export type AnalystCitation = {
+  index: number;
+  source_type: string;
+  source_reference_id: string;
+  chunk_id: string;
+  evidence_text: string;
+  page_number: number | null;
+  status: string | null;
+  confidence: number | null;
+  metadata: Record<string, unknown> | null;
+};
+
+export type AnalystAnswer = {
+  answer_id: string;
+  query_run_id: string;
+  answer: string;
+  status: "ANSWERED" | "PARTIAL" | "INSUFFICIENT_EVIDENCE" | "CONFLICTING_EVIDENCE" | "REQUIRES_HUMAN_REVIEW" | "FAILED";
+  confidence: number;
+  citation_coverage_ratio: number;
+  unsupported_claim_count: number;
+  citations: AnalystCitation[];
 };
 
 export type CreditMLEvaluationSummary = {

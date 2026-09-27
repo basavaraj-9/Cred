@@ -242,3 +242,14 @@ Authorized Preview / Download / Finalization / Supersession
 ```
 
 The snapshot preserves missing values as unavailable and includes the selected upstream record IDs. Document pages, financial outputs, research sources and findings, policy gates, exceptions, review activity, and decision history receive direct report-source edges. Existing upstream lineage continues from those records to extracted evidence and original pages. Newer analysis raises a warning in the snapshot; it never replaces the report basis automatically.
+
+## Day 21 RAG and analyst flow
+
+```text
+Company records → source-specific chunk builder → immutable chunks → embeddings
+Question + company/scope/period filters → hybrid ranker → selected context
+Selected context → deterministic grounded answer → numbered citations
+Question + ranks + scores + answer + citations → persistent audit lineage
+```
+
+The index includes document pages, company profiles, financial values, ratios, trends, anomalies, assessments, 5 Cs evidence, research, recommendation preparation, decision support, gates, exceptions, analytical limits, review activity, RFIs, human decisions, committee packages, and report snapshot navigation. Retrieval never crosses a company boundary. Scope and period constraints narrow or down-rank evidence while historical chunks remain available and visibly versioned.

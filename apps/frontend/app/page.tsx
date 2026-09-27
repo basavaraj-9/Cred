@@ -22,5 +22,7 @@ export default function Home() {
     <Link className="button" href="/credit-committee">Credit committee →</Link>
     {" "}
     <Link className="button" href="/credit-reports">Credit reports →</Link>
+    {" "}
+    <Link className="button" href="/analyst-assistant">Analyst assistant →</Link>
   </>;
 }
