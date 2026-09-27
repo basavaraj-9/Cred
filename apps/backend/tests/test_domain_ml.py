@@ -564,7 +564,7 @@ def test_classification_schema_and_status(context: Context, database_engine: Eng
         "domain_classification_evidence",
     } <= names
     status = context.client.get("/api/v1/status").json()
-    assert status["development_stage"]["day"] == 21
+    assert status["development_stage"]["day"] == 22
     assert status["components"]["domain_ml_dataset"] == "ready"
     assert status["components"]["domain_model_training"] == "ready"
     assert status["components"]["domain_classification"] == "ready"

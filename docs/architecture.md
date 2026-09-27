@@ -277,3 +277,13 @@ Grounded answer + claim citations + status + audit + feedback
 ```
 
 Every chunk records its company, original source identity and version, section, page, period, scope, confidence, source priority, and current flag. A changed source creates a new chunk and marks the previous version historical. Exact manifests return the existing index run. Query, retrieval, answer, citation, chat, and feedback records preserve the full analyst lineage. Embedding and answer providers are interfaces; Day 21 uses deterministic offline implementations and requires no external model service.
+
+## Day 22 stock foundation
+
+```text
+Uploaded Company → Verified Domain Classification → Indian Listed Universe
+  → Explainable Peer Discovery → Peer Group → Primary/Secondary Listings
+  → Provider Market Data Run → Versioned Daily OHLCV
+```
+
+`listed_companies` represents a legal entity while `stock_listings` preserves each NSE or BSE identity. ISIN resolves dual listings to one company. Peer groups freeze classification, policy, engine, and universe snapshot lineage. Market data providers remain interchangeable and one symbol failure is isolated in `market_data_errors`.

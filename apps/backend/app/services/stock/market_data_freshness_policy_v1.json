@@ -1,0 +1,1 @@
+{"version":"market_data_freshness_policy_v1","current_calendar_days":3,"stale_calendar_days":30,"missing_behavior":"MISSING"}

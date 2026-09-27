@@ -1,0 +1,1 @@
+{"version":"stock_listing_selection_policy_v1","preference":["ACTIVE:NSE:EQUITY","ACTIVE:BSE:EQUITY"],"otherwise":"NEEDS_REVIEW"}

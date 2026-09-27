@@ -2,6 +2,7 @@ import { API_BASE_URL, API_V1_PATH, BROWSER_API_BASE_URL } from "@/lib/config";
 import type { ClassificationEvidence, CompanyProfile, CreditAssessment, CreditEvidence, CreditFusionExperiment, CreditMLEvaluationSummary, CreditReason, DocumentMetadata, DomainClassification, FinancialAnalysisSummary, FinancialAnomaly, FinancialAnomalyDetail, FinancialExtractionSummary, FinancialLineItem, FinancialRatio, FinancialRatioDetail, FinancialStatement, FinancialTrend, FinancialTrendAnalysisSummary, FinancialTrendDetail, FinancialValidation, FiveCsAssessment, FiveCsEvidence, FiveCsReviewItem, HealthResponse, PageSummary, ParseSummary, ProfileEvidence, StatusResponse, UploadResult } from "@/types/api";
 import type { CommitteePackage, CreditDecisionSupport, CreditRecommendation, CreditReviewCase, FiveCsRefresh, GeneratedReport, ReportEvidenceLink, ReportSnapshot, ResearchCandidates, ResearchFinding, ResearchRun, ResearchSource } from "@/types/api";
 import type { AnalystAnswer, RagIndexStatus } from "@/types/api";
+import type { MarketDataRun, PeerGroup } from "@/types/api";
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${API_V1_PATH}${path}`, {
@@ -43,6 +44,10 @@ export const askCreditAnalyst = (companyId: string, body: Record<string, unknown
 
 export const submitAnalystFeedback = (answerId: string, actorId: string, rating: string, comment?: string) =>
   analystMutation<Record<string, unknown>>(`/analyst/answers/${encodeURIComponent(answerId)}/feedback`, { actor_user_id: actorId, rating, comment: comment || null });
+
+export const syncStockUniverse = (actorId:string, exchange?:string) => analystMutation<Record<string,unknown>>("/stock-universe/sync", {actor_user_id:actorId,exchange:exchange||null});
+export const discoverPeers = (documentId:string, actorId:string) => analystMutation<PeerGroup>(`/documents/${encodeURIComponent(documentId)}/peers/discover`, {actor_user_id:actorId});
+export const syncMarketData = (actorId:string,startDate:string,endDate:string,symbols?:string[]) => analystMutation<MarketDataRun>("/market-data/sync",{actor_user_id:actorId,start_date:startDate,end_date:endDate,symbols:symbols||null});
 
 export async function createCreditFusionExperiment(
   creditAssessmentId: string,

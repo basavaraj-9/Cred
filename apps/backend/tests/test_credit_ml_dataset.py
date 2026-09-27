@@ -460,6 +460,6 @@ def test_critical_leakage_blocks_dataset_publication(db_session: Session, tmp_pa
 
 def test_status_reports_day_12(client) -> None:
     payload = client.get("/api/v1/status").json()
-    assert payload["development_stage"]["day"] == 21
+    assert payload["development_stage"]["day"] == 22
     assert payload["components"]["credit_ml_training"] in {"ready", "unavailable"}
     assert payload["components"]["production_credit_ml"] == "unavailable"

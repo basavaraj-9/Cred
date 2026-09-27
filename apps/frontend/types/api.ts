@@ -54,6 +54,9 @@ export type AnalystAnswer = {
   citations: AnalystCitation[];
 };
 
+export type PeerGroup = { peer_group_id:string; document_id:string; status:string; policy_version:string; engine_version:string; universe_version:string; universe_snapshot_hash:string; disclaimer:string; peers:Array<{rank:number;company_id:string;company_name:string;listing_id:string;exchange:string;symbol:string;similarity_score:number;components:Record<string,number>;status:string;review_required:boolean;rationale:string[];market_data:{status:string;latest_date:string|null}}> };
+export type MarketDataRun = { run_id:string; provider:string; provider_version:string; status:string; symbol_count:number; success_count:number; failure_count:number; start_date:string; end_date:string };
+
 export type CreditMLEvaluationSummary = {
   evaluation_id: string;
   dataset_id: string;

@@ -105,6 +105,15 @@ from app.models.review import (
     CreditReviewComment,
     CreditReviewEvidenceAcknowledgement,
 )
+from app.models.stock import (
+    ListedCompany,
+    MarketDataError,
+    MarketDataRun,
+    PeerGroup,
+    PeerGroupMember,
+    StockListing,
+    StockPrice,
+)
 from app.models.user import User
 
 __all__ = [
@@ -201,4 +210,11 @@ __all__ = [
     "RagAnswerCitation",
     "RagAnswerFeedback",
     "User",
+    "ListedCompany",
+    "StockListing",
+    "PeerGroup",
+    "PeerGroupMember",
+    "MarketDataRun",
+    "StockPrice",
+    "MarketDataError",
 ]

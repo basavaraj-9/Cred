@@ -1,5 +1,9 @@
 # Company Intelligence Platform
 
+## Day 22: Indian listed peers and market data
+
+Day 22 adds a normalized Indian listed-company universe with separate NSE/BSE listings, deterministic entity resolution, explainable domain-to-peer discovery, and provider-neutral daily OHLCV ingestion. The included development providers are deterministic fixtures, so tests and local demonstrations do not contact exchange websites. Prices preserve provider/version lineage and use PostgreSQL NUMERIC values. Peer similarity describes business comparability only and produces no valuation, target price, forecast, Stock Intelligence Score, or BUY/SELL/HOLD signal. The internal view is available at `/stock-intelligence`.
+
 Day 21 foundation for a company intelligence and governed credit analysis platform. The current build carries source evidence through financial analysis, credit assessment, external research, human review, controlled reporting, and an evidence-grounded analyst assistant. Authentication remains planned.
 
 ## Requirements

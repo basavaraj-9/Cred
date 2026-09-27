@@ -21,7 +21,8 @@
 - Day 19 — **Complete:** role-governed human review cases, assignment history, evidence acknowledgement, checklist actions, information requests, policy-exception actions, explicit versioned human decisions, overrides, timelines, and immutable committee packages.
 - Day 20 — **Complete:** fixed report snapshots, versioned CAM and committee memorandum generation, decision evidence packs, structured JSON export, PDF artifacts, SHA-256 integrity, source lineage, controlled finalization and supersession, APIs, audits, and an internal report workspace.
 - Day 21 — **Complete:** immutable company RAG indexes, vendor-neutral deterministic embeddings, hybrid retrieval, company/scope/period isolation, grounded analyst Q&A, citations, chat and feedback lineage, prompt-injection defenses, evaluation metrics, APIs, audits, and an internal analyst workspace.
-- Day 22+ — **Planned:** stock intelligence, production identity integration, governed production LLM providers, vector extensions, external object storage, electronic signatures, and regulatory templates.
+- Day 22 — **Complete:** normalized NSE/BSE listed entities and listings, deterministic fixture universe, dual-listing resolution, explainable peer discovery, provider-neutral OHLCV ingestion, freshness and partial-failure handling, APIs, audits, and internal UI.
+- Day 23+ — **Planned:** Indian listed-company fundamentals, valuation, sector metrics, historical feature store, production identity integration, and governed production data providers.
 
 Each later increment should define its data contracts, failure behavior, and review requirements before implementation.
 

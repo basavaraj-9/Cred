@@ -101,6 +101,13 @@ def _financial_schema_ready(database_url: str | None) -> bool:
             "rag_answers",
             "rag_answer_citations",
             "rag_answer_feedback",
+            "listed_companies",
+            "stock_listings",
+            "peer_groups",
+            "peer_group_members",
+            "market_data_runs",
+            "stock_prices",
+            "market_data_errors",
         }.issubset(inspect(get_engine(database_url)).get_table_names())
     except Exception:
         return False
@@ -237,6 +244,16 @@ def status(request: Request) -> StatusResponse:
     components["prompt_injection_defense"] = "ready" if schema_ready else "unavailable"
     components["production_ml_decisioning"] = "disabled"
     components["autonomous_lending_decision"] = "disabled"
+    components["indian_listed_universe"] = "ready" if schema_ready else "unavailable"
+    components["nse_bse_mapping"] = "ready" if schema_ready else "unavailable"
+    components["peer_discovery"] = "ready" if schema_ready else "unavailable"
+    components["peer_similarity_explainability"] = "ready" if schema_ready else "unavailable"
+    components["market_data_foundation"] = "ready" if schema_ready else "unavailable"
+    components["stock_fundamentals"] = "not_implemented"
+    components["valuation"] = "not_implemented"
+    components["stock_ml"] = "not_implemented"
+    components["stock_intelligence_score"] = "not_implemented"
+    components["buy_sell_hold"] = "disabled"
     return StatusResponse(
         application=ApplicationInfo(
             name=settings.app_name,
@@ -245,8 +262,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 21,
-            "name": "RAG + Company Intelligence Q&A + Credit Analyst Assistant",
+            "day": 22,
+            "name": "Indian Listed Peer Discovery + Market Data Foundation",
         },
         core_models={
             "user": "ready",
@@ -334,5 +351,12 @@ def status(request: Request) -> StatusResponse:
             "rag_answer": "ready",
             "rag_answer_citation": "ready",
             "rag_answer_feedback": "ready",
+            "listed_company": "ready",
+            "stock_listing": "ready",
+            "peer_group": "ready",
+            "peer_group_member": "ready",
+            "market_data_run": "ready",
+            "stock_price": "ready",
+            "market_data_error": "ready",
         },
     )

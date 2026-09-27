@@ -253,3 +253,12 @@ Question + ranks + scores + answer + citations → persistent audit lineage
 ```
 
 The index includes document pages, company profiles, financial values, ratios, trends, anomalies, assessments, 5 Cs evidence, research, recommendation preparation, decision support, gates, exceptions, analytical limits, review activity, RFIs, human decisions, committee packages, and report snapshot navigation. Retrieval never crosses a company boundary. Scope and period constraints narrow or down-rank evidence while historical chunks remain available and visibly versioned.
+
+## Day 22 peer and price flow
+
+```text
+Company Classification → Active Equity Candidate Filter → Similarity Components
+  → Ranked Peer Group → Primary Listing Selection → Daily Market Data
+```
+
+Sector, industry, domain, sub-domain, business text, and product overlap remain separate persisted scores. The listing-to-run-to-price chain preserves exchange, symbol, provider, provider version, retrieval time, currency, and trading date.

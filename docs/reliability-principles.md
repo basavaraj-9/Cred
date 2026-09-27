@@ -258,3 +258,13 @@
 - Analyst roles are checked by backend services; raw retrieval diagnostics require an administrative role.
 - Evaluation reports observed retrieval recall, reciprocal rank, hit rate, citation precision and recall, citation coverage, and unsupported claim rate. Metrics are never hard-coded as passing.
 - Day 21 does not provide production identity, a production LLM, jurisdiction-specific legal conclusions, semantic reranking, or a native vector database.
+
+## Day 22 stock-data guarantees
+
+- Listed companies and exchange listings are separate entities; dual listings are retained under one ISIN-backed company.
+- Similar names alone never merge identities or create peers. Inactive and non-equity securities are excluded.
+- Peer ranking persists every weighted component and rationale. Low-confidence classifications cannot produce high-confidence peers.
+- Prices use Decimal/NUMERIC, preserve provider versions, and never fabricate weekend or holiday candles.
+- One symbol failure produces a symbol error and a partial run without discarding successful symbols.
+- Missing prices do not remove an otherwise valid peer.
+- Peer similarity is business comparability only. Day 22 creates no valuation, stock ML, target price, forecast, Stock Intelligence Score, or BUY/SELL/HOLD signal.

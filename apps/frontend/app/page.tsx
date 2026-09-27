@@ -24,5 +24,7 @@ export default function Home() {
     <Link className="button" href="/credit-reports">Credit reports →</Link>
     {" "}
     <Link className="button" href="/analyst-assistant">Analyst assistant →</Link>
+    {" "}
+    <Link className="button" href="/stock-intelligence">Stock intelligence →</Link>
   </>;
 }
