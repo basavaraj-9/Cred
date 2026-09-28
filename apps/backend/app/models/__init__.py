@@ -1,3 +1,4 @@
+# ruff: noqa: F401
 from app.models.analysis_job import AnalysisJob
 from app.models.audit_log import AuditLog
 from app.models.company import Company
@@ -113,6 +114,18 @@ from app.models.stock import (
     PeerGroupMember,
     StockListing,
     StockPrice,
+)
+from app.models.stock_analytics import (
+    SectorMetric,
+    SectorMetricRun,
+    StockFeature,
+    StockFeatureInput,
+    StockFeatureRun,
+    StockFundamental,
+    StockFundamentalRun,
+    StockValuation,
+    StockValuationInput,
+    StockValuationRun,
 )
 from app.models.user import User
 

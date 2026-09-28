@@ -1,0 +1,1 @@
+{"version":"stock_valuation_policy_v1","scope_preference":["CONSOLIDATED","STANDALONE"],"period_preference":["TTM","ANNUAL"],"market_date_selection":"LATEST_ON_OR_BEFORE","negative_earnings":"NOT_MEANINGFUL","non_positive_equity":"NOT_MEANINGFUL","non_positive_ebitda":"NOT_MEANINGFUL"}

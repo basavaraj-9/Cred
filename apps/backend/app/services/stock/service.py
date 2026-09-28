@@ -733,6 +733,17 @@ class MarketDataService:
                 bars = self.provider.get_daily_bars(
                     listing.exchange, listing.symbol, start_date, end_date
                 )
+                existing_dates = set(
+                    self.session.scalars(
+                        select(StockPrice.trade_date).where(
+                            StockPrice.stock_listing_id == listing.id,
+                            StockPrice.trade_date >= start_date,
+                            StockPrice.trade_date <= end_date,
+                            StockPrice.provider == self.provider.provider_name,
+                            StockPrice.provider_version == self.provider.provider_version,
+                        )
+                    )
+                )
                 for bar in bars:
                     if (
                         min(bar.open, bar.high, bar.low, bar.close) <= 0
@@ -742,17 +753,7 @@ class MarketDataService:
                         or bar.volume < 0
                     ):
                         raise ValueError("invalid OHLCV")
-                    if (
-                        self.session.scalar(
-                            select(StockPrice).where(
-                                StockPrice.stock_listing_id == listing.id,
-                                StockPrice.trade_date == bar.trade_date,
-                                StockPrice.provider == self.provider.provider_name,
-                                StockPrice.provider_version == self.provider.provider_version,
-                            )
-                        )
-                        is None
-                    ):
+                    if bar.trade_date not in existing_dates:
                         self.session.add(
                             StockPrice(
                                 stock_listing_id=listing.id,
@@ -772,6 +773,7 @@ class MarketDataService:
                                 created_at=now(),
                             )
                         )
+                        existing_dates.add(bar.trade_date)
                 listing.last_price_date = max((x.trade_date for x in bars), default=None)
                 listing.price_data_status = self.status(listing.last_price_date, end_date)
                 run.success_count += 1

@@ -108,6 +108,16 @@ def _financial_schema_ready(database_url: str | None) -> bool:
             "market_data_runs",
             "stock_prices",
             "market_data_errors",
+            "stock_fundamental_runs",
+            "stock_fundamentals",
+            "stock_valuation_runs",
+            "stock_valuations",
+            "stock_valuation_inputs",
+            "sector_metric_runs",
+            "sector_metrics",
+            "stock_feature_runs",
+            "stock_features",
+            "stock_feature_inputs",
         }.issubset(inspect(get_engine(database_url)).get_table_names())
     except Exception:
         return False
@@ -249,11 +259,15 @@ def status(request: Request) -> StatusResponse:
     components["peer_discovery"] = "ready" if schema_ready else "unavailable"
     components["peer_similarity_explainability"] = "ready" if schema_ready else "unavailable"
     components["market_data_foundation"] = "ready" if schema_ready else "unavailable"
-    components["stock_fundamentals"] = "not_implemented"
-    components["valuation"] = "not_implemented"
+    components["stock_fundamentals"] = "ready" if schema_ready else "unavailable"
+    components["valuation"] = "ready" if schema_ready else "unavailable"
+    components["peer_relative_metrics"] = "ready" if schema_ready else "unavailable"
+    components["sector_metrics"] = "ready" if schema_ready else "unavailable"
+    components["historical_feature_store"] = "ready" if schema_ready else "unavailable"
     components["stock_ml"] = "not_implemented"
     components["stock_intelligence_score"] = "not_implemented"
     components["buy_sell_hold"] = "disabled"
+    components["target_price"] = "disabled"
     return StatusResponse(
         application=ApplicationInfo(
             name=settings.app_name,
@@ -262,8 +276,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 22,
-            "name": "Indian Listed Peer Discovery + Market Data Foundation",
+            "day": 23,
+            "name": "Stock Fundamentals + Valuation + Historical Feature Store",
         },
         core_models={
             "user": "ready",
@@ -358,5 +372,15 @@ def status(request: Request) -> StatusResponse:
             "market_data_run": "ready",
             "stock_price": "ready",
             "market_data_error": "ready",
+            "stock_fundamental_run": "ready",
+            "stock_fundamental": "ready",
+            "stock_valuation_run": "ready",
+            "stock_valuation": "ready",
+            "stock_valuation_input": "ready",
+            "sector_metric_run": "ready",
+            "sector_metric": "ready",
+            "stock_feature_run": "ready",
+            "stock_feature": "ready",
+            "stock_feature_input": "ready",
         },
     )
