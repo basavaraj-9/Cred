@@ -56,6 +56,10 @@ export type AnalystAnswer = {
 
 export type PeerGroup = { peer_group_id:string; document_id:string; status:string; policy_version:string; engine_version:string; universe_version:string; universe_snapshot_hash:string; disclaimer:string; peers:Array<{rank:number;company_id:string;company_name:string;listing_id:string;exchange:string;symbol:string;similarity_score:number;components:Record<string,number>;status:string;review_required:boolean;rationale:string[];market_data:{status:string;latest_date:string|null}}> };
 export type MarketDataRun = { run_id:string; provider:string; provider_version:string; status:string; symbol_count:number; success_count:number; failure_count:number; start_date:string; end_date:string };
+export type Fundamental = {id:string;metric_code:string;value:string;unit:string;currency:string|null;period:string;period_end:string;availability_date:string;scope:string;provenance:string;provider:string;status:string};
+export type ValuationResult = {run_id:string;valuation_date:string;status:string;metrics:Array<{code:string;value:string|null;status:string}>};
+export type FeatureResult = {run_id:string;as_of_date:string;feature_set_version:string;status:string;features:Array<{name:string;group:string;value:string|null;status:string;source_count:number}>};
+export type RelativeMetric = {group_type:"PEER_GROUP"|"INDUSTRY"|"SECTOR";group:string;as_of_date:string;metric_code:string;value:string|null;percentile:string|null;z_score:string|null;rank:number|null;group_size:number;status:string};
 
 export type CreditMLEvaluationSummary = {
   evaluation_id: string;

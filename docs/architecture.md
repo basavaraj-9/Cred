@@ -287,3 +287,13 @@ Uploaded Company → Verified Domain Classification → Indian Listed Universe
 ```
 
 `listed_companies` represents a legal entity while `stock_listings` preserves each NSE or BSE identity. ISIN resolves dual listings to one company. Peer groups freeze classification, policy, engine, and universe snapshot lineage. Market data providers remain interchangeable and one symbol failure is isolated in `market_data_errors`.
+
+## Day 23 equity analytics architecture
+
+```text
+Listed Company → Provider Fundamentals → Availability Gate → Validation
+  → As-of Market Price → Valuation → Peer/Industry/Sector Metrics
+  → Historical Feature Store → Future Stock ML
+```
+
+Reported fundamentals, valuation outputs, relative observations, and features remain separate versioned records. Valuation and feature input tables retain the exact price, fundamental, and relative-metric identities used. Relative runs keep each comparison group separately identifiable.

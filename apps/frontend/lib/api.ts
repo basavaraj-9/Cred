@@ -3,6 +3,7 @@ import type { ClassificationEvidence, CompanyProfile, CreditAssessment, CreditEv
 import type { CommitteePackage, CreditDecisionSupport, CreditRecommendation, CreditReviewCase, FiveCsRefresh, GeneratedReport, ReportEvidenceLink, ReportSnapshot, ResearchCandidates, ResearchFinding, ResearchRun, ResearchSource } from "@/types/api";
 import type { AnalystAnswer, RagIndexStatus } from "@/types/api";
 import type { MarketDataRun, PeerGroup } from "@/types/api";
+import type { FeatureResult, Fundamental, RelativeMetric, ValuationResult } from "@/types/api";
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${API_V1_PATH}${path}`, {
@@ -48,6 +49,12 @@ export const submitAnalystFeedback = (answerId: string, actorId: string, rating:
 export const syncStockUniverse = (actorId:string, exchange?:string) => analystMutation<Record<string,unknown>>("/stock-universe/sync", {actor_user_id:actorId,exchange:exchange||null});
 export const discoverPeers = (documentId:string, actorId:string) => analystMutation<PeerGroup>(`/documents/${encodeURIComponent(documentId)}/peers/discover`, {actor_user_id:actorId});
 export const syncMarketData = (actorId:string,startDate:string,endDate:string,symbols?:string[]) => analystMutation<MarketDataRun>("/market-data/sync",{actor_user_id:actorId,start_date:startDate,end_date:endDate,symbols:symbols||null});
+export const syncFundamentals=(actorId:string,companyIds?:string[])=>analystMutation<Record<string,unknown>>("/stock-fundamentals/sync",{actor_user_id:actorId,listed_company_ids:companyIds||null});
+export async function getFundamentals(companyId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stocks/${companyId}/fundamentals?actor_user_id=${actorId}`);if(!r.ok)throw new Error("Fundamentals lookup failed");return await r.json() as Fundamental[]}
+export const buildValuation=(listingId:string,actorId:string,valuationDate:string)=>analystMutation<ValuationResult>(`/stocks/${listingId}/valuations/build`,{actor_user_id:actorId,valuation_date:valuationDate});
+export const buildFeatures=(listingId:string,actorId:string,asOfDate:string)=>analystMutation<FeatureResult>(`/stocks/${listingId}/features/build`,{actor_user_id:actorId,as_of_date:asOfDate});
+export const buildRelativeMetrics=(actorId:string,asOfDate:string)=>analystMutation<Record<string,unknown>>("/sector-metrics/build",{actor_user_id:actorId,as_of_date:asOfDate});
+export async function getRelativeMetrics(companyId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stocks/${encodeURIComponent(companyId)}/relative-metrics?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Relative metrics lookup failed");return await r.json() as RelativeMetric[]}
 
 export async function createCreditFusionExperiment(
   creditAssessmentId: string,

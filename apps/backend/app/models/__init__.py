@@ -127,6 +127,17 @@ from app.models.stock_analytics import (
     StockValuationInput,
     StockValuationRun,
 )
+from app.models.stock_ml import (
+    StockMLDataset,
+    StockMLDatasetFeature,
+    StockMLDatasetRow,
+    StockMLMetric,
+    StockMLModel,
+    StockMLPrediction,
+    StockMLRun,
+    StockMLSplit,
+    StockMLSplitRow,
+)
 from app.models.user import User
 
 __all__ = [
@@ -230,4 +241,13 @@ __all__ = [
     "MarketDataRun",
     "StockPrice",
     "MarketDataError",
+    "StockMLDataset",
+    "StockMLDatasetRow",
+    "StockMLDatasetFeature",
+    "StockMLSplit",
+    "StockMLSplitRow",
+    "StockMLRun",
+    "StockMLMetric",
+    "StockMLModel",
+    "StockMLPrediction",
 ]

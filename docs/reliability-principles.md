@@ -268,3 +268,14 @@
 - One symbol failure produces a symbol error and a partial run without discarding successful symbols.
 - Missing prices do not remove an otherwise valid peer.
 - Peer similarity is business comparability only. Day 22 creates no valuation, stock ML, target price, forecast, Stock Intelligence Score, or BUY/SELL/HOLD signal.
+
+## Day 23 equity analytics guarantees
+
+- Listed-company fundamentals remain separate from borrower financial statements.
+- Availability date controls historical eligibility; period end alone never makes data eligible.
+- Future fundamentals, prices, and member analytics are excluded from as-of calculations.
+- Valuation inputs and feature inputs retain exact record lineage.
+- Negative earnings, non-positive equity, and non-positive EBITDA are explicit not-meaningful states; unavailable values are never represented as zero.
+- Relative comparisons require the configured minimum group size and remain descriptive statistics.
+- Feature runs are input-hash idempotent and reproducible for an as-of date.
+- Day 23 generates no stock recommendation, target price, forecast, stock ML model, or Stock Intelligence Score.

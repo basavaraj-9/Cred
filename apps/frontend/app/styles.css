@@ -44,3 +44,6 @@ fieldset { border: 1px solid #dce4ee; border-radius: 8px; padding: 14px; }
 .snapshot-preview { max-height: 520px; overflow: auto; padding: 16px; border-radius: 8px; background: #111b2e; color: #e8eef8; white-space: pre-wrap; overflow-wrap: anywhere; }
 .answer-text { white-space: pre-wrap; line-height: 1.65; padding: 18px; border-left: 4px solid #3269aa; background: #f7f9fc; }
 details summary { cursor: pointer; font-weight: 700; text-transform: capitalize; }
+.tab-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; }
+.tab-row button { padding:9px 12px; background:#e8eff9; color:#173b74; }
+.tab-row .active-tab { background:#173b74; color:white; }

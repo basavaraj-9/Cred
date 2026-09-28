@@ -22,7 +22,8 @@
 - Day 20 — **Complete:** fixed report snapshots, versioned CAM and committee memorandum generation, decision evidence packs, structured JSON export, PDF artifacts, SHA-256 integrity, source lineage, controlled finalization and supersession, APIs, audits, and an internal report workspace.
 - Day 21 — **Complete:** immutable company RAG indexes, vendor-neutral deterministic embeddings, hybrid retrieval, company/scope/period isolation, grounded analyst Q&A, citations, chat and feedback lineage, prompt-injection defenses, evaluation metrics, APIs, audits, and an internal analyst workspace.
 - Day 22 — **Complete:** normalized NSE/BSE listed entities and listings, deterministic fixture universe, dual-listing resolution, explainable peer discovery, provider-neutral OHLCV ingestion, freshness and partial-failure handling, APIs, audits, and internal UI.
-- Day 23+ — **Planned:** Indian listed-company fundamentals, valuation, sector metrics, historical feature store, production identity integration, and governed production data providers.
+- Day 23 — **Complete:** provider-neutral listed fundamentals, availability-date gating, deterministic valuation, peer, industry, and sector statistics, historical price/fundamental/relative features, drawdowns, lineage, APIs, audits, and UI.
+- Day 24+ — **Planned:** leakage-safe stock ML datasets, walk-forward labels, baseline ranking and classification models, production identity integration, and governed production data providers.
 
 Each later increment should define its data contracts, failure behavior, and review requirements before implementation.
 

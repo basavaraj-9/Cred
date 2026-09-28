@@ -262,3 +262,12 @@ Company Classification → Active Equity Candidate Filter → Similarity Compone
 ```
 
 Sector, industry, domain, sub-domain, business text, and product overlap remain separate persisted scores. The listing-to-run-to-price chain preserves exchange, symbol, provider, provider version, retrieval time, currency, and trading date.
+
+## Day 23 fundamentals and feature flow
+
+```text
+Provider Fundamentals → Normalize → Availability-Date Gate
+  → Market Price As-Of → Valuation → Relative Metrics → Feature Builder
+```
+
+For an as-of date, each company contributes only fundamentals published by that date and prices traded by that date. Every peer, industry, and sector member is subject to the same cutoff. Growth uses compatible prior periods. Momentum, volatility, liquidity, moving averages, and rolling drawdowns use historical prices only. Relative feature lineage points to the exact eligible relative-metric record.

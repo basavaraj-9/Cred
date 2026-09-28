@@ -1,5 +1,15 @@
 # Company Intelligence Platform
 
+## Day 23: fundamentals, valuation, and historical features
+
+Day 23 adds provider-neutral listed-company fundamentals with explicit publication dates, deterministic valuation formulas, peer, industry, and sector context, and an as-of historical feature store. Every valuation selects the latest price and published fundamental available on or before its calculation date. Negative earnings, non-positive equity, and non-positive EBITDA produce explicit not-meaningful states. Relative metrics and features are descriptive analytical data and never produce BUY, SELL, HOLD, target-price, or return-forecast conclusions.
+
+The development provider supplies deterministic annual periods without contacting a finance API. `stock_fundamental_normalizer_v1` preserves raw values, units, provider references, statement scope, currency, provenance, and normalized values. Publication availability, rather than period end, controls historical eligibility; an unknown publication date remains review restricted.
+
+`stock_valuation_engine_v1` calculates market capitalization as price times shares, simplified enterprise value as market capitalization plus debt less cash, and supported price, enterprise, earnings, book, sales, cash-flow, and dividend ratios. `sector_metrics_policy_v1` produces deterministic ranks, inclusive percentiles, and population z-scores for eligible peer, industry, and sector members only when at least three valid observations exist.
+
+`stock_features_v1` persists fundamental, growth, momentum, volatility, liquidity, moving-average, drawdown, peer-relative, and sector-relative features with exact source records. Fixture fundamentals, provider availability dates, limited corporate-action adjustments, and the absence of full free-float and historical share-count modeling limit the current analytics.
+
 ## Day 22: Indian listed peers and market data
 
 Day 22 adds a normalized Indian listed-company universe with separate NSE/BSE listings, deterministic entity resolution, explainable domain-to-peer discovery, and provider-neutral daily OHLCV ingestion. The included development providers are deterministic fixtures, so tests and local demonstrations do not contact exchange websites. Prices preserve provider/version lineage and use PostgreSQL NUMERIC values. Peer similarity describes business comparability only and produces no valuation, target price, forecast, Stock Intelligence Score, or BUY/SELL/HOLD signal. The internal view is available at `/stock-intelligence`.
