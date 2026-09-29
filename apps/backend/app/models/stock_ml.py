@@ -25,7 +25,8 @@ class StockMLDataset(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "stock_ml_datasets"
     __table_args__ = (
         CheckConstraint(
-            "status IN ('PENDING','BUILDING','READY','PARTIAL','FAILED','NEEDS_REVIEW','PIPELINE_VALIDATED')",
+            "status IN ('PENDING','BUILDING','READY','PARTIAL','FAILED',"
+            "'NEEDS_REVIEW','PIPELINE_VALIDATED')",
             name="status_valid",
         ),
         UniqueConstraint("input_hash", name="uq_stock_ml_dataset_input_hash"),
@@ -58,7 +59,8 @@ class StockMLDatasetRow(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "stock_ml_dataset_rows"
     __table_args__ = (
         CheckConstraint(
-            "eligibility_status IN ('LABELED','CENSORED','INSUFFICIENT_BENCHMARK','INSUFFICIENT_PRICE_HISTORY','INVALID_SOURCE','NEEDS_REVIEW')",
+            "eligibility_status IN ('LABELED','CENSORED','INSUFFICIENT_BENCHMARK',"
+            "'INSUFFICIENT_PRICE_HISTORY','INVALID_SOURCE','NEEDS_REVIEW')",
             name="eligibility_status_valid",
         ),
         UniqueConstraint(
@@ -71,10 +73,10 @@ class StockMLDatasetRow(UUIDPrimaryKeyMixin, Base):
     listed_company_id: Mapped[UUID] = mapped_column(
         ForeignKey("listed_companies.id"), nullable=False
     )
-    stock_listing_id: Mapped[UUID] = mapped_column(
-        ForeignKey("stock_listings.id"), nullable=False
+    stock_listing_id: Mapped[UUID] = mapped_column(ForeignKey("stock_listings.id"), nullable=False)
+    feature_run_id: Mapped[UUID] = mapped_column(
+        ForeignKey("stock_feature_runs.id"), nullable=False
     )
-    feature_run_id: Mapped[UUID] = mapped_column(ForeignKey("stock_feature_runs.id"), nullable=False)
     as_of_date: Mapped[date] = mapped_column(Date, nullable=False)
     label_reference_date: Mapped[date | None] = mapped_column(Date)
     start_price_id: Mapped[UUID | None] = mapped_column(ForeignKey("stock_prices.id"))

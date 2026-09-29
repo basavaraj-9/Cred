@@ -289,7 +289,7 @@ def test_status_reports_day_5(context: Context) -> None:
     response = context.client.get("/api/v1/status")
     assert response.status_code == 200
     payload = response.json()
-    assert payload["development_stage"]["day"] == 23
+    assert payload["development_stage"]["day"] == 24
     assert payload["components"]["company_identity_extraction"] == "ready"
     assert payload["components"]["business_profile_extraction"] == "ready"
     assert payload["components"]["evidence_mapping"] == "ready"

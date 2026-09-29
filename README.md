@@ -1,5 +1,13 @@
 # Company Intelligence Platform
 
+## Day 24: stock ML datasets and baseline research models
+
+Day 24 adds the versioned `stock_ml_dataset_v1` research pipeline over persisted Day 23 feature runs. `stock_label_policy_v1` uses the 63rd subsequent trading observation for the primary three-month label, calculates a development broad-universe mean benchmark, and classifies relative returns above 0.5% as `OUTPERFORM`, below -0.5% as `UNDERPERFORM`, and the interval between them as `NEUTRAL`. Rows without the full future window are `CENSORED` and never enter training.
+
+`stock_walk_forward_policy_v1` creates expanding chronological windows, applies a seven-calendar-day embargo, and purges training rows whose forward label period reaches validation. Logistic Regression, Random Forest, and XGBoost baselines use deterministic seed 24. Imputation and Logistic Regression scaling are fit within each training partition. The research workflow trains every valid window, persists mean, median, standard deviation, minimum, and maximum test metrics, and selects its research candidate by aggregate out-of-sample PR-AUC with ROC-AUC as the tie-breaker. Predictions, classification and ranking diagnostics, model artifacts, SHA-256 hashes, and ordered feature schemas are persisted.
+
+The fixture universe is current-company based and may contain survivorship bias. Its benchmark is a development fixture benchmark, corporate-action adjustment coverage is limited, and the sample is not evidence of real predictive performance. Every model remains `PIPELINE_VALIDATION_ONLY`, `production_use_permitted=false`, and unavailable for live prediction, recommendations, BUY/SELL/HOLD, target prices, or return forecasts.
+
 ## Day 23: fundamentals, valuation, and historical features
 
 Day 23 adds provider-neutral listed-company fundamentals with explicit publication dates, deterministic valuation formulas, peer, industry, and sector context, and an as-of historical feature store. Every valuation selects the latest price and published fundamental available on or before its calculation date. Negative earnings, non-positive equity, and non-positive EBITDA produce explicit not-meaningful states. Relative metrics and features are descriptive analytical data and never produce BUY, SELL, HOLD, target-price, or return-forecast conclusions.

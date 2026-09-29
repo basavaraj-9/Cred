@@ -1,0 +1,8 @@
+{
+  "version": "stock_model_selection_policy_v1",
+  "primary_metric": "pr_auc",
+  "secondary_metrics": ["roc_auc", "brier_score", "spearman"],
+  "random_state": 24,
+  "lifecycle": "PIPELINE_VALIDATION_ONLY",
+  "production_use_permitted": false
+}

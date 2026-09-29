@@ -271,3 +271,13 @@ Provider Fundamentals → Normalize → Availability-Date Gate
 ```
 
 For an as-of date, each company contributes only fundamentals published by that date and prices traded by that date. Every peer, industry, and sector member is subject to the same cutoff. Growth uses compatible prior periods. Momentum, volatility, liquidity, moving averages, and rolling drawdowns use historical prices only. Relative feature lineage points to the exact eligible relative-metric record.
+
+## Day 24 stock ML research flow
+
+```text
+As-Of Feature Run → 63 Subsequent Trading Observations → Relative Return Label
+  → Dataset Row and Feature Snapshot → Chronological Walk-Forward Assignment
+  → Purge Overlap + Embargo → Train / Validate / Test → Persisted Diagnostics
+```
+
+Unavailable features remain null. Censored labels are retained for audit but excluded from training. The imputer and scaler fit only the training assignment, and label fields are blocked from the ordered feature catalog.

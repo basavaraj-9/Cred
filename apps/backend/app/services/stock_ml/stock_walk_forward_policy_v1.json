@@ -1,0 +1,12 @@
+{
+  "version": "stock_walk_forward_policy_v1",
+  "mode": "EXPANDING",
+  "minimum_train_dates": 2,
+  "validation_dates": 1,
+  "test_dates": 1,
+  "step_dates": 1,
+  "embargo_calendar_days": 7,
+  "minimum_train_observations": 6,
+  "minimum_companies": 3,
+  "purge_overlapping_label_windows": true
+}

@@ -60,6 +60,11 @@ export type Fundamental = {id:string;metric_code:string;value:string;unit:string
 export type ValuationResult = {run_id:string;valuation_date:string;status:string;metrics:Array<{code:string;value:string|null;status:string}>};
 export type FeatureResult = {run_id:string;as_of_date:string;feature_set_version:string;status:string;features:Array<{name:string;group:string;value:string|null;status:string;source_count:number}>};
 export type RelativeMetric = {group_type:"PEER_GROUP"|"INDUSTRY"|"SECTOR";group:string;as_of_date:string;metric_code:string;value:string|null;percentile:string|null;z_score:string|null;rank:number|null;group_size:number;status:string};
+export type StockMLDataset = {id:string;dataset_version:string;feature_set_version:string;label_policy_version:string;benchmark_policy_version:string;split_policy_version:string;label_horizon:string;status:string;readiness:string;row_count:number;company_count:number;listing_count:number;positive_count:number;negative_count:number;neutral_count:number;censored_count:number;start_date:string;end_date:string;feature_count:number;feature_schema_hash:string};
+export type StockMLSplit = {id:string;split_index:number;policy_version:string;train_start:string;train_end:string;validation_start:string;validation_end:string;test_start:string;test_end:string;embargo_days:number;purged_count:number;status:string;partition_counts:Record<string,number>};
+export type StockMLRun = {id:string;dataset_id:string;split_id:string;model_name:string;model_version:string;task_type:string;lifecycle:string;status:string;random_state:number};
+export type StockMLMetric = {partition:string;name:string;value:string|null;details:Record<string,unknown>|null};
+export type StockMLModel = {id:string;run_id:string;model_name:string;model_version:string;lifecycle:string;selected_for_research:boolean;production_use_permitted:false;artifact_hash:string;feature_schema_hash:string};
 
 export type CreditMLEvaluationSummary = {
   evaluation_id: string;

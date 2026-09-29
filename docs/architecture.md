@@ -297,3 +297,14 @@ Listed Company → Provider Fundamentals → Availability Gate → Validation
 ```
 
 Reported fundamentals, valuation outputs, relative observations, and features remain separate versioned records. Valuation and feature input tables retain the exact price, fundamental, and relative-metric identities used. Relative runs keep each comparison group separately identifiable.
+
+## Day 24 stock ML research architecture
+
+```text
+Historical Features → Versioned ML Dataset → Forward Trading-Day Labels
+  → Purged and Embargoed Walk-Forward Splits → Train-Only Preprocessing
+  → Baseline Models → Aggregate Out-of-Sample Evaluation
+  → Research Candidate Registry → Future Intelligence Layer
+```
+
+Dataset rows reference immutable Day 23 feature runs and the exact start and endpoint prices used for labels. Split assignments, model runs, metrics, predictions, artifacts, hashes, and feature schemas remain separate lineage records. Candidate selection uses aggregate test-window metrics, and model registry entries always disable production use.

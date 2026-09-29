@@ -230,4 +230,4 @@ def test_status_preserves_database_and_model_reporting(test_url: str) -> None:
     payload = response.json()
     assert payload["components"]["database"] == "connected"
     assert payload["components"]["document_intelligence"] == "foundation_ready"
-    assert payload["development_stage"]["day"] == 23
+    assert payload["development_stage"]["day"] == 24

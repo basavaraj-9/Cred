@@ -1,0 +1,12 @@
+{
+  "version": "stock_label_policy_v1",
+  "primary_task": "OUTPERFORM_3M",
+  "horizons": {"1M": 21, "3M": 63, "6M": 126, "12M": 252},
+  "positive_threshold": "0.005",
+  "negative_threshold": "-0.005",
+  "start_price": "LATEST_CLOSE_ON_OR_BEFORE_AS_OF",
+  "end_price": "NTH_SUBSEQUENT_TRADING_OBSERVATION",
+  "price_field_preference": ["adjusted_close", "close"],
+  "binary_training_excludes_neutral": true,
+  "allowed_feature_statuses": ["AVAILABLE"]
+}

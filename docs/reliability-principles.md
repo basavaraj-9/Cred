@@ -279,3 +279,18 @@
 - Relative comparisons require the configured minimum group size and remain descriptive statistics.
 - Feature runs are input-hash idempotent and reproducible for an as-of date.
 - Day 23 generates no stock recommendation, target price, forecast, stock ML model, or Stock Intelligence Score.
+
+## Day 24 stock ML research guarantees
+
+- Dataset splits are chronological and never random.
+- Features remain fixed at the as-of date; future prices exist only in the label layer.
+- Forward labels count trading observations and require the complete horizon.
+- Censored observations remain visible and cannot enter model fitting.
+- Training rows with label windows overlapping validation are purged.
+- A configurable embargo separates training from later partitions.
+- Imputation, scaling, and model fitting use training assignments only.
+- Model selection uses aggregate out-of-sample metrics across valid walk-forward windows.
+- Target and future-return fields are forbidden from the feature catalog.
+- Artifacts retain dataset, feature-schema, model-version, seed, and SHA-256 lineage.
+- Fixture results remain pipeline diagnostics and never production evidence.
+- Stock ML outputs do not produce recommendations, target prices, or live predictions.

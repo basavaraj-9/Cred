@@ -118,6 +118,15 @@ def _financial_schema_ready(database_url: str | None) -> bool:
             "stock_feature_runs",
             "stock_features",
             "stock_feature_inputs",
+            "stock_ml_datasets",
+            "stock_ml_dataset_rows",
+            "stock_ml_dataset_features",
+            "stock_ml_splits",
+            "stock_ml_split_rows",
+            "stock_ml_runs",
+            "stock_ml_metrics",
+            "stock_ml_models",
+            "stock_ml_predictions",
         }.issubset(inspect(get_engine(database_url)).get_table_names())
     except Exception:
         return False
@@ -264,7 +273,12 @@ def status(request: Request) -> StatusResponse:
     components["peer_relative_metrics"] = "ready" if schema_ready else "unavailable"
     components["sector_metrics"] = "ready" if schema_ready else "unavailable"
     components["historical_feature_store"] = "ready" if schema_ready else "unavailable"
-    components["stock_ml"] = "not_implemented"
+    components["stock_ml_dataset"] = "ready" if schema_ready else "unavailable"
+    components["stock_forward_labels"] = "ready" if schema_ready else "unavailable"
+    components["stock_walk_forward_splits"] = "ready" if schema_ready else "unavailable"
+    components["stock_baseline_models"] = "ready" if schema_ready else "unavailable"
+    components["stock_model_evaluation"] = "ready" if schema_ready else "unavailable"
+    components["live_stock_predictions"] = "disabled"
     components["stock_intelligence_score"] = "not_implemented"
     components["buy_sell_hold"] = "disabled"
     components["target_price"] = "disabled"
@@ -276,8 +290,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 23,
-            "name": "Stock Fundamentals + Valuation + Historical Feature Store",
+            "day": 24,
+            "name": "Stock ML Dataset + Baseline Models",
         },
         core_models={
             "user": "ready",
@@ -382,5 +396,14 @@ def status(request: Request) -> StatusResponse:
             "stock_feature_run": "ready",
             "stock_feature": "ready",
             "stock_feature_input": "ready",
+            "stock_ml_dataset": "ready",
+            "stock_ml_dataset_row": "ready",
+            "stock_ml_dataset_feature": "ready",
+            "stock_ml_split": "ready",
+            "stock_ml_split_row": "ready",
+            "stock_ml_run": "ready",
+            "stock_ml_metric": "ready",
+            "stock_ml_model": "ready",
+            "stock_ml_prediction": "ready",
         },
     )

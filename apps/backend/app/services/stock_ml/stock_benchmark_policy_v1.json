@@ -1,0 +1,7 @@
+{
+  "version": "stock_benchmark_policy_v1",
+  "development_method": "BROAD_UNIVERSE_MEAN_RETURN",
+  "minimum_members": 3,
+  "hierarchy": ["PEER_GROUP", "INDUSTRY", "SECTOR", "BROAD_UNIVERSE"],
+  "live_index_required": false
+}

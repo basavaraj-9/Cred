@@ -23,6 +23,7 @@ from app.api.v1 import (
     status,
     stock,
     stock_analytics,
+    stock_ml,
 )
 
 router = APIRouter()
@@ -48,3 +49,4 @@ router.include_router(reports.router)
 router.include_router(rag.router)
 router.include_router(stock.router)
 router.include_router(stock_analytics.router)
+router.include_router(stock_ml.router)

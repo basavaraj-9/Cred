@@ -4,6 +4,7 @@ import type { CommitteePackage, CreditDecisionSupport, CreditRecommendation, Cre
 import type { AnalystAnswer, RagIndexStatus } from "@/types/api";
 import type { MarketDataRun, PeerGroup } from "@/types/api";
 import type { FeatureResult, Fundamental, RelativeMetric, ValuationResult } from "@/types/api";
+import type { StockMLDataset, StockMLMetric, StockMLModel, StockMLRun, StockMLSplit } from "@/types/api";
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${API_V1_PATH}${path}`, {
@@ -55,6 +56,12 @@ export const buildValuation=(listingId:string,actorId:string,valuationDate:strin
 export const buildFeatures=(listingId:string,actorId:string,asOfDate:string)=>analystMutation<FeatureResult>(`/stocks/${listingId}/features/build`,{actor_user_id:actorId,as_of_date:asOfDate});
 export const buildRelativeMetrics=(actorId:string,asOfDate:string)=>analystMutation<Record<string,unknown>>("/sector-metrics/build",{actor_user_id:actorId,as_of_date:asOfDate});
 export async function getRelativeMetrics(companyId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stocks/${encodeURIComponent(companyId)}/relative-metrics?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Relative metrics lookup failed");return await r.json() as RelativeMetric[]}
+export const buildStockMLDataset=(actorId:string,startDate:string,endDate:string)=>analystMutation<StockMLDataset>("/stock-ml/datasets/build",{actor_user_id:actorId,start_date:startDate,end_date:endDate,label_horizon:"3M",feature_set_version:"stock_features_v1"});
+export const buildStockMLSplits=(datasetId:string,actorId:string)=>analystMutation<StockMLSplit[]>(`/stock-ml/datasets/${encodeURIComponent(datasetId)}/splits/build`,{actor_user_id:actorId});
+export const trainStockMLModels=(splitId:string,actorId:string)=>analystMutation<{run_ids:string[];run_count:number}>(`/stock-ml/splits/${encodeURIComponent(splitId)}/train`,{actor_user_id:actorId,models:["logistic_regression","random_forest","xgboost"]});
+export async function getStockMLRuns(datasetId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/runs?actor_user_id=${encodeURIComponent(actorId)}&dataset=${encodeURIComponent(datasetId)}`);if(!r.ok)throw new Error("Stock ML runs lookup failed");return await r.json() as StockMLRun[]}
+export async function getStockMLMetrics(runId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/runs/${encodeURIComponent(runId)}/metrics?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock ML metrics lookup failed");return await r.json() as StockMLMetric[]}
+export async function getStockMLModels(actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/models?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock ML model registry lookup failed");return await r.json() as StockMLModel[]}
 
 export async function createCreditFusionExperiment(
   creditAssessmentId: string,
