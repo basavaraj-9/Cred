@@ -5,6 +5,7 @@ import type { AnalystAnswer, RagIndexStatus } from "@/types/api";
 import type { MarketDataRun, PeerGroup } from "@/types/api";
 import type { FeatureResult, Fundamental, RelativeMetric, ValuationResult } from "@/types/api";
 import type { StockMLDataset, StockMLMetric, StockMLModel, StockMLRun, StockMLSplit } from "@/types/api";
+import type { StockIntelligenceComponent, StockIntelligenceExplanation, StockIntelligenceScore, StockRanking } from "@/types/api";
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${API_V1_PATH}${path}`, {
@@ -62,6 +63,10 @@ export const trainStockMLModels=(splitId:string,actorId:string)=>analystMutation
 export async function getStockMLRuns(datasetId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/runs?actor_user_id=${encodeURIComponent(actorId)}&dataset=${encodeURIComponent(datasetId)}`);if(!r.ok)throw new Error("Stock ML runs lookup failed");return await r.json() as StockMLRun[]}
 export async function getStockMLMetrics(runId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/runs/${encodeURIComponent(runId)}/metrics?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock ML metrics lookup failed");return await r.json() as StockMLMetric[]}
 export async function getStockMLModels(actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/models?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock ML model registry lookup failed");return await r.json() as StockMLModel[]}
+export const buildStockIntelligenceScore=(listingId:string,actorId:string,asOfDate:string)=>analystMutation<StockIntelligenceScore>("/stock-intelligence/scores/build",{stock_listing_id:listingId,actor_user_id:actorId,as_of_date:asOfDate});
+export async function getStockIntelligenceComponents(runId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-intelligence/scores/${encodeURIComponent(runId)}/components?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Score component lookup failed");return await r.json() as StockIntelligenceComponent[]}
+export async function getStockIntelligenceExplanation(runId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-intelligence/scores/${encodeURIComponent(runId)}/explanation?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Score explanation lookup failed");return await r.json() as StockIntelligenceExplanation}
+export const buildStockRanking=(actorId:string,asOfDate:string)=>analystMutation<StockRanking>("/stock-intelligence/rankings/build",{actor_user_id:actorId,as_of_date:asOfDate});
 
 export async function createCreditFusionExperiment(
   creditAssessmentId: string,

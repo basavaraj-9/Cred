@@ -294,3 +294,16 @@
 - Artifacts retain dataset, feature-schema, model-version, seed, and SHA-256 lineage.
 - Fixture results remain pipeline diagnostics and never production evidence.
 - Stock ML outputs do not produce recommendations, target prices, or live predictions.
+
+## Day 25 stock intelligence guarantees
+
+- Score calculation, component ordering, explanations, ties, and watchlist priorities are deterministic.
+- Every score component preserves direct feature and upstream source lineage.
+- Future prices, fundamentals, relative metrics, feature runs, and ML predictions are rejected.
+- Missing inputs remain explicit and their weights are not silently redistributed.
+- Policy versions are immutable inputs to score and ranking hashes.
+- ML contribution confidence respects the selected research model lifecycle.
+- Score confidence and coverage remain separate from the 0–100 analytical score.
+- Rankings use one as-of date, a frozen universe hash, and deterministic tie rules.
+- Ranking and watchlist outputs are research analytics only.
+- No investment recommendation, target price, return forecast, or trade action is generated.

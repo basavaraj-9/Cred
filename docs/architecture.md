@@ -20,7 +20,7 @@ The API health check performs bounded `SELECT 1` and checks local upload directo
 
 The upload service validates and hashes before writing. It uses a caller-owned database transaction, writes through the storage interface, and deletes the newly stored file if a later database step fails. This compensating cleanup handles ordinary failures. A process crash between file write and database commit can still leave a file; future operations tooling should reconcile such files. No cloud adapter exists yet.
 
-Credit Risk Score and Stock Intelligence Score will be separate domain outputs with separate data, models, and evidence. Their implementations remain planned.
+Credit Risk Score and Stock Intelligence Score are separate domain outputs with separate data, models, policies, and evidence. The stock score remains research-only and never changes a credit assessment or human decision.
 
 ## Day 4 document intelligence
 
@@ -308,3 +308,14 @@ Historical Features → Versioned ML Dataset → Forward Trading-Day Labels
 ```
 
 Dataset rows reference immutable Day 23 feature runs and the exact start and endpoint prices used for labels. Split assignments, model runs, metrics, predictions, artifacts, hashes, and feature schemas remain separate lineage records. Candidate selection uses aggregate test-window metrics, and model registry entries always disable production use.
+
+## Day 25 stock intelligence architecture
+
+```text
+Stock Features + Valuation + Relative Metrics + ML Research Prediction
+  → Component Engines → Bounded Normalization → Versioned Fusion Policy
+  → Stock Intelligence Score → Same-Date Cross-Sectional Ranking
+  → Research Watchlist
+```
+
+Every component keeps the Day 23 feature and its underlying price, fundamental, or relative-metric source identities. The ML component also preserves prediction, model, run, and dataset identities. Confidence, coverage, agreement, contradictions, and weighted drivers remain distinct fields. Ranking freezes the eligible universe hash and never changes a historical score run.

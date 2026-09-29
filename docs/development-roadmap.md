@@ -24,7 +24,8 @@
 - Day 22 — **Complete:** normalized NSE/BSE listed entities and listings, deterministic fixture universe, dual-listing resolution, explainable peer discovery, provider-neutral OHLCV ingestion, freshness and partial-failure handling, APIs, audits, and internal UI.
 - Day 23 — **Complete:** provider-neutral listed fundamentals, availability-date gating, deterministic valuation, peer, industry, and sector statistics, historical price/fundamental/relative features, drawdowns, lineage, APIs, audits, and UI.
 - Day 24 — **Complete:** versioned stock ML datasets, trading-day labels, fixture benchmarks, purged and embargoed expanding splits, train-only preprocessing, deterministic baseline models, persisted predictions, metrics, artifacts, registry, APIs, and research UI.
-- Day 25+ — **Planned:** Stock Intelligence Score, governed model/rule fusion, explainable cross-sectional ranking, and watchlist intelligence.
+- Day 25 — **Complete:** deterministic Stock Intelligence Score components, bounded normalization, lifecycle-aware ML fusion, confidence and coverage, exact lineage, explanations, contradictions, same-date ranking, research watchlist priorities, APIs, audits, and UI.
+- Day 26+ — **Planned:** further governed stock-intelligence research stages.
 
 Each later increment should define its data contracts, failure behavior, and review requirements before implementation.
 

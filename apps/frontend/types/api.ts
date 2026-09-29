@@ -65,6 +65,12 @@ export type StockMLSplit = {id:string;split_index:number;policy_version:string;t
 export type StockMLRun = {id:string;dataset_id:string;split_id:string;model_name:string;model_version:string;task_type:string;lifecycle:string;status:string;random_state:number};
 export type StockMLMetric = {partition:string;name:string;value:string|null;details:Record<string,unknown>|null};
 export type StockMLModel = {id:string;run_id:string;model_name:string;model_version:string;lifecycle:string;selected_for_research:boolean;production_use_permitted:false;artifact_hash:string;feature_schema_hash:string};
+export type StockIntelligenceScore = {id:string;listed_company_id:string;stock_listing_id:string;as_of_date:string;score_version:string;fusion_policy_version:string;normalization_policy_version:string;ranking_policy_version:string;watchlist_policy_version:string;status:string;score:string|null;confidence:string;coverage:string;available_weight:string;available_component_count:number;missing_component_count:number;band:string|null;agreement_score:string|null;production_use_permitted:false;research_only:true};
+export type StockIntelligenceComponent = {id:string;name:string;score:string|null;weight:string;effective_weight:string;contribution:string|null;confidence:string;status:string;explanation:string;inputs:Array<{source_type:string;source_id:string;feature_name:string;source_value:string|null;source_status:string}>};
+export type StockIntelligenceDriver = {component:string;impact:number;explanation:string};
+export type StockIntelligenceExplanation = {score_run_id:string;positive_drivers:StockIntelligenceDriver[];negative_drivers:StockIntelligenceDriver[];neutral_factors:string[];missing_evidence:string[];contradictions:string[];confidence_limitations:string[];research_only:true};
+export type StockRankingMember = {stock_intelligence_run_id:string;listed_company_id:string;stock_listing_id:string;company_name:string;ticker:string;score:string;confidence:string;coverage:string;rank:number;percentile:string;rank_status:string;research_priority:"RESEARCH_PRIORITY_HIGH"|"RESEARCH_PRIORITY_MEDIUM"|"RESEARCH_PRIORITY_LOW"|"INSUFFICIENT_DATA"};
+export type StockRanking = {id:string;as_of_date:string;ranking_policy_version:string;watchlist_policy_version:string;universe_hash:string;status:string;eligible_company_count:number;members:StockRankingMember[];research_only:true};
 
 export type CreditMLEvaluationSummary = {
   evaluation_id: string;

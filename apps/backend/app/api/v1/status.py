@@ -127,6 +127,11 @@ def _financial_schema_ready(database_url: str | None) -> bool:
             "stock_ml_metrics",
             "stock_ml_models",
             "stock_ml_predictions",
+            "stock_intelligence_runs",
+            "stock_intelligence_components",
+            "stock_intelligence_component_inputs",
+            "stock_ranking_runs",
+            "stock_ranking_members",
         }.issubset(inspect(get_engine(database_url)).get_table_names())
     except Exception:
         return False
@@ -278,10 +283,14 @@ def status(request: Request) -> StatusResponse:
     components["stock_walk_forward_splits"] = "ready" if schema_ready else "unavailable"
     components["stock_baseline_models"] = "ready" if schema_ready else "unavailable"
     components["stock_model_evaluation"] = "ready" if schema_ready else "unavailable"
+    components["stock_intelligence_score"] = "ready" if schema_ready else "unavailable"
+    components["cross_sectional_ranking"] = "ready" if schema_ready else "unavailable"
+    components["research_watchlist"] = "ready" if schema_ready else "unavailable"
     components["live_stock_predictions"] = "disabled"
-    components["stock_intelligence_score"] = "not_implemented"
+    components["live_prediction_serving"] = "disabled"
     components["buy_sell_hold"] = "disabled"
     components["target_price"] = "disabled"
+    components["trade_execution"] = "disabled"
     return StatusResponse(
         application=ApplicationInfo(
             name=settings.app_name,
@@ -290,8 +299,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 24,
-            "name": "Stock ML Dataset + Baseline Models",
+            "day": 25,
+            "name": "Stock Intelligence Score + Ranking",
         },
         core_models={
             "user": "ready",
@@ -405,5 +414,10 @@ def status(request: Request) -> StatusResponse:
             "stock_ml_metric": "ready",
             "stock_ml_model": "ready",
             "stock_ml_prediction": "ready",
+            "stock_intelligence_run": "ready",
+            "stock_intelligence_component": "ready",
+            "stock_intelligence_component_input": "ready",
+            "stock_ranking_run": "ready",
+            "stock_ranking_member": "ready",
         },
     )

@@ -1,0 +1,29 @@
+{
+  "version": "stock_intelligence_fusion_policy_v1",
+  "score_version": "stock_intelligence_score_v1",
+  "minimum_coverage": 0.70,
+  "partial_confidence_threshold": 0.40,
+  "weights": {
+    "ML_SIGNAL": 20,
+    "VALUATION": 15,
+    "FUNDAMENTAL_QUALITY": 10,
+    "GROWTH": 10,
+    "PROFITABILITY": 10,
+    "BALANCE_SHEET": 10,
+    "MOMENTUM": 10,
+    "RISK": 5,
+    "PEER_RELATIVE": 4,
+    "SECTOR_RELATIVE": 3,
+    "DATA_QUALITY": 3
+  },
+  "ml_allowed_lifecycles": ["PIPELINE_VALIDATION_ONLY", "RESEARCH_EXPERIMENT", "CANDIDATE"],
+  "ml_confidence_caps": {"PIPELINE_VALIDATION_ONLY": 0.50, "RESEARCH_EXPERIMENT": 0.70, "CANDIDATE": 0.80},
+  "bands": [
+    {"minimum": 80, "name": "HIGH_ANALYTICAL_STRENGTH"},
+    {"minimum": 65, "name": "ABOVE_AVERAGE_ANALYTICAL_STRENGTH"},
+    {"minimum": 45, "name": "MIXED_ANALYTICAL_SIGNAL"},
+    {"minimum": 30, "name": "BELOW_AVERAGE_ANALYTICAL_STRENGTH"},
+    {"minimum": 0, "name": "LOW_ANALYTICAL_STRENGTH"}
+  ],
+  "production_use_permitted": false
+}

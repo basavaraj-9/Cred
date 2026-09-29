@@ -1,5 +1,13 @@
 # Company Intelligence Platform
 
+## Day 25: Stock Intelligence Score and research ranking
+
+Day 25 adds the deterministic `stock_intelligence_score_v1` analytical score. The versioned fusion policy assigns ML Signal 20%, Valuation 15%, Fundamental Quality 10%, Growth 10%, Profitability 10%, Balance Sheet 10%, Momentum 10%, Risk 5%, Peer Relative 4%, Sector Relative 3%, and Data Quality 3%. Missing weights are not redistributed. A score is produced only when at least 70% of configured weight is available; confidence and coverage remain separate from the score.
+
+Normalization is bounded and policy controlled. Valuation uses metric-specific direction and prefers peer, then industry, then sector percentiles. Growth, profitability, momentum, leverage, volatility, and drawdown inputs use documented bounds so an extreme value cannot dominate. The Day 24 prediction is one component only. A `PIPELINE_VALIDATION_ONLY` model caps ML component confidence at 0.50 and never permits production use.
+
+Analytical bands describe scores from 0 to 100. Same-date eligible scores can enter deterministic cross-sectional research rankings, with ties resolved by score, confidence, then company ID. Watchlist outputs use `RESEARCH_PRIORITY_HIGH`, `RESEARCH_PRIORITY_MEDIUM`, `RESEARCH_PRIORITY_LOW`, or `INSUFFICIENT_DATA`. Scores, rankings, explanations, contradictions, and watchlists are research analytics only; they do not provide investment recommendations, target prices, return forecasts, or trade actions.
+
 ## Day 24: stock ML datasets and baseline research models
 
 Day 24 adds the versioned `stock_ml_dataset_v1` research pipeline over persisted Day 23 feature runs. `stock_label_policy_v1` uses the 63rd subsequent trading observation for the primary three-month label, calculates a development broad-universe mean benchmark, and classifies relative returns above 0.5% as `OUTPERFORM`, below -0.5% as `UNDERPERFORM`, and the interval between them as `NEUTRAL`. Rows without the full future window are `CENSORED` and never enter training.

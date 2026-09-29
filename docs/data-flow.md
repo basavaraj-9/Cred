@@ -281,3 +281,14 @@ As-Of Feature Run → 63 Subsequent Trading Observations → Relative Return Lab
 ```
 
 Unavailable features remain null. Censored labels are retained for audit but excluded from training. The imputer and scaler fit only the training assignment, and label fields are blocked from the ordered feature catalog.
+
+## Day 25 stock intelligence flow
+
+```text
+Eligible as-of features and research prediction
+  → Component calculation → Bounded normalization → Weighted contributions
+  → Confidence and coverage → Analytical score
+  → Same-date ranking → Research priority
+```
+
+Missing components retain zero effective weight without redistributing their configured weight. Scores require minimum coverage. Ranking members all reference a score from the same as-of date, and the ranking hash covers the fixed universe and score-run inputs.

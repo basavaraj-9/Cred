@@ -1,0 +1,9 @@
+{
+  "version": "stock_ranking_policy_v1",
+  "eligible_statuses": ["AVAILABLE", "PARTIAL"],
+  "minimum_confidence": 0.40,
+  "minimum_coverage": 0.70,
+  "listing_status": "ACTIVE",
+  "tie_breaker": ["SCORE_DESC", "CONFIDENCE_DESC", "LISTED_COMPANY_ID_ASC"],
+  "percentile_method": "INCLUSIVE_ASCENDING"
+}

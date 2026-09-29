@@ -127,6 +127,13 @@ from app.models.stock_analytics import (
     StockValuationInput,
     StockValuationRun,
 )
+from app.models.stock_intelligence import (
+    StockIntelligenceComponent,
+    StockIntelligenceComponentInput,
+    StockIntelligenceRun,
+    StockRankingMember,
+    StockRankingRun,
+)
 from app.models.stock_ml import (
     StockMLDataset,
     StockMLDatasetFeature,
@@ -250,4 +257,9 @@ __all__ = [
     "StockMLMetric",
     "StockMLModel",
     "StockMLPrediction",
+    "StockIntelligenceRun",
+    "StockIntelligenceComponent",
+    "StockIntelligenceComponentInput",
+    "StockRankingRun",
+    "StockRankingMember",
 ]

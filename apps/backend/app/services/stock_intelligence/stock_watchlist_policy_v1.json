@@ -1,0 +1,7 @@
+{
+  "version": "stock_watchlist_policy_v1",
+  "high": {"minimum_score": 75, "minimum_confidence": 0.70, "minimum_coverage": 0.80},
+  "medium": {"minimum_score": 60, "minimum_confidence": 0.60, "minimum_coverage": 0.70},
+  "low": {"minimum_confidence": 0.40, "minimum_coverage": 0.70},
+  "labels": ["RESEARCH_PRIORITY_HIGH", "RESEARCH_PRIORITY_MEDIUM", "RESEARCH_PRIORITY_LOW", "INSUFFICIENT_DATA"]
+}
