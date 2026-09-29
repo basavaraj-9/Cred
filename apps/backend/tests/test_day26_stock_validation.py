@@ -295,8 +295,8 @@ def test_day26_routes_and_status(client: TestClient) -> None:
     } <= paths
     status = client.get("/api/v1/status").json()
     assert status["development_stage"] == {
-        "day": 26,
-        "name": "Historical Stock Intelligence Validation",
+        "day": 27,
+        "name": "Stock Monitoring, Drift, and Governance",
     }
     assert status["components"]["historical_stock_score_validation"] in {
         "ready",

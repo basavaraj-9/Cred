@@ -1,0 +1,6 @@
+{
+  "version": "stock_recalibration_readiness_v1",
+  "statuses": ["NOT_INDICATED", "MONITOR", "RESEARCH_REVIEW_RECOMMENDED", "INSUFFICIENT_DATA"],
+  "advisory_only": true,
+  "automatic_action": false
+}

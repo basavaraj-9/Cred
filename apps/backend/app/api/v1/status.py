@@ -142,6 +142,15 @@ def _financial_schema_ready(database_url: str | None) -> bool:
             "stock_intelligence_ablation_metrics",
             "stock_intelligence_sensitivity_runs",
             "stock_intelligence_segment_validation",
+            "stock_monitoring_runs",
+            "stock_monitoring_findings",
+            "stock_feature_drift",
+            "stock_model_monitoring",
+            "stock_score_monitoring",
+            "stock_component_monitoring",
+            "stock_ranking_monitoring",
+            "stock_provider_monitoring",
+            "stock_governance_assessments",
         }.issubset(inspect(get_engine(database_url)).get_table_names())
     except Exception:
         return False
@@ -299,6 +308,10 @@ def status(request: Request) -> StatusResponse:
     components["historical_stock_score_validation"] = "ready" if schema_ready else "unavailable"
     components["stock_score_ablation"] = "ready" if schema_ready else "unavailable"
     components["stock_score_sensitivity"] = "ready" if schema_ready else "unavailable"
+    components["stock_monitoring"] = "ready" if schema_ready else "unavailable"
+    components["stock_drift_detection"] = "ready" if schema_ready else "unavailable"
+    components["stock_governance_assessment"] = "ready" if schema_ready else "unavailable"
+    components["automatic_stock_retraining"] = "disabled"
     components["live_stock_predictions"] = "disabled"
     components["live_prediction_serving"] = "disabled"
     components["buy_sell_hold"] = "disabled"
@@ -312,8 +325,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 26,
-            "name": "Historical Stock Intelligence Validation",
+            "day": 27,
+            "name": "Stock Monitoring, Drift, and Governance",
         },
         core_models={
             "user": "ready",
@@ -442,5 +455,14 @@ def status(request: Request) -> StatusResponse:
             "stock_intelligence_ablation_metric": "ready",
             "stock_intelligence_sensitivity_run": "ready",
             "stock_intelligence_segment_validation": "ready",
+            "stock_monitoring_run": "ready",
+            "stock_monitoring_finding": "ready",
+            "stock_feature_drift": "ready",
+            "stock_model_monitoring": "ready",
+            "stock_score_monitoring": "ready",
+            "stock_component_monitoring": "ready",
+            "stock_ranking_monitoring": "ready",
+            "stock_provider_monitoring": "ready",
+            "stock_governance_assessment": "ready",
         },
     )

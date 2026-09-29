@@ -1,0 +1,15 @@
+{
+  "version": "stock_drift_policy_v1",
+  "psi_bins": 10,
+  "psi_epsilon": 0.000001,
+  "psi_thresholds": {"moderate": 0.10, "high": 0.25},
+  "missing_rate_thresholds": {"moderate": 0.10, "high": 0.25},
+  "freshness_days": {"current": 7, "aging": 30},
+  "confidence_threshold": 0.50,
+  "coverage_threshold": 0.70,
+  "ranking_watch_threshold": 0.80,
+  "ranking_review_threshold": 0.50,
+  "minimum_mature_periods": 3,
+  "raw_values": true,
+  "winsorization": false
+}

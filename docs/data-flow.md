@@ -295,6 +295,28 @@ Missing components retain zero effective weight without redistributing their con
 
 ## Day 26 historical validation flow
 
+## Day 27 monitoring flow
+
+```text
+Reference Window + Current Window
+               ↓
+     Feature Distributions
+               ↓
+   Prediction Distributions
+               ↓
+Score / Component Distributions
+               ↓
+      Ranking Comparison
+               ↓
+      Provider Freshness
+               ↓
+           Findings
+               ↓
+    Governance Assessment
+```
+
+The resolver excludes features, predictions, scores, rankings, and labels outside their respective window. Outcome diagnostics use labels only after their horizon is mature. PSI and rate shifts return explicit insufficient-data states when samples or variation are inadequate. No monitoring output mutates an upstream record.
+
 ```text
 Historical Day 24 Row → Exact As-Of Day 25 Score and Ranking
   → Labeled/Censored Gate → Per-Date Spearman and Quantile Buckets

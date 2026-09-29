@@ -25,6 +25,7 @@ from app.api.v1 import (
     stock_analytics,
     stock_intelligence,
     stock_ml,
+    stock_monitoring,
     stock_validation,
 )
 
@@ -54,3 +55,4 @@ router.include_router(stock_analytics.router)
 router.include_router(stock_ml.router)
 router.include_router(stock_intelligence.router)
 router.include_router(stock_validation.router)
+router.include_router(stock_monitoring.router)

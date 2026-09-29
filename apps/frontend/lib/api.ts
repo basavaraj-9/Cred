@@ -7,6 +7,7 @@ import type { FeatureResult, Fundamental, RelativeMetric, ValuationResult } from
 import type { StockMLDataset, StockMLMetric, StockMLModel, StockMLRun, StockMLSplit } from "@/types/api";
 import type { StockIntelligenceComponent, StockIntelligenceExplanation, StockIntelligenceScore, StockRanking } from "@/types/api";
 import type { StockComponentValidation, StockValidationAblation, StockValidationPeriod, StockValidationRun, StockValidationSegment, StockValidationSensitivity } from "@/types/api";
+import type { StockComponentMonitoring, StockFeatureDrift, StockGovernanceAssessment, StockModelMonitoring, StockMonitoringFinding, StockMonitoringRun, StockProviderMonitoring, StockRankingMonitoring, StockScoreMonitoring } from "@/types/api";
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${API_V1_PATH}${path}`, {
@@ -32,6 +33,25 @@ async function analystMutation<T>(path: string, body: Record<string, unknown>): 
   if (!response.ok) throw new Error(payload?.error?.message ?? `Analyst request failed (${response.status})`);
   return payload as T;
 }
+
+async function monitoringGet<T>(path: string, actor: string): Promise<T> {
+  const separator = path.includes("?") ? "&" : "?";
+  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}${separator}actor_user_id=${encodeURIComponent(actor)}`);
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload?.error?.message ?? `Monitoring lookup failed (${response.status})`);
+  return payload as T;
+}
+
+export const buildStockMonitoring = (actor_user_id: string, reference_start_date: string, reference_end_date: string, current_start_date: string, current_end_date: string) =>
+  analystMutation<StockMonitoringRun>("/stock-monitoring/runs/build", { actor_user_id, reference_start_date, reference_end_date, current_start_date, current_end_date });
+export const getStockMonitoringFindings = (id: string, actor: string) => monitoringGet<StockMonitoringFinding[]>(`/stock-monitoring/runs/${encodeURIComponent(id)}/findings`, actor);
+export const getStockMonitoringFeatures = (id: string, actor: string) => monitoringGet<StockFeatureDrift[]>(`/stock-monitoring/runs/${encodeURIComponent(id)}/features`, actor);
+export const getStockMonitoringModels = (id: string, actor: string) => monitoringGet<StockModelMonitoring[]>(`/stock-monitoring/runs/${encodeURIComponent(id)}/models`, actor);
+export const getStockMonitoringScores = (id: string, actor: string) => monitoringGet<StockScoreMonitoring[]>(`/stock-monitoring/runs/${encodeURIComponent(id)}/scores`, actor);
+export const getStockMonitoringComponents = (id: string, actor: string) => monitoringGet<StockComponentMonitoring[]>(`/stock-monitoring/runs/${encodeURIComponent(id)}/components`, actor);
+export const getStockMonitoringRankings = (id: string, actor: string) => monitoringGet<StockRankingMonitoring[]>(`/stock-monitoring/runs/${encodeURIComponent(id)}/rankings`, actor);
+export const getStockMonitoringProviders = (id: string, actor: string) => monitoringGet<StockProviderMonitoring[]>(`/stock-monitoring/runs/${encodeURIComponent(id)}/providers`, actor);
+export const getStockMonitoringGovernance = (id: string, actor: string) => monitoringGet<StockGovernanceAssessment>(`/stock-monitoring/runs/${encodeURIComponent(id)}/governance`, actor);
 
 export const buildRagIndex = (companyId: string, actorId: string) =>
   analystMutation<RagIndexStatus>(`/companies/${encodeURIComponent(companyId)}/rag/index`, { actor_user_id: actorId });

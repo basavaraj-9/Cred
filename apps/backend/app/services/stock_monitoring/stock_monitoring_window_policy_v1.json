@@ -1,0 +1,12 @@
+{
+  "version": "stock_monitoring_window_policy_v1",
+  "minimum_dates": 2,
+  "minimum_companies": 5,
+  "minimum_rows": 10,
+  "reference_length_days": 730,
+  "current_length_days": 365,
+  "allowed_overlap_days": 0,
+  "minimum_common_ranking_companies": 5,
+  "top_k_percentage": 0.20,
+  "minimum_top_k": 3
+}

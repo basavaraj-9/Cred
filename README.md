@@ -1,5 +1,13 @@
 # Company Intelligence Platform
 
+## Day 27: Stock Intelligence monitoring, drift, and governance
+
+Day 27 adds `stock_monitoring_v1`, an observational governance layer over historical features, model predictions, Stock Intelligence Scores, rankings, validation results, and provider runs. Versioned reference and current windows feed deterministic PSI, missingness, confidence, coverage, rank stability, universe change, label maturity, and freshness checks. Every metric has sample guards and explicit insufficient-data handling.
+
+The governance assessment combines material signals under `stock_model_governance_policy_v1` and reports health plus advisory recalibration readiness. It never retrains or recalibrates models, changes weights or policies, promotes a model, or produces investment recommendations. Drift indicates a distribution change and does not by itself imply model failure or a bad score.
+
+The Stock Intelligence workspace includes a **Monitoring** tab with feature, model, score, component, ranking, provider, and governance detail. APIs are available under `/api/v1/stock-monitoring`.
+
 ## Day 26: historical Stock Intelligence validation
 
 Day 26 adds `stock_intelligence_validation_v1`, a historical research validation layer over the immutable Day 25 score and Day 24 three-month relative-return labels. It builds or reuses leakage-safe historical scores and same-date rankings, excludes censored labels from outcome metrics, and persists per-date Spearman correlation, honest quintile or tercile buckets, research diagnostic spreads, top-bucket hit rates, monotonicity, and score distribution statistics.

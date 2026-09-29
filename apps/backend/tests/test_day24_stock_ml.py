@@ -265,7 +265,7 @@ def test_stock_ml_routes_and_day24_status(client: TestClient) -> None:
         "/stock-ml/models",
     } <= paths
     status = client.get("/api/v1/status").json()
-    assert status["development_stage"]["day"] == 26
+    assert status["development_stage"]["day"] == 27
     assert "stock_ml_dataset" in status["components"]
     assert status["components"]["live_stock_predictions"] == "disabled"
 

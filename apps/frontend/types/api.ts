@@ -19,6 +19,116 @@ export type StatusResponse = {
   development_stage: { day: number; name: string };
 };
 
+export type StockMonitoringRun = {
+  id: string;
+  monitoring_version: string;
+  reference_start_date: string;
+  reference_end_date: string;
+  current_start_date: string;
+  current_end_date: string;
+  status: string;
+  overall_health_status: string;
+  recalibration_readiness_status: string;
+  changed_member_count: number;
+  comparability_status: string;
+};
+
+export type StockMonitoringFinding = {
+  id: string;
+  category: string;
+  metric_name: string;
+  entity_name: string | null;
+  reference_value: string | null;
+  current_value: string | null;
+  drift_value: string | null;
+  severity: string;
+  status: string;
+  message: string;
+};
+
+export type StockFeatureDrift = {
+  id: string;
+  feature_name: string;
+  reference_mean: string | null;
+  current_mean: string | null;
+  psi: string | null;
+  missing_rate_delta: string;
+  severity: string;
+  status: string;
+};
+
+export type StockModelMonitoring = {
+  id: string;
+  model_name: string;
+  model_version: string;
+  lifecycle: string;
+  probability_psi: string | null;
+  reference_probability_mean: string | null;
+  current_probability_mean: string | null;
+  metric_delta: string | null;
+  status: string;
+};
+
+export type StockScoreMonitoring = {
+  id: string;
+  reference_mean: string | null;
+  current_mean: string | null;
+  score_psi: string | null;
+  confidence_reference_mean: string | null;
+  confidence_current_mean: string | null;
+  coverage_reference_mean: string | null;
+  coverage_current_mean: string | null;
+  band_distribution_reference: Record<string, number>;
+  band_distribution_current: Record<string, number>;
+  status: string;
+};
+
+export type StockComponentMonitoring = {
+  id: string;
+  component_name: string;
+  reference_mean: string | null;
+  current_mean: string | null;
+  psi: string | null;
+  availability_delta: string;
+  status: string;
+};
+
+export type StockRankingMonitoring = {
+  id: string;
+  common_company_count: number;
+  rank_spearman: string | null;
+  top_k_overlap: string | null;
+  mean_absolute_rank_change: string | null;
+  turnover: string | null;
+  status: string;
+};
+
+export type StockProviderMonitoring = {
+  id: string;
+  provider_type: string;
+  provider_name: string;
+  provider_version: string;
+  provider_classification: string;
+  last_success_at: string | null;
+  failure_count: number;
+  freshness_status: string;
+};
+
+export type StockGovernanceAssessment = {
+  id: string;
+  health_status: string;
+  recalibration_readiness_status: string;
+  high_severity_count: number;
+  moderate_severity_count: number;
+  stale_provider_count: number;
+  score_drift_status: string;
+  ranking_stability_status: string;
+  reasons_for_review: string[];
+  reasons_against_review: string[];
+  insufficient_evidence: string[];
+  summary: string;
+};
+
 export type RagIndexStatus = {
   id: string;
   index_version: string;

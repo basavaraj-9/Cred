@@ -330,3 +330,23 @@ Day 24 Label Rows + Day 25 Historical Scores and Rankings
 ```
 
 Validation runs hash the exact score-run IDs, ranking-run IDs, label records, universe snapshot, date range, and all three Day 26 policies. Immutable validation-member rows preserve each joined score, confidence, coverage, rank, percentile, and future-label reference. Period, bucket, component, correlation, segment, ablation, and sensitivity records remain separate. Missing historical scores are created only through the existing Day 25 service; validation never duplicates score logic or model training.
+
+## Day 27 monitoring architecture
+
+```text
+Historical Data + Features + Predictions + Scores + Rankings + Validation
+                                  ↓
+                      Monitoring Window Resolver
+                                  ↓
+                           Drift Detectors
+                                  ↓
+                         Freshness Monitor
+                                  ↓
+                         Stability Monitor
+                                  ↓
+                         Governance Rules
+                                  ↓
+                    Recalibration Readiness
+```
+
+Monitoring uses immutable upstream records eligible inside two ordered, nonoverlapping windows. A content hash covers the windows, upstream identifiers, universe hashes, and policy documents. Repeated inputs reuse the completed run. Findings, metric detail, provider health, and governance assessment are persisted separately under migration `0026_stock_monitoring_governance`.

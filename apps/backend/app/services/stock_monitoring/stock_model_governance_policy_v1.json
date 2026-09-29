@@ -1,0 +1,10 @@
+{
+  "version": "stock_model_governance_policy_v1",
+  "review_minimum_high_findings": 2,
+  "watch_minimum_moderate_findings": 1,
+  "review_requires_multiple_signals": true,
+  "automatic_retraining": false,
+  "automatic_recalibration": false,
+  "automatic_model_promotion": false,
+  "automatic_policy_change": false
+}

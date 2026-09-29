@@ -145,6 +145,17 @@ from app.models.stock_ml import (
     StockMLSplit,
     StockMLSplitRow,
 )
+from app.models.stock_monitoring import (
+    StockComponentMonitoring,
+    StockFeatureDrift,
+    StockGovernanceAssessment,
+    StockModelMonitoring,
+    StockMonitoringFinding,
+    StockMonitoringRun,
+    StockProviderMonitoring,
+    StockRankingMonitoring,
+    StockScoreMonitoring,
+)
 from app.models.stock_validation import (
     StockIntelligenceAblationMetric,
     StockIntelligenceAblationRun,
@@ -269,6 +280,15 @@ __all__ = [
     "StockMLMetric",
     "StockMLModel",
     "StockMLPrediction",
+    "StockMonitoringRun",
+    "StockMonitoringFinding",
+    "StockFeatureDrift",
+    "StockModelMonitoring",
+    "StockScoreMonitoring",
+    "StockComponentMonitoring",
+    "StockRankingMonitoring",
+    "StockProviderMonitoring",
+    "StockGovernanceAssessment",
     "StockIntelligenceRun",
     "StockIntelligenceComponent",
     "StockIntelligenceComponentInput",

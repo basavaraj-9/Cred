@@ -310,6 +310,19 @@
 
 ## Day 26 historical validation guarantees
 
+## Day 27 monitoring guarantees
+
+- Monitoring is observational and completed runs are immutable.
+- Monitoring never retrains or recalibrates models, promotes models, or changes score or monitoring policies.
+- Drift metrics use minimum sample guards; tiny samples cannot produce high urgency.
+- Distribution drift does not by itself imply model failure, and score drift is not adverse by default.
+- NaN and positive or negative infinity are stored as `NULL` with an explicit status.
+- Model version changes are identified separately from prediction distribution drift.
+- Score policy versions are persisted so policy changes can be distinguished from data drift.
+- Provider identity, development classification, failures, and freshness are explicit.
+- Future features, predictions, scores, and immature labels are excluded from a monitoring window.
+- Recalibration readiness is advisory research governance only and triggers no automatic action.
+
 - Validation reuses Day 24 label semantics and never creates a competing future-return engine.
 - Historical scores and rankings are built only through the existing leakage-safe Day 25 service.
 - Censored labels remain visible and are excluded from forward-outcome metrics.
