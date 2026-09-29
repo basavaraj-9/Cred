@@ -292,3 +292,13 @@ Eligible as-of features and research prediction
 ```
 
 Missing components retain zero effective weight without redistributing their configured weight. Scores require minimum coverage. Ranking members all reference a score from the same as-of date, and the ranking hash covers the fixed universe and score-run inputs.
+
+## Day 26 historical validation flow
+
+```text
+Historical Day 24 Row → Exact As-Of Day 25 Score and Ranking
+  → Labeled/Censored Gate → Per-Date Spearman and Quantile Buckets
+  → Component, Segment, Ablation, and Sensitivity Diagnostics
+```
+
+Only `LABELED` rows with an eligible score enter forward-performance diagnostics. `CENSORED` rows remain counted for transparency. Every cross-section uses one historical date; the underlying score retains its original availability-date and price-date gates. Quintiles require ten eligible companies and otherwise fall back to terciles only when that smaller grouping remains valid.

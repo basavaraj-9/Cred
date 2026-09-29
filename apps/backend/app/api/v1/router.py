@@ -25,6 +25,7 @@ from app.api.v1 import (
     stock_analytics,
     stock_intelligence,
     stock_ml,
+    stock_validation,
 )
 
 router = APIRouter()
@@ -52,3 +53,4 @@ router.include_router(stock.router)
 router.include_router(stock_analytics.router)
 router.include_router(stock_ml.router)
 router.include_router(stock_intelligence.router)
+router.include_router(stock_validation.router)

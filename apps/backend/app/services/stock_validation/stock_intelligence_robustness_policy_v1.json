@@ -1,0 +1,15 @@
+{
+  "version": "stock_intelligence_robustness_policy_v1",
+  "relative_change": 0.20,
+  "major_components": ["ML_SIGNAL", "VALUATION", "MOMENTUM"],
+  "experiments": {
+    "ML_MINUS_20_PERCENT": {"component": "ML_SIGNAL", "multiplier": 0.8},
+    "ML_PLUS_20_PERCENT": {"component": "ML_SIGNAL", "multiplier": 1.2},
+    "VALUATION_MINUS_20_PERCENT": {"component": "VALUATION", "multiplier": 0.8},
+    "VALUATION_PLUS_20_PERCENT": {"component": "VALUATION", "multiplier": 1.2},
+    "MOMENTUM_MINUS_20_PERCENT": {"component": "MOMENTUM", "multiplier": 0.8},
+    "MOMENTUM_PLUS_20_PERCENT": {"component": "MOMENTUM", "multiplier": 1.2}
+  },
+  "preserve_total_weight": 100,
+  "optimization_permitted": false
+}

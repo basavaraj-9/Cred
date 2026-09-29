@@ -145,6 +145,18 @@ from app.models.stock_ml import (
     StockMLSplit,
     StockMLSplitRow,
 )
+from app.models.stock_validation import (
+    StockIntelligenceAblationMetric,
+    StockIntelligenceAblationRun,
+    StockIntelligenceComponentCorrelation,
+    StockIntelligenceComponentValidation,
+    StockIntelligenceSegmentValidation,
+    StockIntelligenceSensitivityRun,
+    StockIntelligenceValidationBucket,
+    StockIntelligenceValidationMember,
+    StockIntelligenceValidationPeriod,
+    StockIntelligenceValidationRun,
+)
 from app.models.user import User
 
 __all__ = [
@@ -262,4 +274,14 @@ __all__ = [
     "StockIntelligenceComponentInput",
     "StockRankingRun",
     "StockRankingMember",
+    "StockIntelligenceValidationRun",
+    "StockIntelligenceValidationPeriod",
+    "StockIntelligenceValidationBucket",
+    "StockIntelligenceValidationMember",
+    "StockIntelligenceComponentValidation",
+    "StockIntelligenceComponentCorrelation",
+    "StockIntelligenceAblationRun",
+    "StockIntelligenceAblationMetric",
+    "StockIntelligenceSensitivityRun",
+    "StockIntelligenceSegmentValidation",
 ]

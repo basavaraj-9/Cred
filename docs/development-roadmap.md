@@ -25,7 +25,8 @@
 - Day 23 — **Complete:** provider-neutral listed fundamentals, availability-date gating, deterministic valuation, peer, industry, and sector statistics, historical price/fundamental/relative features, drawdowns, lineage, APIs, audits, and UI.
 - Day 24 — **Complete:** versioned stock ML datasets, trading-day labels, fixture benchmarks, purged and embargoed expanding splits, train-only preprocessing, deterministic baseline models, persisted predictions, metrics, artifacts, registry, APIs, and research UI.
 - Day 25 — **Complete:** deterministic Stock Intelligence Score components, bounded normalization, lifecycle-aware ML fusion, confidence and coverage, exact lineage, explanations, contradictions, same-date ranking, research watchlist priorities, APIs, audits, and UI.
-- Day 26+ — **Planned:** further governed stock-intelligence research stages.
+- Day 26 — **Complete:** leakage-safe historical score validation against Day 24 labels, cross-sectional rank and bucket diagnostics, component and redundancy analysis, guarded segments, named ablations, controlled weight sensitivity, temporal stability, APIs, audits, and UI.
+- Day 27+ — **Planned:** further governed stock-intelligence research stages.
 
 Each later increment should define its data contracts, failure behavior, and review requirements before implementation.
 

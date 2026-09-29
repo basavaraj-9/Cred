@@ -132,6 +132,16 @@ def _financial_schema_ready(database_url: str | None) -> bool:
             "stock_intelligence_component_inputs",
             "stock_ranking_runs",
             "stock_ranking_members",
+            "stock_intelligence_validation_runs",
+            "stock_intelligence_validation_periods",
+            "stock_intelligence_validation_members",
+            "stock_intelligence_validation_buckets",
+            "stock_intelligence_component_validation",
+            "stock_intelligence_component_correlations",
+            "stock_intelligence_ablation_runs",
+            "stock_intelligence_ablation_metrics",
+            "stock_intelligence_sensitivity_runs",
+            "stock_intelligence_segment_validation",
         }.issubset(inspect(get_engine(database_url)).get_table_names())
     except Exception:
         return False
@@ -286,6 +296,9 @@ def status(request: Request) -> StatusResponse:
     components["stock_intelligence_score"] = "ready" if schema_ready else "unavailable"
     components["cross_sectional_ranking"] = "ready" if schema_ready else "unavailable"
     components["research_watchlist"] = "ready" if schema_ready else "unavailable"
+    components["historical_stock_score_validation"] = "ready" if schema_ready else "unavailable"
+    components["stock_score_ablation"] = "ready" if schema_ready else "unavailable"
+    components["stock_score_sensitivity"] = "ready" if schema_ready else "unavailable"
     components["live_stock_predictions"] = "disabled"
     components["live_prediction_serving"] = "disabled"
     components["buy_sell_hold"] = "disabled"
@@ -299,8 +312,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 25,
-            "name": "Stock Intelligence Score + Ranking",
+            "day": 26,
+            "name": "Historical Stock Intelligence Validation",
         },
         core_models={
             "user": "ready",
@@ -419,5 +432,15 @@ def status(request: Request) -> StatusResponse:
             "stock_intelligence_component_input": "ready",
             "stock_ranking_run": "ready",
             "stock_ranking_member": "ready",
+            "stock_intelligence_validation_run": "ready",
+            "stock_intelligence_validation_period": "ready",
+            "stock_intelligence_validation_member": "ready",
+            "stock_intelligence_validation_bucket": "ready",
+            "stock_intelligence_component_validation": "ready",
+            "stock_intelligence_component_correlation": "ready",
+            "stock_intelligence_ablation_run": "ready",
+            "stock_intelligence_ablation_metric": "ready",
+            "stock_intelligence_sensitivity_run": "ready",
+            "stock_intelligence_segment_validation": "ready",
         },
     )

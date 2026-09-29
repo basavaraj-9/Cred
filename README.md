@@ -1,5 +1,13 @@
 # Company Intelligence Platform
 
+## Day 26: historical Stock Intelligence validation
+
+Day 26 adds `stock_intelligence_validation_v1`, a historical research validation layer over the immutable Day 25 score and Day 24 three-month relative-return labels. It builds or reuses leakage-safe historical scores and same-date rankings, excludes censored labels from outcome metrics, and persists per-date Spearman correlation, honest quintile or tercile buckets, research diagnostic spreads, top-bucket hit rates, monotonicity, and score distribution statistics.
+
+The framework evaluates all 11 score components, pairwise redundancy, confidence, coverage, sector, research-priority, and contradiction segments with minimum sample guards. `stock_intelligence_ablation_policy_v1` removes components only in named experiments and renormalizes the remaining configured weights. `stock_intelligence_robustness_policy_v1` applies fixed ±20% changes to ML, Valuation, and Momentum weights and measures rank stability. It performs no historical weight optimization and never changes `stock_intelligence_score_v1`.
+
+Validation results describe the deterministic fixture research dataset. They are not predictive accuracy claims, production validation, investment recommendations, target prices, return forecasts, or trade actions. The internal Score Validation tab is available at `/stock-intelligence`.
+
 ## Day 25: Stock Intelligence Score and research ranking
 
 Day 25 adds the deterministic `stock_intelligence_score_v1` analytical score. The versioned fusion policy assigns ML Signal 20%, Valuation 15%, Fundamental Quality 10%, Growth 10%, Profitability 10%, Balance Sheet 10%, Momentum 10%, Risk 5%, Peer Relative 4%, Sector Relative 3%, and Data Quality 3%. Missing weights are not redistributed. A score is produced only when at least 70% of configured weight is available; confidence and coverage remain separate from the score.

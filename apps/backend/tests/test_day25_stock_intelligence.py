@@ -298,6 +298,6 @@ def test_day25_routes_and_status(client: TestClient) -> None:
         "/stock-intelligence/rankings/{ranking_run_id}/watchlist",
     } <= paths
     status = client.get("/api/v1/status").json()
-    assert status["development_stage"]["day"] == 25
+    assert status["development_stage"]["day"] == 26
     assert "stock_intelligence_score" in status["components"]
     assert status["components"]["trade_execution"] == "disabled"

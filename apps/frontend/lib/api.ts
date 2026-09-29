@@ -6,6 +6,7 @@ import type { MarketDataRun, PeerGroup } from "@/types/api";
 import type { FeatureResult, Fundamental, RelativeMetric, ValuationResult } from "@/types/api";
 import type { StockMLDataset, StockMLMetric, StockMLModel, StockMLRun, StockMLSplit } from "@/types/api";
 import type { StockIntelligenceComponent, StockIntelligenceExplanation, StockIntelligenceScore, StockRanking } from "@/types/api";
+import type { StockComponentValidation, StockValidationAblation, StockValidationPeriod, StockValidationRun, StockValidationSegment, StockValidationSensitivity } from "@/types/api";
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${API_V1_PATH}${path}`, {
@@ -67,6 +68,13 @@ export const buildStockIntelligenceScore=(listingId:string,actorId:string,asOfDa
 export async function getStockIntelligenceComponents(runId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-intelligence/scores/${encodeURIComponent(runId)}/components?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Score component lookup failed");return await r.json() as StockIntelligenceComponent[]}
 export async function getStockIntelligenceExplanation(runId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-intelligence/scores/${encodeURIComponent(runId)}/explanation?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Score explanation lookup failed");return await r.json() as StockIntelligenceExplanation}
 export const buildStockRanking=(actorId:string,asOfDate:string)=>analystMutation<StockRanking>("/stock-intelligence/rankings/build",{actor_user_id:actorId,as_of_date:asOfDate});
+export const buildStockValidation=(actorId:string,startDate:string,endDate:string)=>analystMutation<StockValidationRun>("/stock-validation/runs/build",{actor_user_id:actorId,start_date:startDate,end_date:endDate,score_version:"stock_intelligence_score_v1"});
+async function getStockValidationJson<T>(path:string,actorId:string):Promise<T>{const separator=path.includes("?")?"&":"?";const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}${separator}actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock validation lookup failed");return await r.json() as T}
+export const getStockValidationPeriods=(runId:string,actorId:string)=>getStockValidationJson<StockValidationPeriod[]>(`/stock-validation/runs/${encodeURIComponent(runId)}/periods`,actorId);
+export const getStockValidationComponents=(runId:string,actorId:string)=>getStockValidationJson<StockComponentValidation[]>(`/stock-validation/runs/${encodeURIComponent(runId)}/components`,actorId);
+export const getStockValidationSegments=(runId:string,actorId:string)=>getStockValidationJson<StockValidationSegment[]>(`/stock-validation/runs/${encodeURIComponent(runId)}/segments`,actorId);
+export const buildStockValidationAblations=(runId:string,actorId:string)=>analystMutation<StockValidationAblation[]>(`/stock-validation/runs/${encodeURIComponent(runId)}/ablations/build`,{actor_user_id:actorId});
+export const buildStockValidationSensitivity=(runId:string,actorId:string)=>analystMutation<StockValidationSensitivity[]>(`/stock-validation/runs/${encodeURIComponent(runId)}/sensitivity/build`,{actor_user_id:actorId});
 
 export async function createCreditFusionExperiment(
   creditAssessmentId: string,

@@ -319,3 +319,14 @@ Stock Features + Valuation + Relative Metrics + ML Research Prediction
 ```
 
 Every component keeps the Day 23 feature and its underlying price, fundamental, or relative-metric source identities. The ML component also preserves prediction, model, run, and dataset identities. Confidence, coverage, agreement, contradictions, and weighted drivers remain distinct fields. Ranking freezes the eligible universe hash and never changes a historical score run.
+
+## Day 26 historical validation architecture
+
+```text
+Day 24 Label Rows + Day 25 Historical Scores and Rankings
+  → Same-Date Eligibility Alignment → Period and Bucket Diagnostics
+  → Component and Redundancy Analysis → Guarded Segment Diagnostics
+  → Named Ablations + Controlled Weight Sensitivity
+```
+
+Validation runs hash the exact score-run IDs, ranking-run IDs, label records, universe snapshot, date range, and all three Day 26 policies. Immutable validation-member rows preserve each joined score, confidence, coverage, rank, percentile, and future-label reference. Period, bucket, component, correlation, segment, ablation, and sensitivity records remain separate. Missing historical scores are created only through the existing Day 25 service; validation never duplicates score logic or model training.

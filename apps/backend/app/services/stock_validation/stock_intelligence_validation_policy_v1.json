@@ -1,0 +1,30 @@
+{
+  "version": "stock_intelligence_validation_policy_v1",
+  "validation_version": "stock_intelligence_validation_v1",
+  "score_version": "stock_intelligence_score_v1",
+  "label_policy_version": "stock_label_policy_v1",
+  "minimum_companies_per_date": 5,
+  "minimum_historical_dates": 3,
+  "eligible_score_statuses": ["AVAILABLE", "PARTIAL"],
+  "minimum_coverage": 0.70,
+  "minimum_confidence": 0.0,
+  "preferred_bucket_method": "QUINTILE",
+  "quintile_minimum_companies": 10,
+  "tercile_minimum_companies": 6,
+  "minimum_bucket_size": 2,
+  "confidence_bands": [
+    {"name": "LOW", "minimum": 0.0, "maximum": 0.5},
+    {"name": "MEDIUM", "minimum": 0.5, "maximum": 0.75},
+    {"name": "HIGH", "minimum": 0.75, "maximum": 1.000001}
+  ],
+  "coverage_bands": [
+    {"name": "70_TO_80", "minimum": 0.70, "maximum": 0.80},
+    {"name": "80_TO_90", "minimum": 0.80, "maximum": 0.90},
+    {"name": "90_TO_100", "minimum": 0.90, "maximum": 1.000001}
+  ],
+  "segment_minimum_sample_size": 5,
+  "top_k_percentage": 0.20,
+  "primary_metric": "MEAN_HISTORICAL_CROSS_SECTIONAL_SPEARMAN",
+  "monotonicity_thresholds": {"strong": 0.75, "moderate": 0.50},
+  "redundancy_thresholds": {"high": 0.85, "moderate": 0.60}
+}

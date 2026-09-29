@@ -307,3 +307,17 @@
 - Rankings use one as-of date, a frozen universe hash, and deterministic tie rules.
 - Ranking and watchlist outputs are research analytics only.
 - No investment recommendation, target price, return forecast, or trade action is generated.
+
+## Day 26 historical validation guarantees
+
+- Validation reuses Day 24 label semantics and never creates a competing future-return engine.
+- Historical scores and rankings are built only through the existing leakage-safe Day 25 service.
+- Censored labels remain visible and are excluded from forward-outcome metrics.
+- Per-date cross-sections prevent observations from different historical dates being ranked together.
+- Bucket counts reflect the actual method; small universes never masquerade as quintiles.
+- Segment and sector metrics require the configured minimum sample size.
+- Ablations and sensitivity runs use named experiment policies and cannot overwrite Day 25 weights.
+- Sensitivity checks use fixed perturbations and perform no historical optimization.
+- Input hashes cover score, ranking, label, policy, date-range, and eligible-universe identities.
+- Day 23 features, Day 24 datasets and models, and existing Day 25 records remain immutable.
+- Results remain fixture research diagnostics and never claim production validation or predictive accuracy.
