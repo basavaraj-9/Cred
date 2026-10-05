@@ -1,5 +1,15 @@
 # Data flow
 
+## Company intelligence report
+
+Source documents → Validated analytics → Existing credit outputs → Existing stock
+outputs → Historical validation → Monitoring → As-of snapshot resolver → Section
+builder → Evidence linker → 360 JSON → PDF.
+
+Selected input identifiers and policy versions determine report identity. Generation
+persists the snapshot and both export hashes atomically. New analytics produce a new
+version; finalization never reloads live source values.
+
 Day 3 upload and persistence lineage:
 
 ```text

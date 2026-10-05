@@ -5,5 +5,5 @@
   "root_directory": "reports",
   "immutable_finalized_artifacts": true,
   "sha256_required": true,
-  "safe_filenames": {"CAM": "cam", "CREDIT_COMMITTEE_MEMO": "committee-memo", "DECISION_EVIDENCE_PACK": "decision-evidence-pack", "STRUCTURED_JSON_EXPORT": "structured-export"}
+  "safe_filenames": {"CAM": "cam", "CREDIT_COMMITTEE_MEMO": "committee-memo", "DECISION_EVIDENCE_PACK": "decision-evidence-pack", "STRUCTURED_JSON_EXPORT": "structured-export", "COMPANY_INTELLIGENCE_360": "company-intelligence-360"}
 }

@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v1 import (
+    company_intelligence_reports,
     company_profiles,
     credit_decision,
     credit_fusion,
@@ -34,6 +35,7 @@ router.include_router(health.router)
 router.include_router(status.router)
 router.include_router(documents.router)
 router.include_router(company_profiles.router)
+router.include_router(company_intelligence_reports.router)
 router.include_router(domain_classification.router)
 router.include_router(financial_statements.router)
 router.include_router(financial_analysis.router)

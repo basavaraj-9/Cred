@@ -1,16 +1,20 @@
 from __future__ import annotations
 
 # ruff: noqa: E501
-from datetime import datetime
+from datetime import date, datetime
+from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import (
     JSON,
+    Boolean,
     CheckConstraint,
+    Date,
     DateTime,
     ForeignKey,
     Index,
     Integer,
+    Numeric,
     String,
     Text,
     UniqueConstraint,
@@ -24,11 +28,27 @@ class GeneratedReport(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __tablename__ = "generated_reports"
     __table_args__ = (
         CheckConstraint(
-            "report_type IN ('CAM','CREDIT_COMMITTEE_MEMO','DECISION_EVIDENCE_PACK','STRUCTURED_JSON_EXPORT')",
+            "report_type IN ('CAM','CREDIT_COMMITTEE_MEMO','DECISION_EVIDENCE_PACK',"
+            "'STRUCTURED_JSON_EXPORT','COMPANY_INTELLIGENCE_360')",
             name="report_type_valid",
         ),
         CheckConstraint(
-            "status IN ('DRAFT','GENERATED','FINALIZED','SUPERSEDED','FAILED')", name="status_valid"
+            "status IN ('DRAFT','GENERATED','READY','NEEDS_REVIEW','FINALIZED',"
+            "'SUPERSEDED','FAILED')",
+            name="status_valid",
+        ),
+        CheckConstraint(
+            "readiness_status IS NULL OR readiness_status IN "
+            "('COMPLETE','PARTIAL','INSUFFICIENT_DATA','NEEDS_REVIEW')",
+            name="readiness_valid",
+        ),
+        CheckConstraint(
+            "completeness_ratio IS NULL OR completeness_ratio BETWEEN 0 AND 1",
+            name="completeness_range",
+        ),
+        CheckConstraint(
+            "evidence_coverage IS NULL OR evidence_coverage BETWEEN 0 AND 1",
+            name="evidence_coverage_range",
         ),
         CheckConstraint("report_version > 0", name="version_positive"),
         CheckConstraint(
@@ -47,15 +67,15 @@ class GeneratedReport(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             name="uq_generated_report_input",
         ),
         Index("ix_generated_reports_case_type", "review_case_id", "report_type", "created_at"),
+        Index("ix_generated_reports_company_type", "company_id", "report_type", "generated_at"),
+        Index("ix_generated_reports_as_of", "analytical_as_of_date", "report_type"),
     )
     company_id: Mapped[UUID] = mapped_column(ForeignKey("companies.id"), nullable=False)
-    document_id: Mapped[UUID] = mapped_column(ForeignKey("documents.id"), nullable=False)
-    analysis_job_id: Mapped[UUID] = mapped_column(ForeignKey("analysis_jobs.id"), nullable=False)
-    review_case_id: Mapped[UUID] = mapped_column(
-        ForeignKey("credit_review_cases.id"), nullable=False
-    )
-    decision_support_id: Mapped[UUID] = mapped_column(
-        ForeignKey("credit_decision_support.id"), nullable=False
+    document_id: Mapped[UUID | None] = mapped_column(ForeignKey("documents.id"))
+    analysis_job_id: Mapped[UUID | None] = mapped_column(ForeignKey("analysis_jobs.id"))
+    review_case_id: Mapped[UUID | None] = mapped_column(ForeignKey("credit_review_cases.id"))
+    decision_support_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("credit_decision_support.id")
     )
     human_decision_id: Mapped[UUID | None] = mapped_column(ForeignKey("credit_human_decisions.id"))
     committee_package_id: Mapped[UUID | None] = mapped_column(
@@ -66,6 +86,14 @@ class GeneratedReport(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     report_version: Mapped[int] = mapped_column(Integer, nullable=False)
     template_version: Mapped[str] = mapped_column(String(100), nullable=False)
     renderer_version: Mapped[str] = mapped_column(String(100), nullable=False)
+    policy_version: Mapped[str | None] = mapped_column(String(100))
+    schema_version: Mapped[str | None] = mapped_column(String(100))
+    readiness_status: Mapped[str | None] = mapped_column(String(30))
+    analytical_as_of_date: Mapped[date | None] = mapped_column(Date)
+    include_credit: Mapped[bool | None] = mapped_column(Boolean)
+    include_stock: Mapped[bool | None] = mapped_column(Boolean)
+    completeness_ratio: Mapped[Decimal | None] = mapped_column(Numeric(7, 6))
+    evidence_coverage: Mapped[Decimal | None] = mapped_column(Numeric(7, 6))
     input_hash: Mapped[str] = mapped_column(String(64), nullable=False)
     confidentiality_label: Mapped[str] = mapped_column(String(40), nullable=False)
     generated_by_user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id"), nullable=False)

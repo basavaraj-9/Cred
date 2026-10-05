@@ -249,8 +249,10 @@ def test_completeness_is_availability_not_strength_and_confidence_is_conservativ
     assert overall_completeness([0.4, 1.0, 0.8, 0.0, 0.5]) == pytest.approx(0.54)
 
 
-def _context(session: Session) -> tuple[Document, CreditAssessment]:
-    company = Company(legal_name="Day 15 Test Ltd", country="India")
+def _context(
+    session: Session, company_name: str = "Day 15 Test Ltd"
+) -> tuple[Document, CreditAssessment]:
+    company = Company(legal_name=company_name, country="India")
     session.add(company)
     session.flush()
     job = AnalysisJob(company_id=company.id)

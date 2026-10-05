@@ -91,7 +91,23 @@ def test_fundamental_sync_periods_availability_currency_and_idempotency(
 
 def test_valuation_formulas_negative_states_and_asof_leakage(db_session: Session) -> None:
     admin, listings = _context(db_session)
-    listing = listings[0]
+    # PostgreSQL does not guarantee row order; choose a profitable fixture for
+    # the positive-denominator assertions below.
+    listing = next(
+        item
+        for item in sorted(listings, key=lambda row: row.symbol)
+        if db_session.scalar(
+            select(StockFundamental.id)
+            .where(
+                StockFundamental.listed_company_id == item.listed_company_id,
+                StockFundamental.metric_code == "PAT",
+                StockFundamental.period_end == date(2026, 3, 31),
+                StockFundamental.value > 0,
+            )
+            .limit(1)
+        )
+        is not None
+    )
     service = ValuationService(db_session)
     early = service.build(listing.id, date(2026, 4, 30), admin.id)
     assert early.fundamental_run_id is not None

@@ -1,0 +1,13 @@
+{
+  "version": "company_intelligence_report_policy_v1",
+  "schema_version": "company_intelligence_360_schema_v1",
+  "report_version": "company_intelligence_360_v1",
+  "renderer_version": "company_intelligence_renderer_v1",
+  "required_sections": ["executive_summary", "company_profile", "documents", "financials", "credit", "stock", "validation", "monitoring", "evidence", "limitations"],
+  "credit_stock_separation_required": true,
+  "master_score_permitted": false,
+  "future_data_permitted": false,
+  "max_records_per_collection": 2000,
+  "max_snapshot_bytes": 20971520,
+  "automatic_decision_permitted": false
+}

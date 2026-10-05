@@ -309,6 +309,7 @@ def status(request: Request) -> StatusResponse:
     components["stock_score_ablation"] = "ready" if schema_ready else "unavailable"
     components["stock_score_sensitivity"] = "ready" if schema_ready else "unavailable"
     components["stock_monitoring"] = "ready" if schema_ready else "unavailable"
+    components["company_intelligence_360_report"] = "ready" if schema_ready else "unavailable"
     components["stock_drift_detection"] = "ready" if schema_ready else "unavailable"
     components["stock_governance_assessment"] = "ready" if schema_ready else "unavailable"
     components["automatic_stock_retraining"] = "disabled"
@@ -325,8 +326,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 27,
-            "name": "Stock Monitoring, Drift, and Governance",
+            "day": 28,
+            "name": "360° Company Intelligence Report",
         },
         core_models={
             "user": "ready",

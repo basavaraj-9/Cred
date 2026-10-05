@@ -916,15 +916,36 @@ class CreditReportService:
         return report, artifact, path
 
 
-def report_payload(session: Session, report: GeneratedReport) -> dict[str, object]:
-    artifact = session.scalar(
-        select(ReportArtifact).where(ReportArtifact.generated_report_id == report.id)
-    )
-    snapshot = session.scalar(
-        select(ReportSnapshot).where(ReportSnapshot.generated_report_id == report.id)
-    )
+def report_payload(
+    session: Session,
+    report: GeneratedReport,
+    artifacts: list[ReportArtifact] | None = None,
+    snapshot: ReportSnapshot | None = None,
+) -> dict[str, object]:
+    if artifacts is None:
+        artifacts = list(
+            session.scalars(
+                select(ReportArtifact)
+                .where(ReportArtifact.generated_report_id == report.id)
+                .order_by(ReportArtifact.format)
+            )
+        )
+    # Keep the original singular field for older clients while exposing every
+    # authoritative artifact produced by the 360 report.
+    artifact = next((item for item in artifacts if item.format == "PDF"), None)
+    if artifact is None and artifacts:
+        artifact = artifacts[0]
+    if snapshot is None:
+        snapshot = session.scalar(
+            select(ReportSnapshot).where(ReportSnapshot.generated_report_id == report.id)
+        )
+    saved_payload = cast(dict[str, Any], snapshot.payload_json) if snapshot else {}
+    monitoring_data = saved_payload.get("sections", {}).get("monitoring", {}).get("data") or {}
     return {
         "id": report.id,
+        "company_id": report.company_id,
+        "company_name": saved_payload.get("executive_summary", {}).get("company"),
+        "monitoring_health": (monitoring_data.get("run") or {}).get("overall_health_status"),
         "review_case_id": report.review_case_id,
         "decision_support_id": report.decision_support_id,
         "human_decision_id": report.human_decision_id,
@@ -934,6 +955,14 @@ def report_payload(session: Session, report: GeneratedReport) -> dict[str, objec
         "report_version": report.report_version,
         "template_version": report.template_version,
         "renderer_version": report.renderer_version,
+        "policy_version": report.policy_version,
+        "schema_version": report.schema_version,
+        "readiness_status": report.readiness_status,
+        "analytical_as_of_date": report.analytical_as_of_date,
+        "include_credit": report.include_credit,
+        "include_stock": report.include_stock,
+        "completeness_ratio": report.completeness_ratio,
+        "evidence_coverage": report.evidence_coverage,
         "input_hash": report.input_hash,
         "confidentiality_label": report.confidentiality_label,
         "generated_by_user_id": report.generated_by_user_id,
@@ -952,5 +981,16 @@ def report_payload(session: Session, report: GeneratedReport) -> dict[str, objec
         }
         if artifact
         else None,
+        "artifacts": [
+            {
+                "id": item.id,
+                "format": item.format,
+                "mime_type": item.mime_type,
+                "file_size_bytes": item.file_size_bytes,
+                "sha256": item.sha256,
+                "download_available": True,
+            }
+            for item in artifacts
+        ],
         "snapshot_hash": snapshot.payload_hash if snapshot else None,
     }

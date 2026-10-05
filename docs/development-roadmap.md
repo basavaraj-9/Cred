@@ -27,7 +27,8 @@
 - Day 25 — **Complete:** deterministic Stock Intelligence Score components, bounded normalization, lifecycle-aware ML fusion, confidence and coverage, exact lineage, explanations, contradictions, same-date ranking, research watchlist priorities, APIs, audits, and UI.
 - Day 26 — **Complete:** leakage-safe historical score validation against Day 24 labels, cross-sectional rank and bucket diagnostics, component and redundancy analysis, guarded segments, named ablations, controlled weight sensitivity, temporal stability, APIs, audits, and UI.
 - Day 27 — **Complete:** versioned monitoring windows, data freshness, feature and prediction PSI, score and component drift, confidence and coverage, ranking stability, universe and mature-label monitoring, provider diagnostics, advisory governance, APIs, audits, and UI.
-- Day 28+ — **Planned:** further governed stock-intelligence research stages.
+- Day 28 — **Complete:** immutable 360° company report snapshots, JSON/PDF exports, source evidence, APIs, and workspace; 440 backend tests passed with one Tesseract-dependent skip, migration/schema checks and frontend production validation passed.
+- Day 29+ — **Planned:** production hardening and further governed integration stages.
 
 Each later increment should define its data contracts, failure behavior, and review requirements before implementation.
 

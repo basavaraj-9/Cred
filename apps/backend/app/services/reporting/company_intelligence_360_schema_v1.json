@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "company_intelligence_360_schema_v1",
+  "type": "object",
+  "required": ["schema_version", "manifest", "executive_summary", "sections", "section_completeness", "evidence", "conflicts", "disclaimers", "credit_stock_separation", "no_master_score"],
+  "properties": {
+    "schema_version": {"const": "company_intelligence_360_schema_v1"},
+    "manifest": {"type": "object", "required": ["report_version", "policy_version", "renderer_version", "company_id", "analytical_as_of_date", "source_ids", "include_credit", "include_stock"], "properties": {
+      "report_version": {"const": "company_intelligence_360_v1"},
+      "policy_version": {"const": "company_intelligence_report_policy_v1"},
+      "renderer_version": {"const": "company_intelligence_renderer_v1"},
+      "company_id": {"type": "string", "format": "uuid"},
+      "analytical_as_of_date": {"type": "string", "format": "date"},
+      "source_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "format": "uuid"}},
+      "include_credit": {"type": "boolean"}, "include_stock": {"type": "boolean"}
+    }},
+    "executive_summary": {"type": "object", "required": ["company", "business_profile", "financial_condition", "credit_view", "equity_research_view", "key_strengths", "key_risks", "data_quality_limitations", "governance_warnings"]},
+    "sections": {"type": "object", "required": ["company_profile", "documents", "financials", "credit", "stock", "validation", "monitoring"], "additionalProperties": {"$ref": "#/$defs/section"}},
+    "section_completeness": {"type": "object"},
+    "evidence": {"type": "object"},
+    "conflicts": {"type": "array"},
+    "disclaimers": {"type": "object", "required": ["credit", "stock", "historical_validation"], "additionalProperties": {"type": "string", "minLength": 1}},
+    "credit_stock_separation": {"type": "string"},
+    "no_master_score": {"const": true}
+  },
+  "$defs": {"section": {"type": "object", "required": ["status", "data", "source_references"], "properties": {
+    "status": {"enum": ["AVAILABLE", "PARTIAL", "UNAVAILABLE", "NEEDS_REVIEW", "NOT_APPLICABLE"]},
+    "source_references": {"type": "array", "uniqueItems": true, "items": {"type": "string", "format": "uuid"}},
+    "data": {"type": ["object", "array", "null"]}
+  }}},
+  "additionalProperties": true
+}

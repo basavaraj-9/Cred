@@ -1,5 +1,22 @@
 # Company Intelligence Platform
 
+## Day 28: 360° Company Intelligence Report (complete)
+
+The `/company-intelligence` workspace assembles existing company, document, financial,
+credit, stock, validation, and monitoring evidence into an immutable report. JSON is
+authoritative; PDF is a readable export. Section states expose missing evidence and
+conflicts. Credit and equity remain independent, with no combined master score.
+
+The report reuses Day 20 persistence and audit infrastructure. Identical inputs reuse
+an existing version; changed inputs create a new version. Finalization and supersession
+retain prior snapshots and exports. Source links connect sections to original records.
+Migration `0027_company_intelligence_360_report` supports reports without a credit
+review case and adds readiness, as-of, and coverage metadata. See
+[Day 28 architecture, API, and limitations](docs/day28-company-intelligence.md).
+Final validation: 440 backend tests passed, one Tesseract-dependent test skipped;
+migration round-trip, schema drift, backend quality, frontend checks, and production
+build passed. See the [completion report](docs/day28-completion-report.md).
+
 ## Day 27: Stock Intelligence monitoring, drift, and governance
 
 Day 27 adds `stock_monitoring_v1`, an observational governance layer over historical features, model predictions, Stock Intelligence Scores, rankings, validation results, and provider runs. Versioned reference and current windows feed deterministic PSI, missingness, confidence, coverage, rank stability, universe change, label maturity, and freshness checks. Every metric has sample guards and explicit insufficient-data handling.

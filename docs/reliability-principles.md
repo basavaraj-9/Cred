@@ -1,5 +1,13 @@
 # Reliability principles
 
+- Reporting reads persisted analytics and never recalculates scores.
+- Every included source-record claim has lineage; evidence coverage is not confidence.
+- Missing data and conflicting sources remain explicit; credit and equity views remain independent.
+- There is no unified company master score or autonomous report decision.
+- Snapshots and finalized report contents are immutable; newer inputs produce another version.
+- Original evidence outranks synthesized report prose; circular report citations are excluded.
+- Historical reports exclude future dates and records whose prior state cannot be reconstructed.
+
 - Keep process liveness independent of infrastructure and report degraded database state explicitly.
 - Validate configuration at startup and keep secret values out of logs.
 - Return stable, typed API responses and generic error messages for unexpected failures.

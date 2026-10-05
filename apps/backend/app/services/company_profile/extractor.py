@@ -1,4 +1,5 @@
 import re
+import unicodedata
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
 
@@ -71,7 +72,7 @@ def normalize_legal_name(value: str) -> str:
 
 
 def identity_key(value: str) -> str:
-    name = re.sub(r"[^a-z0-9 ]", " ", value.lower())
+    name = re.sub(r"[^a-z0-9 ]", " ", unicodedata.normalize("NFKC", value).casefold())
     name = re.sub(r"\b(ltd|limited)\b", "limited", name)
     name = re.sub(r"\b(pvt|private)\b", "private", name)
     return " ".join(name.split())
@@ -81,6 +82,8 @@ def compare_identity(uploaded: str, extracted: str | None) -> IdentityMatchStatu
     if extracted is None:
         return IdentityMatchStatus.UNAVAILABLE
     left, right = identity_key(uploaded), identity_key(extracted)
+    if not left or not right:
+        return IdentityMatchStatus.UNAVAILABLE
     if left == right:
         return IdentityMatchStatus.MATCHED
     left_tokens, right_tokens = set(left.split()), set(right.split())

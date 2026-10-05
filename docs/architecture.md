@@ -1,5 +1,15 @@
 # Architecture
 
+## 360° company report
+
+Document evidence → Company intelligence → Financial intelligence → Existing credit
+and stock intelligence → Validation / Monitoring → 360 snapshot builder → Structured
+JSON → PDF renderer → Finalization / Supersession.
+
+The builder reads existing results without invoking analytics. Day 20 report tables
+store the fixed snapshot, artifacts, source links, and governance actions. Credit and
+stock assessments remain independent. See [Day 28 details](day28-company-intelligence.md).
+
 ## Current system
 
 The frontend is a Next.js App Router application with a status page and PDF upload form. FastAPI owns configuration, route contracts, validation, logging, exception handling, CORS, and database checks. SQLAlchemy models and explicit repositories isolate persistence from routes. Alembic owns schema changes.
