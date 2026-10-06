@@ -1,0 +1,44 @@
+{
+  "database": "company_intelligence_day29_9ad2fdd1_test",
+  "checks": {
+    "clean_database_to_head": true,
+    "day29_downgrade_reapply": true,
+    "schema_drift": "none",
+    "base_to_head_roundtrip": true,
+    "live_latency_ms": 21.84,
+    "enqueue_latency_ms": 184.56,
+    "authenticated_queue_and_real_worker": true,
+    "authenticated_pdf_download": true,
+    "readiness": true,
+    "production_missing_redis_fails_closed": true
+  },
+  "quality": {
+    "ruff": "passed",
+    "format_files": 311,
+    "mypy_files": 245,
+    "frontend_typescript": "passed",
+    "frontend_lint": "passed",
+    "frontend_production_build": "passed",
+    "frontend_runtime_client_checks": "passed",
+    "report_render_sections": 9
+  },
+  "regression": {
+    "baseline_passed": 440,
+    "previous_full_passed": 470,
+    "focused_final_passed": 35,
+    "final_full": "passed",
+    "skipped_reason": "Optional Tesseract dependency unavailable",
+    "final_full_passed": 473,
+    "final_full_skipped": 1,
+    "new_day29_cases": 33,
+    "seconds": 287.56
+  },
+  "limitations": [
+    "Docker/container execution unavailable locally",
+    "Redis RQ end-to-end deployment unverified",
+    "Five high development-only frontend audit entries remain",
+    "Stock ML is PIPELINE_VALIDATION_ONLY",
+    "No regulatory or compliance deployment certification"
+  ],
+  "status": "COMPLETE_LOCAL_VALIDATION"
+}

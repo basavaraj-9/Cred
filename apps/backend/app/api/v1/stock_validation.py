@@ -21,7 +21,7 @@ from app.models.stock_validation import (
     StockIntelligenceValidationPeriod,
     StockIntelligenceValidationRun,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 from app.services.stock_validation.service import StockIntelligenceValidationService
 
 router = APIRouter(prefix="/stock-validation", tags=["stock intelligence validation"])
@@ -88,7 +88,7 @@ def get_validation(
     actor_user_id: UUID,
     session: Session = Depends(get_db),
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     return run_payload(_run(session, validation_run_id))
 
 
@@ -101,7 +101,7 @@ def list_validations(
     end_date: date | None = None,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     query = select(StockIntelligenceValidationRun)
     if status:
         query = query.where(StockIntelligenceValidationRun.status == status)
@@ -123,7 +123,7 @@ def periods(
     actor_user_id: UUID,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     _run(session, validation_run_id)
     return [
         {
@@ -156,7 +156,7 @@ def buckets(
     actor_user_id: UUID,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     _run(session, validation_run_id)
     return [
         {
@@ -190,7 +190,7 @@ def components(
     actor_user_id: UUID,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     _run(session, validation_run_id)
     return [
         {
@@ -217,7 +217,7 @@ def correlations(
     actor_user_id: UUID,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     _run(session, validation_run_id)
     return [
         {
@@ -284,7 +284,7 @@ def ablations(
     actor_user_id: UUID,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     _run(session, validation_run_id)
     results = list(
         session.scalars(
@@ -329,7 +329,7 @@ def sensitivity(
     actor_user_id: UUID,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     _run(session, validation_run_id)
     return [
         sensitivity_payload(item)
@@ -347,7 +347,7 @@ def segments(
     actor_user_id: UUID,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     _run(session, validation_run_id)
     return [
         {

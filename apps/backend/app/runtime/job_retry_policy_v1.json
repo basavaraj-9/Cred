@@ -1,0 +1,10 @@
+{
+  "version": "job_retry_policy_v1",
+  "max_backoff_seconds": 300,
+  "transient_codes": [
+    "DEPENDENCY_UNAVAILABLE",
+    "PROVIDER_TIMEOUT",
+    "DATABASE_TRANSIENT"
+  ],
+  "permanent_errors_retry": false
+}

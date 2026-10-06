@@ -46,7 +46,7 @@ from app.models.stock_ml import (
     StockMLSplit,
     StockMLSplitRow,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 
 DATASET_VERSION = "stock_ml_dataset_v1"
 FEATURE_SET_VERSION = "stock_features_v1"
@@ -161,7 +161,7 @@ class StockMlDatasetBuilder:
         horizon: str = "3M",
         feature_set_version: str = FEATURE_SET_VERSION,
     ) -> StockMLDataset:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         runs = list(
             self.s.scalars(
                 select(StockFeatureRun)
@@ -366,7 +366,7 @@ class StockWalkForwardBuilder:
         self.policy = policy("stock_walk_forward_policy_v1.json")
 
     def build(self, dataset_id: UUID, actor_id: UUID) -> list[StockMLSplit]:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         dataset = self.s.get(StockMLDataset, dataset_id)
         if dataset is None:
             raise AppError("STOCK_ML_DATASET_NOT_FOUND", "Stock ML dataset not found", 404)
@@ -575,7 +575,7 @@ class StockModelTrainer:
     def train(
         self, split_id: UUID, actor_id: UUID, models: list[str] | None = None
     ) -> list[StockMLRun]:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         split = self.s.get(StockMLSplit, split_id)
         if split is None:
             raise AppError("STOCK_ML_SPLIT_NOT_FOUND", "Stock ML split not found", 404)

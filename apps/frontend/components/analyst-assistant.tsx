@@ -1,12 +1,13 @@
 "use client";
 
+import { useRuntimeActor } from "@/lib/use-runtime-actor";
 import { FormEvent, useState } from "react";
 import { askCreditAnalyst, buildRagIndex, getRagIndex, submitAnalystFeedback } from "@/lib/api";
 import type { AnalystAnswer, RagIndexStatus } from "@/types/api";
 
 export function AnalystAssistant() {
   const [companyId, setCompanyId] = useState("");
-  const [actorId, setActorId] = useState("");
+  const [actorId, setActorId] = useRuntimeActor();
   const [question, setQuestion] = useState("");
   const [scope, setScope] = useState("");
   const [period, setPeriod] = useState("");

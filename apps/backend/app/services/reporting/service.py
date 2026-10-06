@@ -71,6 +71,7 @@ from app.models.review import (
     CreditReviewEvidenceAcknowledgement,
 )
 from app.models.user import User
+from app.runtime.storage import checked_artifact
 
 RENDERER_VERSION = "report_renderer_v1"
 TEMPLATES = {
@@ -908,11 +909,18 @@ class CreditReportService:
         )
         if artifact is None:
             raise AppError("REPORT_ARTIFACT_NOT_FOUND", "Report artifact not found", 404)
-        path = (self.storage_root / artifact.storage_path).resolve()
-        if not path.is_relative_to(self.storage_root) or not path.is_file():
-            raise AppError("REPORT_ARTIFACT_UNAVAILABLE", "Report artifact is unavailable", 404)
-        if hashlib.sha256(path.read_bytes()).hexdigest() != artifact.sha256:
-            raise AppError("REPORT_ARTIFACT_INTEGRITY_FAILED", "Report artifact hash mismatch", 409)
+        try:
+            path = checked_artifact(self.storage_root, artifact.storage_path, artifact.sha256)
+        except AppError as exc:
+            code = (
+                "REPORT_ARTIFACT_INTEGRITY_FAILED"
+                if exc.status_code == 409
+                else "REPORT_ARTIFACT_UNAVAILABLE"
+            )
+            status = 409 if exc.status_code == 409 else 404
+            raise AppError(
+                code, "Report artifact unavailable or integrity check failed", status
+            ) from exc
         return report, artifact, path
 
 

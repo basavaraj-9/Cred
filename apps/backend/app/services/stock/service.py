@@ -29,7 +29,8 @@ from app.models.stock import (
     StockListing,
     StockPrice,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.runtime.provider_safety import reject_development_provider
+from app.services.stock.authorization import require_stock_actor
 
 UNIVERSE_VERSION = "indian_listed_universe_v1"
 RESOLVER_VERSION = "listed_company_entity_resolver_v1"
@@ -92,6 +93,7 @@ class FixtureListedUniverseProvider:
     provider_version = UNIVERSE_VERSION
 
     def _all(self) -> list[UniverseRecord]:
+        reject_development_provider()
         e = (
             "Industrials",
             "Electrical Equipment",
@@ -267,7 +269,7 @@ class StockUniverseService:
         self.provider = provider or FixtureListedUniverseProvider()
 
     def sync(self, actor_id: UUID, exchange: str | None = None) -> dict[str, object]:
-        actor = CreditRagIndexService(self.session)._user(actor_id)
+        actor = require_stock_actor(self.session, actor_id, write=True)
         rows = []
         if exchange in {None, "NSE"}:
             rows += self.provider.fetch_nse_universe()
@@ -408,7 +410,7 @@ class PeerDiscoveryService:
     def discover(
         self, document_id: UUID, actor_id: UUID, max_peers: int | None = None
     ) -> PeerGroup:
-        actor = CreditRagIndexService(self.session)._user(actor_id)
+        actor = require_stock_actor(self.session, actor_id, write=True)
         profile = self.session.scalar(
             select(CompanyProfile)
             .where(CompanyProfile.document_id == document_id)
@@ -634,6 +636,7 @@ class FixtureMarketDataProvider:
     def get_daily_bars(
         self, exchange: str, symbol: str, start_date: date, end_date: date
     ) -> list[DailyBar]:
+        reject_development_provider()
         if symbol == "FAIL":
             raise RuntimeError("fixture symbol failure")
         result = []
@@ -683,7 +686,7 @@ class MarketDataService:
         exchange: str | None = None,
         symbols: list[str] | None = None,
     ) -> MarketDataRun:
-        actor = CreditRagIndexService(self.session)._user(actor_id)
+        actor = require_stock_actor(self.session, actor_id, write=True)
         query = select(StockListing).where(
             StockListing.listing_status == "ACTIVE", StockListing.security_type == "EQUITY"
         )

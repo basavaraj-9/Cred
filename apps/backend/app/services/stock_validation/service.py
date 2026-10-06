@@ -36,7 +36,7 @@ from app.models.stock_validation import (
     StockIntelligenceValidationPeriod,
     StockIntelligenceValidationRun,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 from app.services.stock_intelligence.service import COMPONENT_NAMES, StockIntelligenceService
 from app.services.stock_validation.statistics import (
     mean,
@@ -306,7 +306,7 @@ class StockIntelligenceValidationService:
         actor_id: UUID,
         score_version: str = "stock_intelligence_score_v1",
     ) -> StockIntelligenceValidationRun:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         if start_date > end_date:
             raise AppError(
                 "STOCK_VALIDATION_DATE_RANGE_INVALID",
@@ -659,7 +659,7 @@ class StockIntelligenceValidationService:
     def run_ablation(
         self, validation_run_id: UUID, actor_id: UUID
     ) -> list[StockIntelligenceAblationRun]:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         validation = self._run(validation_run_id)
         history = self._history_for_run(validation, actor.id)
         grouped = self._group_dates(history)
@@ -763,7 +763,7 @@ class StockIntelligenceValidationService:
     def run_sensitivity(
         self, validation_run_id: UUID, actor_id: UUID
     ) -> list[StockIntelligenceSensitivityRun]:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         validation = self._run(validation_run_id)
         history = self._history_for_run(validation, actor.id)
         grouped = self._group_dates(history)

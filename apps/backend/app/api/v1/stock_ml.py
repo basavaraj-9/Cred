@@ -19,7 +19,7 @@ from app.models.stock_ml import (
     StockMLSplit,
     StockMLSplitRow,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 from app.services.stock_ml.service import (
     StockMlDatasetBuilder,
     StockModelTrainer,
@@ -130,7 +130,7 @@ def build_dataset(body: DatasetBuild, session: Session = Depends(get_db)) -> dic
 def get_dataset(
     dataset_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     dataset = session.get(StockMLDataset, dataset_id)
     if dataset is None:
         from app.core.exceptions import AppError
@@ -152,7 +152,7 @@ def build_splits(
 def get_splits(
     dataset_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     return [
         split_payload(session, split)
         for split in session.scalars(
@@ -180,7 +180,7 @@ def get_runs(
     status: str | None = None,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     query = select(StockMLRun)
     if dataset:
         query = query.where(StockMLRun.dataset_id == dataset)
@@ -208,7 +208,7 @@ def get_runs(
 def get_metrics(
     run_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     return [
         {
             "partition": metric.partition,
@@ -228,7 +228,7 @@ def get_metrics(
 def get_predictions(
     run_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     return [
         {
             "dataset_row_id": prediction.dataset_row_id,
@@ -246,7 +246,7 @@ def get_predictions(
 
 @router.get("/models")
 def get_models(actor_user_id: UUID, session: Session = Depends(get_db)) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     return [
         {
             "id": model.id,

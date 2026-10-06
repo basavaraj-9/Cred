@@ -28,7 +28,8 @@
 - Day 26 — **Complete:** leakage-safe historical score validation against Day 24 labels, cross-sectional rank and bucket diagnostics, component and redundancy analysis, guarded segments, named ablations, controlled weight sensitivity, temporal stability, APIs, audits, and UI.
 - Day 27 — **Complete:** versioned monitoring windows, data freshness, feature and prediction PSI, score and component drift, confidence and coverage, ranking stability, universe and mature-label monitoring, provider diagnostics, advisory governance, APIs, audits, and UI.
 - Day 28 — **Complete:** immutable 360° company report snapshots, JSON/PDF exports, source evidence, APIs, and workspace; 440 backend tests passed with one Tesseract-dependent skip, migration/schema checks and frontend production validation passed.
-- Day 29+ — **Planned:** production hardening and further governed integration stages.
+- Day 29 — **Complete, local validation:** authentication, authorization, company isolation, bounded jobs, health, secure artifacts, deployment foundation and runtime UI; 473 tests passed, one optional OCR skip. Docker/Redis deployment gates remain. See [validation report](day29-completion-report.md).
+- Day 30 — **Not started:** final integration and release-readiness stage.
 
 Each later increment should define its data contracts, failure behavior, and review requirements before implementation.
 

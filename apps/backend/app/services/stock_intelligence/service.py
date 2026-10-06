@@ -37,7 +37,7 @@ from app.models.stock_ml import (
     StockMLPrediction,
     StockMLRun,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 
 SCORE_VERSION = "stock_intelligence_score_v1"
 COMPONENT_NAMES = (
@@ -566,7 +566,7 @@ class StockIntelligenceService:
         return flags
 
     def build_score(self, listing_id: UUID, as_of: date, actor_id: UUID) -> StockIntelligenceRun:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         listing = self.s.get(StockListing, listing_id)
         if listing is None:
             raise AppError("STOCK_LISTING_NOT_FOUND", "Stock listing not found", 404)
@@ -760,7 +760,7 @@ class StockIntelligenceService:
     def build_ranking(
         self, as_of: date, actor_id: UUID, listing_ids: list[UUID] | None = None
     ) -> StockRankingRun:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         query = (
             select(StockListing)
             .join(ListedCompany)
@@ -883,7 +883,7 @@ class StockIntelligenceService:
         return run
 
     def build_watchlist(self, ranking_run_id: UUID, actor_id: UUID) -> list[StockRankingMember]:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         ranking = self.s.get(StockRankingRun, ranking_run_id)
         if ranking is None:
             raise AppError("STOCK_RANKING_NOT_FOUND", "Stock ranking not found", 404)

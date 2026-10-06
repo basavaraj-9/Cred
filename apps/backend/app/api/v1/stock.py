@@ -18,7 +18,7 @@ from app.models.stock import (
     StockListing,
     StockPrice,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 from app.services.stock.service import MarketDataService, PeerDiscoveryService, StockUniverseService
 
 router = APIRouter(tags=["stock intelligence foundation"])
@@ -139,7 +139,7 @@ def list_universe(
     status: str | None = None,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     query = select(ListedCompany, StockListing).join(StockListing)
     if exchange:
         query = query.where(StockListing.exchange == exchange)
@@ -179,7 +179,7 @@ def list_universe(
 def get_company(
     company_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     company = session.get(ListedCompany, company_id)
     if company is None:
         raise AppError("LISTED_COMPANY_NOT_FOUND", "Listed company not found", 404)
@@ -237,7 +237,7 @@ def discover(
 def get_peers(
     document_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     group = session.scalar(
         select(PeerGroup)
         .where(PeerGroup.document_id == document_id)
@@ -253,7 +253,7 @@ def get_peers(
 def get_peer_group(
     group_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     group = session.get(PeerGroup, group_id)
     if group is None:
         raise AppError("PEER_GROUP_NOT_FOUND", "Peer group not found", 404)
@@ -289,7 +289,7 @@ def prices(
     end_date: date | None = None,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     query = select(StockPrice).where(StockPrice.stock_listing_id == listing_id)
     if start_date:
         query = query.where(StockPrice.trade_date >= start_date)
@@ -317,7 +317,7 @@ def prices(
 def market_status(
     listing_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     listing = session.get(StockListing, listing_id)
     if listing is None:
         raise AppError("STOCK_LISTING_NOT_FOUND", "Stock listing not found", 404)

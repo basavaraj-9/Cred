@@ -1,5 +1,14 @@
 # Company Intelligence Platform
 
+## Day 29: production hardening (local validation complete)
+
+Authentication, company access, bounded background jobs, runtime health, secure artifact
+downloads and deployment configuration are implemented. Existing installations require
+explicit account provisioning and company grants. See the [runtime runbook](docs/day29-production-runtime.md)
+and [validation report](docs/day29-completion-report.md). Final backend regression: 473 passed,
+one optional OCR skip. Backend quality and frontend production checks passed. Docker/Redis deployment remains
+unverified locally; analytical services remain non-production. Day 30 has not started.
+
 ## Day 28: 360° Company Intelligence Report (complete)
 
 The `/company-intelligence` workspace assembles existing company, document, financial,
@@ -67,7 +76,7 @@ Day 21 foundation for a company intelligence and governed credit analysis platfo
 
 ## Requirements
 
-- Python 3.11+
+- Python 3.13 (tested runtime and container baseline)
 - Node.js 20+
 - PostgreSQL 15+ or Docker Compose
 

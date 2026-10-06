@@ -326,8 +326,8 @@ def status(request: Request) -> StatusResponse:
         ),
         components=components,
         development_stage={
-            "day": 28,
-            "name": "360° Company Intelligence Report",
+            "day": 29,
+            "name": "Production Hardening & Deployment Readiness",
         },
         core_models={
             "user": "ready",

@@ -342,3 +342,19 @@
 - Input hashes cover score, ranking, label, policy, date-range, and eligible-universe identities.
 - Day 23 features, Day 24 datasets and models, and existing Day 25 records remain immutable.
 - Results remain fixture research diagnostics and never claim production validation or predictive accuracy.
+
+## Day 29 operational controls
+
+Requests and jobs have independent deadlines. Shared production rate limits fail closed
+when Redis is unavailable. Transient job failures retry with bounded policy-driven backoff;
+permanent failures remain visible. Expired leases become timed out, and late results cannot
+replace terminal job state. Cancellation preserves already committed analytical history.
+
+Logs redact registered secrets and sensitive fields; public errors omit internal exception
+text. Artifact reads reject traversal and verify hashes. Cleanup only removes expired
+runtime temporary files, never report versions, source documents, models or audit history.
+
+Deployment readiness is separate from analytical readiness. Fixture providers remain
+blocked in controlled environments, and stock ML remains PIPELINE_VALIDATION_ONLY. Local
+smoke timing is a single observation, not a throughput or capacity certification. Docker,
+Redis deployment and backup/restore drills require validation in the target environment.

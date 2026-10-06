@@ -1,4 +1,5 @@
-import { API_BASE_URL, API_V1_PATH, BROWSER_API_BASE_URL } from "@/lib/config";
+import { apiFetch } from "@/lib/http";
+import { API_V1_PATH, BROWSER_API_BASE_URL } from "@/lib/config";
 import type { ClassificationEvidence, CompanyProfile, CreditAssessment, CreditEvidence, CreditFusionExperiment, CreditMLEvaluationSummary, CreditReason, DocumentMetadata, DomainClassification, FinancialAnalysisSummary, FinancialAnomaly, FinancialAnomalyDetail, FinancialExtractionSummary, FinancialLineItem, FinancialRatio, FinancialRatioDetail, FinancialStatement, FinancialTrend, FinancialTrendAnalysisSummary, FinancialTrendDetail, FinancialValidation, FiveCsAssessment, FiveCsEvidence, FiveCsReviewItem, HealthResponse, PageSummary, ParseSummary, ProfileEvidence, StatusResponse, UploadResult } from "@/types/api";
 import type { CommitteePackage, CreditDecisionSupport, CreditRecommendation, CreditReviewCase, FiveCsRefresh, GeneratedReport, ReportEvidenceLink, ReportSnapshot, ResearchCandidates, ResearchFinding, ResearchRun, ResearchSource } from "@/types/api";
 import type { AnalystAnswer, RagIndexStatus } from "@/types/api";
@@ -10,7 +11,7 @@ import type { StockComponentValidation, StockValidationAblation, StockValidation
 import type { StockComponentMonitoring, StockFeatureDrift, StockGovernanceAssessment, StockModelMonitoring, StockMonitoringFinding, StockMonitoringRun, StockProviderMonitoring, StockRankingMonitoring, StockScoreMonitoring } from "@/types/api";
 
 async function getJson<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${API_V1_PATH}${path}`, {
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}`, {
     cache: "no-store",
     signal: AbortSignal.timeout(5000),
   });
@@ -24,7 +25,7 @@ export const getCreditMLEvaluations = () =>
   getJson<CreditMLEvaluationSummary[]>("/ml/credit/evaluations");
 
 async function analystMutation<T>(path: string, body: Record<string, unknown>): Promise<T> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}`, {
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -36,7 +37,7 @@ async function analystMutation<T>(path: string, body: Record<string, unknown>): 
 
 async function monitoringGet<T>(path: string, actor: string): Promise<T> {
   const separator = path.includes("?") ? "&" : "?";
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}${separator}actor_user_id=${encodeURIComponent(actor)}`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}${separator}actor_user_id=${encodeURIComponent(actor)}`);
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `Monitoring lookup failed (${response.status})`);
   return payload as T;
@@ -57,7 +58,7 @@ export const buildRagIndex = (companyId: string, actorId: string) =>
   analystMutation<RagIndexStatus>(`/companies/${encodeURIComponent(companyId)}/rag/index`, { actor_user_id: actorId });
 
 export async function getRagIndex(companyId: string, actorId: string): Promise<RagIndexStatus> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/companies/${encodeURIComponent(companyId)}/rag/index?actor_user_id=${encodeURIComponent(actorId)}`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/companies/${encodeURIComponent(companyId)}/rag/index?actor_user_id=${encodeURIComponent(actorId)}`);
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `Index lookup failed (${response.status})`);
   return payload as RagIndexStatus;
@@ -73,23 +74,23 @@ export const syncStockUniverse = (actorId:string, exchange?:string) => analystMu
 export const discoverPeers = (documentId:string, actorId:string) => analystMutation<PeerGroup>(`/documents/${encodeURIComponent(documentId)}/peers/discover`, {actor_user_id:actorId});
 export const syncMarketData = (actorId:string,startDate:string,endDate:string,symbols?:string[]) => analystMutation<MarketDataRun>("/market-data/sync",{actor_user_id:actorId,start_date:startDate,end_date:endDate,symbols:symbols||null});
 export const syncFundamentals=(actorId:string,companyIds?:string[])=>analystMutation<Record<string,unknown>>("/stock-fundamentals/sync",{actor_user_id:actorId,listed_company_ids:companyIds||null});
-export async function getFundamentals(companyId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stocks/${companyId}/fundamentals?actor_user_id=${actorId}`);if(!r.ok)throw new Error("Fundamentals lookup failed");return await r.json() as Fundamental[]}
+export async function getFundamentals(companyId:string,actorId:string){const r=await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stocks/${companyId}/fundamentals?actor_user_id=${actorId}`);if(!r.ok)throw new Error("Fundamentals lookup failed");return await r.json() as Fundamental[]}
 export const buildValuation=(listingId:string,actorId:string,valuationDate:string)=>analystMutation<ValuationResult>(`/stocks/${listingId}/valuations/build`,{actor_user_id:actorId,valuation_date:valuationDate});
 export const buildFeatures=(listingId:string,actorId:string,asOfDate:string)=>analystMutation<FeatureResult>(`/stocks/${listingId}/features/build`,{actor_user_id:actorId,as_of_date:asOfDate});
 export const buildRelativeMetrics=(actorId:string,asOfDate:string)=>analystMutation<Record<string,unknown>>("/sector-metrics/build",{actor_user_id:actorId,as_of_date:asOfDate});
-export async function getRelativeMetrics(companyId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stocks/${encodeURIComponent(companyId)}/relative-metrics?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Relative metrics lookup failed");return await r.json() as RelativeMetric[]}
+export async function getRelativeMetrics(companyId:string,actorId:string){const r=await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stocks/${encodeURIComponent(companyId)}/relative-metrics?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Relative metrics lookup failed");return await r.json() as RelativeMetric[]}
 export const buildStockMLDataset=(actorId:string,startDate:string,endDate:string)=>analystMutation<StockMLDataset>("/stock-ml/datasets/build",{actor_user_id:actorId,start_date:startDate,end_date:endDate,label_horizon:"3M",feature_set_version:"stock_features_v1"});
 export const buildStockMLSplits=(datasetId:string,actorId:string)=>analystMutation<StockMLSplit[]>(`/stock-ml/datasets/${encodeURIComponent(datasetId)}/splits/build`,{actor_user_id:actorId});
 export const trainStockMLModels=(splitId:string,actorId:string)=>analystMutation<{run_ids:string[];run_count:number}>(`/stock-ml/splits/${encodeURIComponent(splitId)}/train`,{actor_user_id:actorId,models:["logistic_regression","random_forest","xgboost"]});
-export async function getStockMLRuns(datasetId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/runs?actor_user_id=${encodeURIComponent(actorId)}&dataset=${encodeURIComponent(datasetId)}`);if(!r.ok)throw new Error("Stock ML runs lookup failed");return await r.json() as StockMLRun[]}
-export async function getStockMLMetrics(runId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/runs/${encodeURIComponent(runId)}/metrics?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock ML metrics lookup failed");return await r.json() as StockMLMetric[]}
-export async function getStockMLModels(actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/models?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock ML model registry lookup failed");return await r.json() as StockMLModel[]}
+export async function getStockMLRuns(datasetId:string,actorId:string){const r=await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/runs?actor_user_id=${encodeURIComponent(actorId)}&dataset=${encodeURIComponent(datasetId)}`);if(!r.ok)throw new Error("Stock ML runs lookup failed");return await r.json() as StockMLRun[]}
+export async function getStockMLMetrics(runId:string,actorId:string){const r=await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/runs/${encodeURIComponent(runId)}/metrics?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock ML metrics lookup failed");return await r.json() as StockMLMetric[]}
+export async function getStockMLModels(actorId:string){const r=await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-ml/models?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock ML model registry lookup failed");return await r.json() as StockMLModel[]}
 export const buildStockIntelligenceScore=(listingId:string,actorId:string,asOfDate:string)=>analystMutation<StockIntelligenceScore>("/stock-intelligence/scores/build",{stock_listing_id:listingId,actor_user_id:actorId,as_of_date:asOfDate});
-export async function getStockIntelligenceComponents(runId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-intelligence/scores/${encodeURIComponent(runId)}/components?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Score component lookup failed");return await r.json() as StockIntelligenceComponent[]}
-export async function getStockIntelligenceExplanation(runId:string,actorId:string){const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-intelligence/scores/${encodeURIComponent(runId)}/explanation?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Score explanation lookup failed");return await r.json() as StockIntelligenceExplanation}
+export async function getStockIntelligenceComponents(runId:string,actorId:string){const r=await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-intelligence/scores/${encodeURIComponent(runId)}/components?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Score component lookup failed");return await r.json() as StockIntelligenceComponent[]}
+export async function getStockIntelligenceExplanation(runId:string,actorId:string){const r=await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/stock-intelligence/scores/${encodeURIComponent(runId)}/explanation?actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Score explanation lookup failed");return await r.json() as StockIntelligenceExplanation}
 export const buildStockRanking=(actorId:string,asOfDate:string)=>analystMutation<StockRanking>("/stock-intelligence/rankings/build",{actor_user_id:actorId,as_of_date:asOfDate});
 export const buildStockValidation=(actorId:string,startDate:string,endDate:string)=>analystMutation<StockValidationRun>("/stock-validation/runs/build",{actor_user_id:actorId,start_date:startDate,end_date:endDate,score_version:"stock_intelligence_score_v1"});
-async function getStockValidationJson<T>(path:string,actorId:string):Promise<T>{const separator=path.includes("?")?"&":"?";const r=await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}${separator}actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock validation lookup failed");return await r.json() as T}
+async function getStockValidationJson<T>(path:string,actorId:string):Promise<T>{const separator=path.includes("?")?"&":"?";const r=await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}${separator}actor_user_id=${encodeURIComponent(actorId)}`);if(!r.ok)throw new Error("Stock validation lookup failed");return await r.json() as T}
 export const getStockValidationPeriods=(runId:string,actorId:string)=>getStockValidationJson<StockValidationPeriod[]>(`/stock-validation/runs/${encodeURIComponent(runId)}/periods`,actorId);
 export const getStockValidationComponents=(runId:string,actorId:string)=>getStockValidationJson<StockComponentValidation[]>(`/stock-validation/runs/${encodeURIComponent(runId)}/components`,actorId);
 export const getStockValidationSegments=(runId:string,actorId:string)=>getStockValidationJson<StockValidationSegment[]>(`/stock-validation/runs/${encodeURIComponent(runId)}/segments`,actorId);
@@ -101,7 +102,7 @@ export async function createCreditFusionExperiment(
   featureSnapshotId: string,
   strategy: string,
 ): Promise<CreditFusionExperiment> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-fusion/experiments`, {
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-fusion/experiments`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ credit_assessment_id: creditAssessmentId, feature_snapshot_id: featureSnapshotId, strategy }),
@@ -113,26 +114,26 @@ export async function createCreditFusionExperiment(
 
 export async function analyzeFiveCs(documentId: string, scope: string): Promise<FiveCsAssessment> {
   const query = scope ? `?scope=${encodeURIComponent(scope)}` : "";
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/five-cs/analyze${query}`, { method: "POST" });
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/five-cs/analyze${query}`, { method: "POST" });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `5 Cs analysis failed (${response.status})`);
   return (Array.isArray(payload) ? payload[0] : payload) as FiveCsAssessment;
 }
 
 export async function getFiveCsEvidence(assessmentId: string): Promise<FiveCsEvidence[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/five-cs/${encodeURIComponent(assessmentId)}/evidence`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/five-cs/${encodeURIComponent(assessmentId)}/evidence`);
   if (!response.ok) throw new Error(`5 Cs evidence lookup failed (${response.status})`);
   return (await response.json()) as FiveCsEvidence[];
 }
 
 export async function getFiveCsReviewItems(assessmentId: string): Promise<FiveCsReviewItem[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/five-cs/${encodeURIComponent(assessmentId)}/review-items`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/five-cs/${encodeURIComponent(assessmentId)}/review-items`);
   if (!response.ok) throw new Error(`5 Cs review lookup failed (${response.status})`);
   return (await response.json()) as FiveCsReviewItem[];
 }
 
 export async function refreshFiveCs(assessmentId: string, researchRunId: string): Promise<FiveCsRefresh> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/five-cs/${encodeURIComponent(assessmentId)}/refresh-with-research`, {
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/five-cs/${encodeURIComponent(assessmentId)}/refresh-with-research`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ research_run_id: researchRunId }),
   });
   const payload = await response.json();
@@ -141,7 +142,7 @@ export async function refreshFiveCs(assessmentId: string, researchRunId: string)
 }
 
 export async function prepareCreditRecommendation(documentId: string, scope: string, fiveCsAssessmentId?: string, researchRunId?: string, fusionExperimentId?: string): Promise<CreditRecommendation> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/credit-recommendation/prepare`, {
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/credit-recommendation/prepare`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ scope, five_cs_assessment_id: fiveCsAssessmentId || null, research_run_id: researchRunId || null, fusion_experiment_id: fusionExperimentId || null }),
   });
   const payload = await response.json();
@@ -150,7 +151,7 @@ export async function prepareCreditRecommendation(documentId: string, scope: str
 }
 
 export async function prepareCreditDecision(documentId: string, scope: string, recommendationPreparationId?: string): Promise<CreditDecisionSupport> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/credit-decision/prepare`, {
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/credit-decision/prepare`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ scope, recommendation_preparation_id: recommendationPreparationId || null }),
   });
   const payload = await response.json();
@@ -159,18 +160,18 @@ export async function prepareCreditDecision(documentId: string, scope: string, r
 }
 
 async function reviewMutation<T>(path: string, body: Record<string, unknown>): Promise<T> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}${path}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `Review action failed (${response.status})`);
   return payload as T;
 }
 export const listCreditReviewCases = async () => {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-review-cases`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-review-cases`);
   if (!response.ok) throw new Error(`Review case lookup failed (${response.status})`);
   return (await response.json()) as CreditReviewCase[];
 };
 export const getCreditReviewCase = async (id: string) => {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-review-cases/${encodeURIComponent(id)}`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-review-cases/${encodeURIComponent(id)}`);
   if (!response.ok) throw new Error(`Review case lookup failed (${response.status})`);
   return (await response.json()) as CreditReviewCase;
 };
@@ -180,31 +181,31 @@ export const startCreditReview = (caseId: string, actorId: string) => reviewMuta
 export const recordHumanDecision = (caseId: string, body: Record<string, unknown>) => reviewMutation<Record<string, unknown>>(`/credit-review-cases/${encodeURIComponent(caseId)}/decision`, body);
 export const createCommitteePackage = (caseId: string, actorId: string) => reviewMutation<CommitteePackage>(`/credit-review-cases/${encodeURIComponent(caseId)}/committee-package`, { actor_user_id: actorId });
 export const listCommitteePackages = async (caseId: string) => {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-review-cases/${encodeURIComponent(caseId)}/committee-packages`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-review-cases/${encodeURIComponent(caseId)}/committee-packages`);
   if (!response.ok) throw new Error(`Committee package lookup failed (${response.status})`);
   return (await response.json()) as CommitteePackage[];
 };
 export const generateCreditReport = (caseId: string, body: Record<string, unknown>) => reviewMutation<GeneratedReport>(`/credit-review-cases/${encodeURIComponent(caseId)}/reports`, body);
 export const listCreditReports = async (caseId: string) => {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-review-cases/${encodeURIComponent(caseId)}/reports`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-review-cases/${encodeURIComponent(caseId)}/reports`);
   if (!response.ok) throw new Error(`Credit report lookup failed (${response.status})`);
   return (await response.json()) as GeneratedReport[];
 };
 export const finalizeCreditReport = (reportId: string, actorId: string, rationale: string) => reviewMutation<GeneratedReport>(`/reports/${encodeURIComponent(reportId)}/finalize`, { actor_user_id: actorId, rationale });
 export const getCreditReportSnapshot = async (reportId: string, actorId: string) => {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/reports/${encodeURIComponent(reportId)}/snapshot?actor_user_id=${encodeURIComponent(actorId)}`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/reports/${encodeURIComponent(reportId)}/snapshot?actor_user_id=${encodeURIComponent(actorId)}`);
   if (!response.ok) throw new Error(`Report preview failed (${response.status})`);
   return (await response.json()) as ReportSnapshot;
 };
 export const getCreditReportEvidence = async (reportId: string, actorId: string) => {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/reports/${encodeURIComponent(reportId)}/evidence?actor_user_id=${encodeURIComponent(actorId)}`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/reports/${encodeURIComponent(reportId)}/evidence?actor_user_id=${encodeURIComponent(actorId)}`);
   if (!response.ok) throw new Error(`Report evidence lookup failed (${response.status})`);
   return (await response.json()) as ReportEvidenceLink[];
 };
 export const creditReportDownloadUrl = (reportId: string, actorId: string) => `${BROWSER_API_BASE_URL}${API_V1_PATH}/reports/${encodeURIComponent(reportId)}/download?actor_user_id=${encodeURIComponent(actorId)}`;
 
 export async function startCompanyResearch(companyId: string, scopes: string[], refresh: boolean): Promise<ResearchRun> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/companies/${encodeURIComponent(companyId)}/research`, {
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/companies/${encodeURIComponent(companyId)}/research`, {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ scopes, refresh }),
   });
   const payload = await response.json();
@@ -213,19 +214,19 @@ export async function startCompanyResearch(companyId: string, scopes: string[], 
 }
 
 export async function getResearchSources(runId: string): Promise<ResearchSource[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/research-runs/${encodeURIComponent(runId)}/sources`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/research-runs/${encodeURIComponent(runId)}/sources`);
   if (!response.ok) throw new Error(`Research sources lookup failed (${response.status})`);
   return (await response.json()) as ResearchSource[];
 }
 
 export async function getResearchFindings(runId: string): Promise<ResearchFinding[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/research-runs/${encodeURIComponent(runId)}/findings`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/research-runs/${encodeURIComponent(runId)}/findings`);
   if (!response.ok) throw new Error(`Research findings lookup failed (${response.status})`);
   return (await response.json()) as ResearchFinding[];
 }
 
 export async function getResearchCandidates(runId: string): Promise<ResearchCandidates> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/research-runs/${encodeURIComponent(runId)}/five-cs-candidates`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/research-runs/${encodeURIComponent(runId)}/five-cs-candidates`);
   if (!response.ok) throw new Error(`5 Cs candidate lookup failed (${response.status})`);
   return (await response.json()) as ResearchCandidates;
 }
@@ -239,7 +240,7 @@ export async function uploadDocument(
   body.append("company_legal_name", companyLegalName);
   if (displayName.trim()) body.append("display_name", displayName.trim());
   body.append("file", file);
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/upload`, {
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/upload`, {
     method: "POST",
     body,
   });
@@ -251,19 +252,19 @@ export async function uploadDocument(
 }
 
 export async function getDocument(documentId: string): Promise<DocumentMetadata> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}`);
   if (!response.ok) throw new Error(`Document lookup failed (${response.status})`);
   return (await response.json()) as DocumentMetadata;
 }
 
 export async function getAnalysisDocuments(analysisId: string): Promise<DocumentMetadata[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/analysis/${encodeURIComponent(analysisId)}/documents`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/analysis/${encodeURIComponent(analysisId)}/documents`);
   if (!response.ok) throw new Error(`Document list failed (${response.status})`);
   return (await response.json()) as DocumentMetadata[];
 }
 
 export async function parseDocument(documentId: string): Promise<ParseSummary> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/parse`, {
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/parse`, {
     method: "POST",
   });
   const payload = await response.json();
@@ -272,140 +273,140 @@ export async function parseDocument(documentId: string): Promise<ParseSummary> {
 }
 
 export async function getDocumentPages(documentId: string): Promise<PageSummary[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/pages`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/pages`);
   if (!response.ok) throw new Error(`Page lookup failed (${response.status})`);
   return (await response.json()) as PageSummary[];
 }
 
 export async function extractCompanyProfile(documentId: string): Promise<CompanyProfile> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/company-profile/extract`, { method: "POST" });
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/company-profile/extract`, { method: "POST" });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `Profile extraction failed (${response.status})`);
   return payload as CompanyProfile;
 }
 
 export async function getCompanyProfile(documentId: string): Promise<CompanyProfile> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/company-profile`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/company-profile`);
   if (!response.ok) throw new Error(`Profile lookup failed (${response.status})`);
   return (await response.json()) as CompanyProfile;
 }
 
 export async function getProfileEvidence(profileId: string): Promise<ProfileEvidence[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/company-profiles/${encodeURIComponent(profileId)}/evidence`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/company-profiles/${encodeURIComponent(profileId)}/evidence`);
   if (!response.ok) throw new Error(`Evidence lookup failed (${response.status})`);
   return (await response.json()) as ProfileEvidence[];
 }
 
 export async function classifyDomain(profileId: string): Promise<DomainClassification> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/company-profiles/${encodeURIComponent(profileId)}/domain-classification`, { method: "POST" });
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/company-profiles/${encodeURIComponent(profileId)}/domain-classification`, { method: "POST" });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `Domain classification failed (${response.status})`);
   return payload as DomainClassification;
 }
 
 export async function getDomainClassification(profileId: string): Promise<DomainClassification> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/company-profiles/${encodeURIComponent(profileId)}/domain-classification`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/company-profiles/${encodeURIComponent(profileId)}/domain-classification`);
   if (!response.ok) throw new Error(`Domain classification lookup failed (${response.status})`);
   return (await response.json()) as DomainClassification;
 }
 
 export async function getDomainClassificationEvidence(classificationId: string): Promise<ClassificationEvidence[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/domain-classifications/${encodeURIComponent(classificationId)}/evidence`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/domain-classifications/${encodeURIComponent(classificationId)}/evidence`);
   if (!response.ok) throw new Error(`Classification evidence lookup failed (${response.status})`);
   return (await response.json()) as ClassificationEvidence[];
 }
 
 export async function extractFinancialStatements(documentId: string): Promise<FinancialExtractionSummary> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-statements/extract`, { method: "POST" });
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-statements/extract`, { method: "POST" });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `Financial extraction failed (${response.status})`);
   return payload as FinancialExtractionSummary;
 }
 
 export async function getFinancialStatements(documentId: string): Promise<FinancialStatement[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-statements`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-statements`);
   if (!response.ok) throw new Error(`Financial statements lookup failed (${response.status})`);
   return (await response.json()) as FinancialStatement[];
 }
 
 export async function getFinancialLineItems(statementId: string): Promise<FinancialLineItem[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/financial-statements/${encodeURIComponent(statementId)}/line-items`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/financial-statements/${encodeURIComponent(statementId)}/line-items`);
   if (!response.ok) throw new Error(`Financial line items lookup failed (${response.status})`);
   return (await response.json()) as FinancialLineItem[];
 }
 
 export async function runFinancialAnalysis(documentId: string): Promise<FinancialAnalysisSummary> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-analysis`, { method: "POST" });
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-analysis`, { method: "POST" });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `Financial analysis failed (${response.status})`);
   return payload as FinancialAnalysisSummary;
 }
 
 export async function getFinancialValidation(documentId: string): Promise<FinancialValidation> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-validation`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-validation`);
   if (!response.ok) throw new Error(`Financial validation lookup failed (${response.status})`);
   return (await response.json()) as FinancialValidation;
 }
 
 export async function getFinancialRatios(documentId: string): Promise<FinancialRatio[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-ratios`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-ratios`);
   if (!response.ok) throw new Error(`Financial ratio lookup failed (${response.status})`);
   return (await response.json()) as FinancialRatio[];
 }
 
 export async function getFinancialRatio(ratioId: string): Promise<FinancialRatioDetail> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/financial-ratios/${encodeURIComponent(ratioId)}`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/financial-ratios/${encodeURIComponent(ratioId)}`);
   if (!response.ok) throw new Error(`Financial ratio evidence lookup failed (${response.status})`);
   return (await response.json()) as FinancialRatioDetail;
 }
 
 export async function runFinancialTrendAnalysis(documentId: string): Promise<FinancialTrendAnalysisSummary> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-trends/analyze`, { method: "POST" });
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-trends/analyze`, { method: "POST" });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `Trend analysis failed (${response.status})`);
   return payload as FinancialTrendAnalysisSummary;
 }
 
 export async function getFinancialTrends(documentId: string): Promise<FinancialTrend[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-trends`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-trends`);
   if (!response.ok) throw new Error(`Financial trend lookup failed (${response.status})`);
   return (await response.json()) as FinancialTrend[];
 }
 
 export async function getFinancialTrend(trendId: string): Promise<FinancialTrendDetail> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/financial-trends/${encodeURIComponent(trendId)}`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/financial-trends/${encodeURIComponent(trendId)}`);
   if (!response.ok) throw new Error(`Financial trend evidence lookup failed (${response.status})`);
   return (await response.json()) as FinancialTrendDetail;
 }
 
 export async function getFinancialAnomalies(documentId: string): Promise<FinancialAnomaly[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-anomalies`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/financial-anomalies`);
   if (!response.ok) throw new Error(`Financial anomaly lookup failed (${response.status})`);
   return (await response.json()) as FinancialAnomaly[];
 }
 
 export async function getFinancialAnomaly(anomalyId: string): Promise<FinancialAnomalyDetail> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/financial-anomalies/${encodeURIComponent(anomalyId)}`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/financial-anomalies/${encodeURIComponent(anomalyId)}`);
   if (!response.ok) throw new Error(`Financial anomaly evidence lookup failed (${response.status})`);
   return (await response.json()) as FinancialAnomalyDetail;
 }
 
 export async function runCreditAnalysis(documentId: string): Promise<CreditAssessment[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/credit-risk/analyze`, { method: "POST" });
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/documents/${encodeURIComponent(documentId)}/credit-risk/analyze`, { method: "POST" });
   const payload = await response.json();
   if (!response.ok) throw new Error(payload?.error?.message ?? `Credit analysis failed (${response.status})`);
   return (Array.isArray(payload) ? payload : [payload]) as CreditAssessment[];
 }
 
 export async function getCreditReasons(assessmentId: string): Promise<CreditReason[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-assessments/${encodeURIComponent(assessmentId)}/reasons`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-assessments/${encodeURIComponent(assessmentId)}/reasons`);
   if (!response.ok) throw new Error(`Credit reasons lookup failed (${response.status})`);
   const groups = (await response.json()) as Record<string, CreditReason[]>;
   return ["positive", "negative", "review", "neutral"].flatMap((name) => groups[name] ?? []);
 }
 
 export async function getCreditEvidence(assessmentId: string): Promise<CreditEvidence[]> {
-  const response = await fetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-assessments/${encodeURIComponent(assessmentId)}/evidence`);
+  const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/credit-assessments/${encodeURIComponent(assessmentId)}/evidence`);
   if (!response.ok) throw new Error(`Credit evidence lookup failed (${response.status})`);
   return (await response.json()) as CreditEvidence[];
 }

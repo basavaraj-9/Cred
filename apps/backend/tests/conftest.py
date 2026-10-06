@@ -13,6 +13,35 @@ from app.core.config import Settings, get_settings
 from app.main import create_app
 
 
+@pytest.fixture(autouse=True)
+def legacy_auth_override(request, monkeypatch):
+    """Legacy service tests bypass only the HTTP auth dependency, explicitly in tests.
+
+    Day 29 security tests exercise the real boundary with the strict_auth marker.
+    There is no application configuration switch for bypassing authentication.
+    """
+    if request.node.get_closest_marker("strict_auth"):
+        return
+    from uuid import UUID
+
+    from fastapi import Request
+
+    import app.main as main_module
+    from app.runtime.security import Principal, authorize_request, install_security
+
+    async def test_principal(http_request: Request) -> Principal:
+        principal = Principal(UUID(int=1), "ADMIN", frozenset())
+        http_request.state.principal = principal
+        return principal
+
+    def install_for_test(app):
+        install_security(app)
+        if app.state.settings.app_env == "test":
+            app.dependency_overrides[authorize_request] = test_principal
+
+    monkeypatch.setattr(main_module, "install_security", install_for_test)
+
+
 @pytest.fixture
 def client() -> TestClient:
     with TestClient(

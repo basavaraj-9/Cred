@@ -1,0 +1,86 @@
+# Provide secrets through the deployment secret manager/environment; never commit real values.
+x-runtime: &runtime
+  APP_ENV: production
+  DEBUG: "false"
+  HTTPS_DEPLOYMENT: "true"
+  DATABASE_URL: ${DATABASE_URL:?Database connection required}
+  REDIS_URL: ${REDIS_URL:?Authenticated Redis connection required}
+  AUTH_SIGNING_KEY: ${AUTH_SIGNING_KEY:?Signing key required}
+  ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:?Explicit HTTPS frontend origins required}
+  TRUSTED_HOSTS: ${TRUSTED_HOSTS:?Explicit API hosts required}
+  LOCAL_STORAGE_PATH: /app/storage
+  QUEUE_BACKEND: redis_rq
+  RATE_LIMIT_BACKEND: redis
+  OCR_ENABLED: "false"
+  STOCK_ML_RESEARCH_ENABLED: "false"
+  EXTERNAL_RESEARCH_ENABLED: "false"
+
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: company_intelligence
+      POSTGRES_USER: company_intelligence
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Database password required}
+    volumes: ["postgres_data:/var/lib/postgresql"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U company_intelligence -d company_intelligence"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  redis:
+    image: redis:7.4-alpine
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Redis password required}
+    command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
+    volumes: ["redis_data:/data"]
+    restart: unless-stopped
+  migrate:
+    build: ./apps/backend
+    environment: *runtime
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+    depends_on:
+      postgres: {condition: service_healthy}
+  backend:
+    build: ./apps/backend
+    mem_limit: 1g
+    environment: *runtime
+    volumes: ["artifacts:/app/storage"]
+    ports: ["127.0.0.1:8000:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+  dispatcher:
+    build: ./apps/backend
+    mem_limit: 256m
+    environment: *runtime
+    command: ["python", "-m", "app.runtime.dispatch"]
+    volumes: ["artifacts:/app/storage"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    restart: unless-stopped
+  worker:
+    build: ./apps/backend
+    mem_limit: 2g
+    environment: *runtime
+    command: ["python", "-m", "app.runtime.rq_worker"]
+    volumes: ["artifacts:/app/storage"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+  frontend:
+    mem_limit: 512m
+    build:
+      context: ./apps/frontend
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:?Public HTTPS API origin required}
+    ports: ["127.0.0.1:3000:3000"]
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  artifacts:

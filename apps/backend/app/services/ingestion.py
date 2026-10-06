@@ -16,6 +16,7 @@ from app.database.repositories.document import register_document_metadata
 from app.models.company import Company
 from app.models.document import Document
 from app.models.enums import DocumentStatus
+from app.models.runtime import CompanyAccess
 from app.schemas.document import UploadDocumentResult, UploadResult
 from app.services.storage.base import StorageBackend
 
@@ -90,9 +91,19 @@ def upload_document(
                 .where(func.lower(Company.legal_name) == legal_name.lower())
                 .order_by(Company.created_at, Company.id)
                 .limit(1)
+                .execution_options(runtime_identity_lookup=True)
             )
             if company is None:
                 company = create_company(session, legal_name, display_name=display_name)
+                if "company_scope" in session.info:
+                    session.add(
+                        CompanyAccess(user_id=session.info["user_scope"], company_id=company.id)
+                    )
+                    session.info["company_scope"].append(company.id)
+            elif (
+                "company_scope" in session.info and company.id not in session.info["company_scope"]
+            ):
+                raise AppError("AUTHORIZATION_DENIED", "Access denied", 403)
             existing = session.scalar(
                 select(Document)
                 .where(

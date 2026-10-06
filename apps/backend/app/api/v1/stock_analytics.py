@@ -19,7 +19,7 @@ from app.models.stock_analytics import (
     StockValuation,
     StockValuationRun,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 from app.services.stock_analytics.service import (
     FeatureService,
     FundamentalService,
@@ -71,7 +71,7 @@ def fundamentals(
     metric: str | None = None,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     q = (
         select(StockFundamental, StockFundamentalRun)
         .join(StockFundamentalRun)
@@ -147,7 +147,7 @@ def valuation_payload(session: Session, run: StockValuationRun) -> dict[str, obj
 def valuations(
     listing_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     return [
         valuation_payload(session, x)
         for x in session.scalars(
@@ -174,7 +174,7 @@ def build_relative(body: DateAction, session: Session = Depends(get_db)) -> dict
 def relative(
     company_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     q = (
         select(SectorMetric, SectorMetricRun)
         .join(SectorMetricRun)
@@ -243,7 +243,7 @@ def features(
     feature_group: str | None = None,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     q = select(StockFeatureRun).where(StockFeatureRun.stock_listing_id == listing_id)
     if as_of_date:
         q = q.where(StockFeatureRun.as_of_date == as_of_date)

@@ -1,10 +1,11 @@
 "use client";
+import { useRuntimeActor } from "@/lib/use-runtime-actor";
 import { FormEvent, useEffect, useState } from "react";
 import { assignCreditReviewCase, createCreditReviewCase, listCreditReviewCases, recordHumanDecision, startCreditReview } from "@/lib/api";
 import type { CreditReviewCase } from "@/types/api";
 
 export function CreditReviewDashboard() {
-  const [cases, setCases] = useState<CreditReviewCase[]>([]); const [decisionId, setDecisionId] = useState(""); const [actorId, setActorId] = useState(""); const [reviewerId, setReviewerId] = useState(""); const [rationale, setRationale] = useState(""); const [error, setError] = useState("");
+  const [cases, setCases] = useState<CreditReviewCase[]>([]); const [decisionId, setDecisionId] = useState(""); const [actorId, setActorId] = useRuntimeActor(); const [reviewerId, setReviewerId] = useState(""); const [rationale, setRationale] = useState(""); const [error, setError] = useState("");
   const refresh = () => listCreditReviewCases().then(setCases).catch((e: Error) => setError(e.message));
   useEffect(() => { void refresh(); }, []);
   async function create(event: FormEvent) { event.preventDefault(); try { await createCreditReviewCase(decisionId, actorId); await refresh(); } catch (e) { setError(e instanceof Error ? e.message : "Review action failed"); } }

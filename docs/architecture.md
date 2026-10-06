@@ -360,3 +360,19 @@ Historical Data + Features + Predictions + Scores + Rankings + Validation
 ```
 
 Monitoring uses immutable upstream records eligible inside two ordered, nonoverlapping windows. A content hash covers the windows, upstream identifiers, universe hashes, and policy documents. Repeated inputs reuse the completed run. Findings, metric detail, provider health, and governance assessment are persisted separately under migration `0026_stock_monitoring_governance`.
+
+## Day 29 runtime boundary
+
+Every protected API resolves a signed token to a current account, policy permissions and
+company grants. Database request sessions apply company/owner scope; source references are
+checked before service execution. Stock actor checks are independent of credit RAG roles.
+Existing credit human-authority checks remain additional controls.
+
+The SQL job ledger records idempotent submissions, attempts, deadlines and terminal states.
+A database worker or Redis delivery dispatcher invokes the same bounded process supervisor.
+Workers recheck authorization and call existing analytical services. Fenced completion
+prevents late workers from replacing cancelled/timed-out job outcomes. Service artifacts
+remain immutable, including artifacts committed just before cancellation.
+
+See [runtime configuration and deployment](day29-production-runtime.md) and
+[verification and limitations](day29-completion-report.md).

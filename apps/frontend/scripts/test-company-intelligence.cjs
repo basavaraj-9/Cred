@@ -18,6 +18,8 @@ loaded.paths = Module._nodeModulePaths(path.dirname(source));
 const originalRequire = loaded.require.bind(loaded);
 loaded.require = name => name === '@/lib/config'
   ? { BROWSER_API_BASE_URL: 'http://localhost:8000', API_V1_PATH: '/api/v1' }
+  : name === "@/lib/http" ? { apiFetch: () => { throw new Error("Unexpected network call"); } }
+  : name === "@/lib/use-runtime-actor" ? { useRuntimeActor: () => ["", () => {}] }
   : originalRequire(name);
 loaded._compile(compiled, source);
 const { CompanyIntelligenceReports } = loaded.exports;

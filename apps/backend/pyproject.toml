@@ -1,5 +1,6 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = ["strict_auth: exercise real authentication and authorization dependencies"]
 
 [tool.ruff]
 target-version = "py311"

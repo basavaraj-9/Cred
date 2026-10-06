@@ -106,6 +106,7 @@ from app.models.review import (
     CreditReviewComment,
     CreditReviewEvidenceAcknowledgement,
 )
+from app.models.runtime import BackgroundJob, CompanyAccess, JobAttempt
 from app.models.stock import (
     ListedCompany,
     MarketDataError,
@@ -171,6 +172,9 @@ from app.models.stock_validation import (
 from app.models.user import User
 
 __all__ = [
+    "BackgroundJob",
+    "CompanyAccess",
+    "JobAttempt",
     "AnalysisJob",
     "AuditLog",
     "Company",

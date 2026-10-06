@@ -1,0 +1,15 @@
+{
+  "database": "company_intelligence_day29_9ad2fdd1_test",
+  "checks": {
+    "clean_database_to_head": true,
+    "day29_downgrade_reapply": true,
+    "schema_drift": "none",
+    "base_to_head_roundtrip": true,
+    "live_latency_ms": 21.84,
+    "enqueue_latency_ms": 184.56,
+    "authenticated_queue_and_real_worker": true,
+    "authenticated_pdf_download": true,
+    "readiness": true,
+    "production_missing_redis_fails_closed": true
+  }
+}

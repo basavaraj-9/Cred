@@ -3,6 +3,7 @@ from __future__ import annotations
 # ruff: noqa: E501
 from datetime import UTC, datetime, timedelta
 
+from app.runtime.provider_safety import reject_development_provider
 from app.services.external_research.providers.base import ResearchProvider
 from app.services.external_research.schemas import ProviderResult, QueryDraft
 
@@ -12,6 +13,7 @@ class FixtureResearchProvider(ResearchProvider):
     version = "fixture_research_provider_v1"
 
     def search(self, query: QueryDraft, legal_name: str) -> list[ProviderResult]:
+        reject_development_provider()
         today = datetime.now(UTC).date()
         recent = today - timedelta(days=45)
         events: dict[str, list[ProviderResult]] = {

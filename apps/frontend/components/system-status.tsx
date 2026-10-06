@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import { getHealth, getStatus } from "@/lib/api";
 import type { HealthResponse, StatusResponse } from "@/types/api";
 
@@ -9,10 +11,10 @@ async function loadSystemStatus(): Promise<[HealthResponse, StatusResponse] | nu
   }
 }
 
-export async function SystemStatus() {
-  const result = await loadSystemStatus();
+export function SystemStatus() {
+  const [result, setResult] = useState<[HealthResponse, StatusResponse] | null>(null);
   if (!result) {
-    return <section role="status"><p className="badge unavailable">API unavailable</p><p>Start the backend and refresh this page.</p></section>;
+    return <section role="status"><p className="badge unavailable">API unavailable</p><p>Sign in and load platform status.</p><button onClick={() => void loadSystemStatus().then(setResult)}>Load status</button></section>;
   }
   const [health, status] = result;
   const labels: Record<string, string> = {

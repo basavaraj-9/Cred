@@ -387,7 +387,7 @@ def test_health_and_status_report_ocr_truthfully(parse_context: ParseContext) ->
     assert status["components"]["page_level_extraction"] == "ready"
     assert status["components"]["ocr_fallback"] == "unavailable"
     assert status["components"]["document_intelligence"] == "foundation_ready"
-    assert status["development_stage"]["day"] == 28
+    assert status["development_stage"]["day"] == 29
 
 
 def test_real_ocr_if_tesseract_is_installed(parse_context: ParseContext) -> None:

@@ -334,3 +334,18 @@ Historical Day 24 Row → Exact As-Of Day 25 Score and Ranking
 ```
 
 Only `LABELED` rows with an eligible score enter forward-performance diagnostics. `CENSORED` rows remain counted for transparency. Every cross-section uses one historical date; the underlying score retains its original availability-date and price-date gates. Quintiles require ten eligible companies and otherwise fall back to terciles only when that smaller grouping remains valid.
+
+## Day 29 authenticated and asynchronous flow
+
+1. Login verifies an Argon2 password and returns a short-lived signed token.
+2. Each protected request checks current account state, token version, role, company grants,
+   referenced records and request bounds. The browser keeps the token only in memory.
+3. Long-running submissions validate a typed payload and persist an idempotent SQL job.
+4. A worker claims a lease, rechecks authorization and executes an existing service in a
+   bounded child process. Attempts, retries and outcomes retain their audit history.
+5. Users poll authorized job records and download artifacts through authenticated endpoints
+   that validate path containment and stored hashes. Sign-out unmounts private workspaces.
+6. Public health returns minimal status; administrators receive dependency and queue detail.
+
+Redis failure in controlled environments fails protected requests closed and retains queued
+SQL work for later dispatch. No development provider is substituted in production.

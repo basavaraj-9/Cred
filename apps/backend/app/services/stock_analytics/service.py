@@ -36,7 +36,8 @@ from app.models.stock_analytics import (
     StockValuationInput,
     StockValuationRun,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.runtime.provider_safety import reject_development_provider
+from app.services.stock.authorization import require_stock_actor
 
 NORMALIZER = "stock_fundamental_normalizer_v1"
 VAL_ENGINE = "stock_valuation_engine_v1"
@@ -79,6 +80,7 @@ class FixtureFundamentalsProvider:
     provider_version = PROVIDER_VERSION
 
     def get_company_fundamentals(self, company):
+        reject_development_provider()
         seed = int(hashlib.sha256(company.canonical_name.encode()).hexdigest()[:4], 16)
         base = Decimal(3000 + seed % 1500)
         shares = Decimal(10 + seed % 10)
@@ -139,7 +141,7 @@ class FundamentalService:
         self.p = p or FixtureFundamentalsProvider()
 
     def sync(self, actor: UUID, ids: list[UUID] | None = None):
-        user = CreditRagIndexService(self.s)._user(actor)
+        user = require_stock_actor(self.s, actor, write=True)
         companies = (
             list(self.s.scalars(select(ListedCompany).where(ListedCompany.id.in_(ids))))
             if ids
@@ -228,7 +230,7 @@ class ValuationService:
         )
 
     def build(self, listing_id, day, actor):
-        user = CreditRagIndexService(self.s)._user(actor)
+        user = require_stock_actor(self.s, actor, write=True)
         listing = self.s.get(StockListing, listing_id)
         if not listing:
             raise AppError("STOCK_LISTING_NOT_FOUND", "Stock listing not found", 404)
@@ -400,7 +402,7 @@ class RelativeMetricService:
         sector: str | None = None,
         industry: str | None = None,
     ) -> list[SectorMetricRun]:
-        CreditRagIndexService(self.s)._user(actor)
+        require_stock_actor(self.s, actor, write=True)
         company_query = select(ListedCompany)
         if sector:
             company_query = company_query.where(ListedCompany.sector == sector)
@@ -613,7 +615,7 @@ class FeatureService:
         )
 
     def build(self, listing_id: UUID, as_of: date, actor: UUID) -> StockFeatureRun:
-        user = CreditRagIndexService(self.s)._user(actor)
+        user = require_stock_actor(self.s, actor, write=True)
         listing = self.s.get(StockListing, listing_id)
         if listing is None:
             raise AppError("STOCK_LISTING_NOT_FOUND", "Stock listing not found", 404)

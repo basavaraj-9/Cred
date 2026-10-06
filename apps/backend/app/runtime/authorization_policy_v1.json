@@ -1,0 +1,73 @@
+{
+  "version": "authorization_policy_v1",
+  "roles": {
+    "VIEWER": [
+      "DOCUMENT_READ",
+      "COMPANY_READ",
+      "REPORT_READ",
+      "STOCK_RESEARCH_READ",
+      "MONITORING_READ"
+    ],
+    "CREDIT_ANALYST": [
+      "DOCUMENT_READ",
+      "DOCUMENT_UPLOAD",
+      "COMPANY_READ",
+      "CREDIT_ANALYZE",
+      "CREDIT_REVIEW",
+      "REPORT_READ",
+      "REPORT_GENERATE"
+    ],
+    "SENIOR_CREDIT_REVIEWER": [
+      "DOCUMENT_READ",
+      "DOCUMENT_UPLOAD",
+      "COMPANY_READ",
+      "CREDIT_ANALYZE",
+      "CREDIT_REVIEW",
+      "REPORT_READ",
+      "REPORT_GENERATE",
+      "REPORT_FINALIZE"
+    ],
+    "CREDIT_MANAGER": [
+      "DOCUMENT_READ",
+      "DOCUMENT_UPLOAD",
+      "COMPANY_READ",
+      "CREDIT_ANALYZE",
+      "CREDIT_REVIEW",
+      "CREDIT_DECIDE",
+      "REPORT_READ",
+      "REPORT_GENERATE",
+      "REPORT_FINALIZE"
+    ],
+    "CREDIT_COMMITTEE_MEMBER": [
+      "DOCUMENT_READ",
+      "COMPANY_READ",
+      "CREDIT_REVIEW",
+      "CREDIT_DECIDE",
+      "REPORT_READ",
+      "REPORT_GENERATE",
+      "REPORT_FINALIZE"
+    ],
+    "RESEARCH_ANALYST": [
+      "COMPANY_READ",
+      "STOCK_RESEARCH_READ",
+      "STOCK_RESEARCH_BUILD",
+      "MONITORING_READ",
+      "REPORT_READ"
+    ],
+    "ADMIN": [
+      "DOCUMENT_READ",
+      "DOCUMENT_UPLOAD",
+      "COMPANY_READ",
+      "CREDIT_ANALYZE",
+      "CREDIT_REVIEW",
+      "CREDIT_DECIDE",
+      "REPORT_READ",
+      "REPORT_GENERATE",
+      "REPORT_FINALIZE",
+      "STOCK_RESEARCH_READ",
+      "STOCK_RESEARCH_BUILD",
+      "MONITORING_READ",
+      "ADMIN_RUNTIME"
+    ]
+  }
+}

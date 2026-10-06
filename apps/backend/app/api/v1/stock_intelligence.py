@@ -18,7 +18,7 @@ from app.models.stock_intelligence import (
     StockRankingMember,
     StockRankingRun,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 from app.services.stock_intelligence.service import StockIntelligenceService
 
 router = APIRouter(prefix="/stock-intelligence", tags=["stock intelligence research"])
@@ -167,7 +167,7 @@ def build_score(body: ScoreBuild, session: Session = Depends(get_db)) -> dict[st
 def get_score(
     score_run_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     run = session.get(StockIntelligenceRun, score_run_id)
     if run is None:
         raise AppError("STOCK_INTELLIGENCE_NOT_FOUND", "Stock intelligence score not found", 404)
@@ -183,7 +183,7 @@ def list_scores(
     status: str | None = None,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     query = select(StockIntelligenceRun)
     if listing:
         query = query.where(StockIntelligenceRun.stock_listing_id == listing)
@@ -203,7 +203,7 @@ def list_scores(
 def get_components(
     score_run_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     return components_payload(session, score_run_id)
 
 
@@ -211,7 +211,7 @@ def get_components(
 def get_explanation(
     score_run_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     run = session.get(StockIntelligenceRun, score_run_id)
     if run is None:
         raise AppError("STOCK_INTELLIGENCE_NOT_FOUND", "Stock intelligence score not found", 404)
@@ -240,7 +240,7 @@ def build_ranking(body: RankingBuild, session: Session = Depends(get_db)) -> dic
 def get_ranking(
     ranking_run_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     run = session.get(StockRankingRun, ranking_run_id)
     if run is None:
         raise AppError("STOCK_RANKING_NOT_FOUND", "Stock ranking not found", 404)

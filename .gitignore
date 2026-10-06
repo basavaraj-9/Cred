@@ -44,3 +44,5 @@ storage/research/*
 storage/day*-smoke/
 
 apps/backend/.test-tmp*/
+apps/backend/.t[0-9]*/
+apps/backend/.audit-venv/

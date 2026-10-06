@@ -1,22 +1,21 @@
+"use client";
+import { useState } from "react";
 import Link from "next/link";
 import { getCreditMLEvaluations } from "@/lib/api";
 import type { CreditMLEvaluationSummary } from "@/types/api";
 
-export const dynamic = "force-dynamic";
-
-export default async function ModelValidationPage() {
-  let evaluations: CreditMLEvaluationSummary[] = [];
-  let unavailable = false;
-  try {
-    evaluations = await getCreditMLEvaluations();
-  } catch {
-    unavailable = true;
+export default function ModelValidationPage() {
+  const [evaluations, setEvaluations] = useState<CreditMLEvaluationSummary[]>([]);
+  const [unavailable, setUnavailable] = useState(false);
+  async function load() {
+    try { setEvaluations(await getCreditMLEvaluations()); setUnavailable(false); }
+    catch { setUnavailable(true); }
   }
   const latest = evaluations[0];
   return <>
     <Link href="/">← Home</Link>
     <p className="eyebrow">Internal model validation</p>
-    <h1>Credit ML evaluation</h1>
+    <h1>Credit ML evaluation</h1><button onClick={() => void load()}>Load evaluations</button>
     <Link className="button" href="/credit-fusion">Open fusion experiments →</Link>
     <div className="validation-warning">
       <strong>Development synthetic dataset</strong>

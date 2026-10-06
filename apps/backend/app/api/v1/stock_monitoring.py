@@ -22,7 +22,7 @@ from app.models.stock_monitoring import (
     StockRankingMonitoring,
     StockScoreMonitoring,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 from app.services.stock_monitoring.service import StockMonitoringService
 
 router = APIRouter(prefix="/stock-monitoring", tags=["stock monitoring"])
@@ -90,7 +90,7 @@ def list_runs(
     readiness: str | None = None,
     session: Session = Depends(get_db),
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     query = select(StockMonitoringRun)
     if status:
         query = query.where(StockMonitoringRun.status == status)
@@ -108,7 +108,7 @@ def list_runs(
 def get_run(
     run_id: UUID, actor_user_id: UUID, session: Session = Depends(get_db)
 ) -> dict[str, object]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     return run_payload(_run(session, run_id))
 
 
@@ -118,7 +118,7 @@ def _rows(
     actor_user_id: UUID,
     model: Any,
 ) -> list[dict[str, object]]:
-    CreditRagIndexService(session)._user(actor_user_id)
+    require_stock_actor(session, actor_user_id)
     _run(session, run_id)
     items: list[Any] = list(session.scalars(select(model).where(model.monitoring_run_id == run_id)))
     return [

@@ -45,7 +45,7 @@ from app.models.stock_validation import (
     StockIntelligenceValidationPeriod,
     StockIntelligenceValidationRun,
 )
-from app.services.rag.service import CreditRagIndexService
+from app.services.stock.authorization import require_stock_actor
 from app.services.stock_intelligence.service import COMPONENT_NAMES
 from app.services.stock_monitoring.psi import PsiResult, population_stability_index
 from app.services.stock_validation.statistics import spearman
@@ -195,7 +195,7 @@ class StockMonitoringService:
         current_end: date,
         actor_id: UUID,
     ) -> StockMonitoringRun:
-        actor = CreditRagIndexService(self.s)._user(actor_id)
+        actor = require_stock_actor(self.s, actor_id, write=True)
         self._validate_windows(reference_start, reference_end, current_start, current_end)
         ref_scores = self._window_score_runs(reference_start, reference_end)
         cur_scores = self._window_score_runs(current_start, current_end)

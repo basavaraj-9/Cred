@@ -1,5 +1,7 @@
 "use client";
 
+import { useRuntimeActor } from "@/lib/use-runtime-actor";
+import { apiFetch, downloadArtifact } from "@/lib/http";
 import { FormEvent, useState } from "react";
 import { BROWSER_API_BASE_URL, API_V1_PATH } from "@/lib/config";
 
@@ -18,7 +20,8 @@ function Details({ value }: { value: Value }) {
 
 export function CompanyIntelligenceReports({ initialPreview = null, initialTab = "summary" }: { initialPreview?: Snapshot | null; initialTab?: string } = {}) {
   const [company, setCompany] = useState("");
-  const [actor, setActor] = useState("");
+  const [actor, setActor] = useRuntimeActor();
+  const [queuedJob, setQueuedJob] = useState("");
   const [job, setJob] = useState("");
   const [asOf, setAsOf] = useState("");
   const [credit, setCredit] = useState(true);
@@ -26,6 +29,8 @@ export function CompanyIntelligenceReports({ initialPreview = null, initialTab =
   const [reports, setReports] = useState<Report[]>([]);
   const [preview, setPreview] = useState<Snapshot | null>(initialPreview);
   const [evidence, setEvidence] = useState<Value>([]);
+  const [selectedReport, setSelectedReport] = useState("");
+  const [evidencePage, setEvidencePage] = useState(0);
   const [tab, setTab] = useState(initialTab);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -33,7 +38,7 @@ export function CompanyIntelligenceReports({ initialPreview = null, initialTab =
   const [rationale, setRationale] = useState("");
 
   async function request<T>(path: string, body?: Record<string, unknown>): Promise<T> {
-    const response = await fetch(`${root}${path}${path.includes("?") ? "&" : "?"}actor_user_id=${encodeURIComponent(actor)}`, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, actor_user_id: actor }) } : { cache: "no-store" });
+    const response = await apiFetch(`${root}${path}${path.includes("?") ? "&" : "?"}actor_user_id=${encodeURIComponent(actor)}`, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...body, actor_user_id: actor }) } : { cache: "no-store" });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload?.error?.message ?? `Request failed (${response.status})`);
     return payload as T;
@@ -45,11 +50,22 @@ export function CompanyIntelligenceReports({ initialPreview = null, initialTab =
   async function refresh() { setReports(await request<Report[]>(`?company=${encodeURIComponent(company)}`)); }
   async function inspect(id: string) {
     const [snapshot, links] = await Promise.all([request<Snapshot>(`/${id}/snapshot`), request<Value>(`/${id}/evidence`)]);
-    setPreview(snapshot); setEvidence(links); setTab("summary");
+    setPreview(snapshot); setEvidence(links); setTab("summary"); setSelectedReport(id); setEvidencePage(0);
+  }
+  async function loadEvidence(page: number) {
+    setEvidence(await request<Value>(`/${selectedReport}/evidence?limit=100&offset=${page * 100}`));
+    setEvidencePage(page);
   }
   function generate(event: FormEvent) {
     event.preventDefault();
-    void run(async () => { const report = await request<Report>("", { company_id: company, analysis_job_id: job || null, as_of_date: asOf || null, include_credit: credit, include_stock: stock }); await refresh(); await inspect(report.id); });
+    void run(async () => {
+      const response = await apiFetch(`${BROWSER_API_BASE_URL}${API_V1_PATH}/jobs`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ job_type: "REPORT_360", idempotency_key: crypto.randomUUID(), company_id: company, analysis_job_id: job || null, as_of_date: asOf || null, include_credit: credit, include_stock: stock }),
+      });
+      if (!response.ok) throw new Error("Report could not be queued");
+      setQueuedJob((await response.json()).id);
+    });
   }
   const tabs = ["summary", "company_profile", "documents", "financials", "credit", "stock", "validation", "monitoring", "evidence"];
   return <>
@@ -60,20 +76,20 @@ export function CompanyIntelligenceReports({ initialPreview = null, initialTab =
       <label htmlFor="ci-date">Analytical as-of date</label><input id="ci-date" type="date" value={asOf} onChange={e => setAsOf(e.target.value)} />
       <label><input type="checkbox" checked={credit} onChange={e => setCredit(e.target.checked)} /> Include credit</label>
       <label><input type="checkbox" checked={stock} onChange={e => setStock(e.target.checked)} /> Include stock research</label>
-      <button disabled={busy}>Generate snapshot</button> <button type="button" disabled={busy || !company || !actor} onClick={() => void run(refresh)}>Load versions</button>
-    </form><p role="alert">{error}</p><p aria-live="polite">{busy ? "Processing report…" : ""}</p></section>
+      <button disabled={busy}>Queue snapshot</button> <button type="button" disabled={busy || !company || !actor} onClick={() => void run(refresh)}>Load versions</button>
+    </form><p role="alert">{error}</p><p aria-live="polite">{busy ? "Processing request…" : queuedJob ? "Report queued. Check Jobs and system status, then load versions when complete." : ""}</p></section>
     <section><h2>Report versions</h2><div className="card-grid">{reports.map(report => <article className="research-card" key={report.id}>
       <h3>{report.company_name ?? "Company report"} · Version {report.report_version}</h3><p>{report.status} · {report.readiness_status}</p><p>Monitoring health: {report.monitoring_health ?? "Unavailable"}</p><p>As of {report.analytical_as_of_date}<br />Generated {new Date(report.generated_at).toLocaleString()}</p>
       <p>Completeness: {(Number(report.completeness_ratio) * 100).toFixed(0)}% · Evidence coverage: {(Number(report.evidence_coverage) * 100).toFixed(0)}%</p><p>Credit {report.include_credit ? "included" : "excluded"} · Stock {report.include_stock ? "included" : "excluded"}</p>
       <button disabled={busy} onClick={() => void run(() => inspect(report.id))}>Preview and evidence</button>{["READY", "NEEDS_REVIEW"].includes(report.status) && <button disabled={busy} onClick={() => void run(async () => { await request(`/${report.id}/finalize`, { rationale }); await refresh(); })}>Finalize</button>}
       {report.status === "FINALIZED" && <button disabled={busy || !successor || !rationale} onClick={() => void run(async () => { await request(`/${report.id}/supersede`, { successor_report_id: successor, rationale }); await refresh(); })}>Supersede with selected version</button>}
-      <p>{["json", "pdf"].map(format => <a key={format} className="button" href={`${root}/${report.id}/artifacts/${format}?actor_user_id=${encodeURIComponent(actor)}`}>Download {format.toUpperCase()} </a>)}</p>
+      <p>{["json", "pdf"].map(format => <button key={format} className="button" onClick={() => void run(() => downloadArtifact(`${root}/${report.id}/artifacts/${format}?actor_user_id=${encodeURIComponent(actor)}`, `company-report.${format}`))}>Download {format.toUpperCase()} </button>)}</p>
     </article>)}</div>{reports.length === 0 && <p>No report versions loaded.</p>}
       <label htmlFor="ci-successor">Successor version</label><select id="ci-successor" value={successor} onChange={e => setSuccessor(e.target.value)}><option value="">Select a newer report</option>{reports.map(report => <option key={report.id} value={report.id}>Version {report.report_version} · {report.status}</option>)}</select>
       <label htmlFor="ci-rationale">Finalization / supersession rationale</label><input id="ci-rationale" value={rationale} onChange={e => setRationale(e.target.value)} />
     </section>
     {preview && <section><h2>Saved report preview</h2><p className="validation-warning">{preview.payload.credit_stock_separation}</p><nav aria-label="Report sections">{tabs.map(item => <button key={item} aria-pressed={tab === item} onClick={() => setTab(item)}>{label(item)}</button>)}</nav>
-      {tab === "summary" ? <><h3>Executive summary</h3><Details value={preview.payload.executive_summary} /><h3>Conflicts requiring review</h3><Details value={preview.payload.conflicts} /><details><summary>Snapshot manifest and hash</summary><p>{preview.payload_hash}</p><Details value={preview.payload.manifest} /></details></> : tab === "evidence" ? <><h3>Evidence inspection</h3><Details value={evidence} /></> : <><h3>{tab === "credit" ? "Credit Assessment" : tab === "stock" ? "Stock Intelligence Research" : label(tab)}</h3><p>{preview.payload.sections[tab]?.status ?? "UNAVAILABLE"}</p><Details value={preview.payload.sections[tab]?.data ?? null} /></>}
+      {tab === "summary" ? <><h3>Executive summary</h3><Details value={preview.payload.executive_summary} /><h3>Conflicts requiring review</h3><Details value={preview.payload.conflicts} /><details><summary>Snapshot manifest and hash</summary><p>{preview.payload_hash}</p><Details value={preview.payload.manifest} /></details></> : tab === "evidence" ? <><h3>Evidence inspection</h3><p>Page {evidencePage + 1} · up to 100 links</p><button disabled={busy || !selectedReport || evidencePage === 0} onClick={() => void run(() => loadEvidence(evidencePage - 1))}>Previous evidence</button><button disabled={busy || !selectedReport || !Array.isArray(evidence) || evidence.length < 100} onClick={() => void run(() => loadEvidence(evidencePage + 1))}>Next evidence</button><Details value={evidence} /></> : <><h3>{tab === "credit" ? "Credit Assessment" : tab === "stock" ? "Stock Intelligence Research" : label(tab)}</h3><p>{preview.payload.sections[tab]?.status ?? "UNAVAILABLE"}</p><Details value={preview.payload.sections[tab]?.data ?? null} /></>}
       {Object.values(preview.payload.disclaimers).map(text => <p className="validation-warning" key={text}>{text}</p>)}
     </section>}
   </>;

@@ -1,0 +1,38 @@
+{
+  "version": "production_runtime_policy_v1",
+  "max_page_size": 200,
+  "max_date_range_days": 3650,
+  "max_payload_references": 100,
+  "auto_credit_approval": false,
+  "live_stock_predictions": false,
+  "automated_trading": false,
+  "production_stock_model": false,
+  "analytics_status": "NON_PRODUCTION_ANALYTICS",
+  "configuration_classes": {
+    "PUBLIC_CONFIG": [
+      "app_name",
+      "app_version"
+    ],
+    "SECRET_CONFIG": [
+      "database_url",
+      "auth_signing_key",
+      "redis_url"
+    ],
+    "ENVIRONMENT_SPECIFIC": [
+      "app_env",
+      "allowed_origins",
+      "trusted_hosts",
+      "local_storage_path"
+    ],
+    "OPERATIONAL_LIMIT": [
+      "request_timeout_seconds",
+      "job_timeout_seconds",
+      "max_upload_size_mb",
+      "worker_concurrency"
+    ],
+    "POLICY_CONFIG": [
+      "authorization_policy_v1",
+      "job_retry_policy_v1"
+    ]
+  }
+}

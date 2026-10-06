@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import hashlib
 from datetime import date
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query
@@ -14,6 +14,7 @@ from app.core.config import Settings, get_settings
 from app.core.exceptions import AppError
 from app.database.session import get_db
 from app.models.reporting import GeneratedReport, ReportArtifact, ReportSnapshot, ReportSourceLink
+from app.runtime.storage import checked_artifact
 from app.services.reporting.company_intelligence import (
     REPORT_TYPE,
     CompanyIntelligenceReportService,
@@ -144,6 +145,8 @@ def evidence(
     actor_user_id: UUID,
     session: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+    offset: Annotated[int, Query(ge=0, le=100000)] = 0,
 ) -> list[dict[str, object]]:
     CompanyIntelligenceReportService(session, settings.storage_root)._user(actor_user_id)
     _report(session, report_id)
@@ -158,7 +161,11 @@ def evidence(
         for item in session.scalars(
             select(ReportSourceLink)
             .where(ReportSourceLink.generated_report_id == report_id)
-            .order_by(ReportSourceLink.lineage_role, ReportSourceLink.source_type)
+            .order_by(
+                ReportSourceLink.lineage_role, ReportSourceLink.source_type, ReportSourceLink.id
+            )
+            .offset(offset)
+            .limit(limit)
         )
     ]
 
@@ -180,11 +187,19 @@ def _artifact(
     )
     if item is None:
         raise AppError("REPORT_ARTIFACT_NOT_FOUND", "Report artifact not found", 404)
-    path = (settings.storage_root / item.storage_path).resolve()
-    if not path.is_relative_to(settings.storage_root.resolve()) or not path.is_file():
-        raise AppError("REPORT_ARTIFACT_UNAVAILABLE", "Report artifact unavailable", 404)
-    if hashlib.sha256(path.read_bytes()).hexdigest() != item.sha256:
-        raise AppError("REPORT_ARTIFACT_INTEGRITY_FAILED", "Artifact hash mismatch", 409)
+    try:
+        path = checked_artifact(settings.storage_root, item.storage_path, item.sha256)
+    except AppError as exc:
+        code = (
+            "REPORT_ARTIFACT_INTEGRITY_FAILED"
+            if exc.status_code == 409
+            else "REPORT_ARTIFACT_UNAVAILABLE"
+        )
+        raise AppError(
+            code,
+            "Report artifact unavailable or integrity check failed",
+            409 if exc.status_code == 409 else 404,
+        ) from exc
     return FileResponse(path, media_type=item.mime_type, filename=path.name)
 
 
